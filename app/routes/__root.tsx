@@ -6,6 +6,8 @@ import {
   Scripts,
 } from '@tanstack/react-router'
 import appCss from "@/styles/globals.css?url"
+import { ThemeProvider } from '@/providers/theme-provider'
+import AppLayout from '@/components/layout/app-layout'
 
 export const Route = createRootRoute({
   head: () => ({
@@ -41,12 +43,14 @@ function RootComponent() {
 
 function RootDocument({ children }: Readonly<{ children: ReactNode }>) {
   return (
-    <html>
+    <html className='dark'>
       <head>
         <HeadContent />
       </head>
       <body>
-        {children}
+        <ThemeProvider defaultTheme="dark" storageKey="theme">
+          <AppLayout>{children}</AppLayout>
+        </ThemeProvider>
         <Scripts />
       </body>
     </html>
