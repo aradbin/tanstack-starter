@@ -3,8 +3,8 @@ import {
   SidebarProvider,
   SidebarTrigger,
 } from "@/components/ui/sidebar"
-import { Breadcrumbs } from "@/components/layout/app-layout/breadcrumbs"
 import { AppSidebar } from "@/components/layout/app-layout/app-sidebar"
+import { Breadcrumbs } from "@/components/layout/app-layout/breadcrumbs"
 
 export default function AppLayout({ children }: { children: React.ReactNode }) {
   return (

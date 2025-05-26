@@ -1,3 +1,7 @@
+import { type ComponentPropsWithoutRef } from "react"
+import { Link } from "@tanstack/react-router"
+
+import { NavItem } from "@/lib/types"
 import {
   SidebarGroup,
   SidebarGroupContent,
@@ -5,9 +9,6 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
 } from "@/components/ui/sidebar"
-import { NavItem } from "@/lib/types"
-import { Link } from "@tanstack/react-router"
-import { type ComponentPropsWithoutRef } from "react"
 
 export function NavFooter({
   items,

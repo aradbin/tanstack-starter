@@ -1,5 +1,6 @@
-import { Link } from "@tanstack/react-router"
 import { Fragment } from "react"
+import { Link } from "@tanstack/react-router"
+
 import {
   Breadcrumb,
   BreadcrumbItem,

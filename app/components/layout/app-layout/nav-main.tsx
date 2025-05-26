@@ -1,3 +1,6 @@
+import { Link } from "@tanstack/react-router"
+
+import { NavItem } from "@/lib/types"
 import {
   SidebarGroup,
   SidebarGroupLabel,
@@ -5,8 +8,6 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
 } from "@/components/ui/sidebar"
-import { NavItem } from "@/lib/types"
-import { Link } from "@tanstack/react-router"
 
 export function NavMain({ items = [] }: { items: NavItem[] }) {
   // const page = usePage();

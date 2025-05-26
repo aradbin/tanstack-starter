@@ -1,16 +1,17 @@
+import { ChevronsUpDown } from "lucide-react"
+
+import { useIsMobile } from "@/hooks/use-mobile"
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
 import {
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
   useSidebar,
 } from "@/components/ui/sidebar"
-import { useIsMobile } from "@/hooks/use-mobile"
-import { ChevronsUpDown } from "lucide-react"
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
 import { UserInfo } from "@/components/layout/app-layout/user-info"
 import { UserMenuContent } from "@/components/layout/app-layout/user-menu-content"
 

@@ -1,3 +1,7 @@
+import { Link } from "@tanstack/react-router"
+import { BookOpen, Folder, LayoutGrid } from "lucide-react"
+
+import { NavItem } from "@/lib/types"
 import {
   Sidebar,
   SidebarContent,
@@ -7,11 +11,8 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
 } from "@/components/ui/sidebar"
-import { BookOpen, Folder, LayoutGrid } from "lucide-react"
-import { Link } from "@tanstack/react-router"
-import { NavItem } from "@/lib/types"
-import { NavMain } from "@/components/layout/app-layout/nav-main"
 import { NavFooter } from "@/components/layout/app-layout/nav-footer"
+import { NavMain } from "@/components/layout/app-layout/nav-main"
 import { NavUser } from "@/components/layout/app-layout/nav-user"
 
 const mainNavItems: NavItem[] = [

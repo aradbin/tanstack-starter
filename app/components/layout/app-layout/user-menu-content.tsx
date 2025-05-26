@@ -1,3 +1,7 @@
+import { Link } from "@tanstack/react-router"
+import { LogOut, Settings } from "lucide-react"
+
+import { useMobileNavigation } from "@/hooks/use-mobile-navigation"
 import {
   DropdownMenuGroup,
   DropdownMenuItem,
@@ -5,9 +9,6 @@ import {
   DropdownMenuSeparator,
 } from "@/components/ui/dropdown-menu"
 import { UserInfo } from "@/components/layout/app-layout/user-info"
-import { Link } from "@tanstack/react-router"
-import { LogOut, Settings } from "lucide-react"
-import { useMobileNavigation } from "@/hooks/use-mobile-navigation"
 
 interface UserMenuContentProps {
   user: any
