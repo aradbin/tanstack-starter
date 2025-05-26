@@ -30,10 +30,11 @@ export function ThemeProvider({
 
   useEffect(() => {
     // Access localStorage only on client side
-    const savedTheme = typeof window !== 'undefined' 
-      ? localStorage.getItem(storageKey) as Theme 
-      : null
-    
+    const savedTheme =
+      typeof window !== "undefined"
+        ? (localStorage.getItem(storageKey) as Theme)
+        : null
+
     if (savedTheme) {
       setTheme(savedTheme)
     }
@@ -60,7 +61,7 @@ export function ThemeProvider({
   const value = {
     theme,
     setTheme: (theme: Theme) => {
-      if (typeof window !== 'undefined') {
+      if (typeof window !== "undefined") {
         localStorage.setItem(storageKey, theme)
       }
       setTheme(theme)
