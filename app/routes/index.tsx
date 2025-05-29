@@ -10,7 +10,7 @@ export const Route = createFileRoute("/")({
 function Home() {
   return (
     <div>
-      <Button
+      {/* <Button
         onClick={async () => {
           const { data, error } = await authClient.signUp.email({
             email: "email@example.com",
@@ -18,7 +18,7 @@ function Home() {
             name: "User",
           })
         }}
-      ></Button>
+      ></Button> */}
     </div>
   )
 }

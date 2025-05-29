@@ -1,7 +1,7 @@
 import { type ComponentPropsWithoutRef } from "react"
 import { Link } from "@tanstack/react-router"
 
-import { NavItem } from "@/lib/types"
+import { footerNavItems } from "@/lib/variables"
 import {
   SidebarGroup,
   SidebarGroupContent,
@@ -11,12 +11,9 @@ import {
 } from "@/components/ui/sidebar"
 
 export function NavFooter({
-  items,
   className,
   ...props
-}: ComponentPropsWithoutRef<typeof SidebarGroup> & {
-  items: NavItem[]
-}) {
+}: ComponentPropsWithoutRef<typeof SidebarGroup>) {
   return (
     <SidebarGroup
       {...props}
@@ -24,7 +21,7 @@ export function NavFooter({
     >
       <SidebarGroupContent>
         <SidebarMenu>
-          {items.map((item) => (
+          {footerNavItems.map((item) => (
             <SidebarMenuItem key={item.title}>
               <SidebarMenuButton
                 asChild

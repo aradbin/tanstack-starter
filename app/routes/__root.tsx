@@ -44,12 +44,12 @@ function RootComponent() {
 
 function RootDocument({ children }: Readonly<{ children: ReactNode }>) {
   return (
-    <html className="dark">
+    <html className="dark" lang="en" dir="ltr" suppressHydrationWarning>
       <head>
         <HeadContent />
       </head>
-      <body>
-        <ThemeProvider defaultTheme="dark" storageKey="theme">
+      <body className="bg-background text-foreground antialiased overscroll-none">
+        <ThemeProvider defaultTheme="system" storageKey="mode">
           <AppLayout>{children}</AppLayout>
         </ThemeProvider>
         <Scripts />
