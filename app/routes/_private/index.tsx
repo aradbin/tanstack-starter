@@ -1,9 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router"
 
-import { authClient } from "@/lib/auth/client"
-import { Button } from "@/components/ui/button"
-
-export const Route = createFileRoute("/")({
+export const Route = createFileRoute("/_private/")({
   component: Home,
 })
 

@@ -50,7 +50,7 @@ function RootDocument({ children }: Readonly<{ children: ReactNode }>) {
       </head>
       <body className="bg-background text-foreground antialiased overscroll-none">
         <ThemeProvider defaultTheme="system" storageKey="mode">
-          <AppLayout>{children}</AppLayout>
+          {children}
         </ThemeProvider>
         <Scripts />
       </body>
