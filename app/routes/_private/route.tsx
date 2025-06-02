@@ -14,7 +14,7 @@ export const Route = createFileRoute("/_private")({
     if (!context?.user) {
       throw redirect({
         to: "/login",
-        search: { from: location.href },
+        search: { redirect: location.href },
       })
     }
   },

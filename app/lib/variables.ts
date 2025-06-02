@@ -1,4 +1,4 @@
-import { BookOpen, Folder, LayoutGrid } from "lucide-react"
+import { LayoutGrid } from "lucide-react"
 
 import { NavigationType, NavItem } from "@/lib/types"
 

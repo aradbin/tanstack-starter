@@ -3,11 +3,9 @@ import { Button } from "@/components/ui/button"
 
 export default function AuthProviders() {
   const signIn = async () => {
-    const data = await authClient.signIn.social({
+    const { data, error } = await authClient.signIn.social({
       provider: "google",
     })
-
-    console.log(data)
   }
 
   return (
