@@ -1,6 +1,7 @@
-import { Link } from "@tanstack/react-router"
+import { Link, useNavigate, useRouteContext } from "@tanstack/react-router"
 import { LogOut, User, UserCog } from "lucide-react"
 
+import { authClient } from "@/lib/auth/client"
 import { getInitials } from "@/lib/utils"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Button } from "@/components/ui/button"
@@ -15,6 +16,9 @@ import {
 } from "@/components/ui/dropdown-menu"
 
 export function NavUser() {
+  const { user } = useRouteContext({ from: "/_private" })
+  const navigate = useNavigate()
+
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
@@ -25,9 +29,9 @@ export function NavUser() {
           aria-label="User"
         >
           <Avatar className="size-9">
-            <AvatarImage src="" alt="Avatar" />
+            <AvatarImage src={user?.image || ""} alt={user?.name} />
             <AvatarFallback className="bg-transparent">
-              {getInitials("John Doe")}
+              {getInitials(user?.name)}
             </AvatarFallback>
           </Avatar>
         </Button>
@@ -35,15 +39,15 @@ export function NavUser() {
       <DropdownMenuContent forceMount align="end">
         <DropdownMenuLabel className="flex gap-2">
           <Avatar>
-            <AvatarImage src="" alt="Avatar" />
+            <AvatarImage src={user?.image || ""} alt={user?.name} />
             <AvatarFallback className="bg-transparent">
-              {getInitials("John Doe")}
+              {getInitials(user?.name)}
             </AvatarFallback>
           </Avatar>
           <div className="flex flex-col overflow-hidden">
-            <p className="text-sm font-medium truncate">John Doe</p>
+            <p className="text-sm font-medium truncate">{user?.name}</p>
             <p className="text-xs text-muted-foreground font-semibold truncate">
-              johndoe@email.com
+              {user?.email}
             </p>
           </div>
         </DropdownMenuLabel>
@@ -63,7 +67,14 @@ export function NavUser() {
           </DropdownMenuItem>
         </DropdownMenuGroup>
         <DropdownMenuSeparator />
-        <DropdownMenuItem onClick={() => console.log("logout")}>
+        <DropdownMenuItem
+          onClick={async () => {
+            await authClient.signOut()
+            navigate({
+              to: "/login",
+            })
+          }}
+        >
           <LogOut className="me-2 size-4" />
           Sign Out
         </DropdownMenuItem>

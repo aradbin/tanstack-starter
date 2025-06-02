@@ -1,11 +1,21 @@
-import { createFileRoute, Outlet } from "@tanstack/react-router"
+import { createFileRoute, Outlet, redirect } from "@tanstack/react-router"
 import { GalleryVerticalEnd } from "lucide-react"
 
+import { getUser } from "@/lib/auth/functions"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 
 import AuthProviders from "./-auth-providers"
 
 export const Route = createFileRoute("/_auth")({
+  beforeLoad: async () => {
+    const user = await getUser()
+
+    if (user) {
+      throw redirect({
+        to: "/",
+      })
+    }
+  },
   component: RouteComponent,
 })
 

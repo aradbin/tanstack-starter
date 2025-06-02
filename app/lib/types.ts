@@ -13,13 +13,14 @@ export interface NavigationType {
   items?: NavItem[]
 }
 
-export interface User {
-  id: number
+export interface FieldType {
   name: string
-  email: string
-  avatar?: string
-  email_verified_at: string | null
-  created_at: string
-  updated_at: string
-  [key: string]: unknown // This allows for additional properties...
+  state: {
+    value: string
+  }
+  handleBlur: () => void
+  handleChange: (value: string) => void
+  type?: string
+  label?: string
+  placeholder?: string
 }

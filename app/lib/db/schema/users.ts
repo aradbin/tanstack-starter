@@ -5,10 +5,10 @@ import { timestamps } from "./columns.helpers"
 
 export const users = pgTable("users", {
   id: table.text().primaryKey(),
-  email: table.text().notNull().unique(),
   name: table.text().notNull(),
+  email: table.text().notNull().unique(),
   dob: table.date(),
-  avatar: table.text(),
+  image: table.text(),
   emailVerified: table
     .boolean("email_verified")
     .$defaultFn(() => false)
