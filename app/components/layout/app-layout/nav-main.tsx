@@ -1,7 +1,7 @@
 import { Link } from "@tanstack/react-router"
 import { ChevronDown } from "lucide-react"
 
-import { NavItem } from "@/lib/types"
+import { NavItemType } from "@/lib/types"
 import { mainNavItems } from "@/lib/variables"
 import { Badge } from "@/components/ui/badge"
 import {
@@ -23,7 +23,7 @@ import {
 export function NavMain() {
   const { openMobile, setOpenMobile } = useSidebar()
 
-  const renderMenuItem = (item: NavItem) => {
+  const renderMenuItem = (item: NavItemType) => {
     if (item?.items?.length) {
       return (
         <Collapsible className="group/collapsible">

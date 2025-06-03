@@ -1,16 +1,16 @@
 import { LucideIcon } from "lucide-react"
 
-export interface NavItem {
+export interface NavItemType {
   title?: string
   href?: string
   label?: string
   icon?: LucideIcon | null
-  items?: NavItem[]
+  items?: NavItemType[]
 }
 
 export interface NavigationType {
   title?: string
-  items?: NavItem[]
+  items?: NavItemType[]
 }
 
 export interface FieldType {

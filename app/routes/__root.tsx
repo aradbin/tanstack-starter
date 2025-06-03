@@ -4,10 +4,12 @@ import {
   createRootRoute,
   HeadContent,
   Outlet,
+  redirect,
   Scripts,
 } from "@tanstack/react-router"
 
-import AppLayout from "@/components/layout/app-layout"
+import { getUser } from "@/lib/auth/functions"
+import { authRoutes } from "@/lib/variables"
 import appCss from "@/styles/globals.css?url"
 
 export const Route = createRootRoute({
@@ -21,7 +23,7 @@ export const Route = createRootRoute({
         content: "width=device-width, initial-scale=1",
       },
       {
-        title: "TanStack Start Starter",
+        title: "TanStack Starter",
       },
     ],
     links: [
@@ -32,6 +34,23 @@ export const Route = createRootRoute({
     ],
   }),
   component: RootComponent,
+  beforeLoad: async () => {
+    const user = await getUser()
+    return { user }
+  },
+  loader: ({ context, location }) => {
+    if (!context?.user && !authRoutes.includes(location.pathname)) {
+      throw redirect({
+        to: "/login",
+        search: { redirect: location.href },
+      })
+    }
+    if (context?.user && authRoutes.includes(location.pathname)) {
+      throw redirect({
+        to: "/",
+      })
+    }
+  },
 })
 
 function RootComponent() {

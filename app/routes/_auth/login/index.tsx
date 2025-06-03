@@ -35,23 +35,24 @@ function RouteComponent() {
     },
     onSubmit: async ({ value }) => {
       setMessage(null)
-      const { data, error } = await authClient.signIn.email(value)
-      if (error) {
-        setMessage(error?.message)
-        return
-      }
-      if (data && !error) {
-        router.navigate({ to: "/" })
-      }
+      await authClient.signIn.email(value, {
+        onError(context) {
+          setMessage(
+            context.error.message || "Something went wrong. Please try again."
+          )
+        },
+        onSuccess() {
+          router.navigate({ to: "/" })
+        },
+      })
     },
   })
 
   return (
     <form
-      className="grid gap-6"
+      className="grid gap-4"
       onSubmit={(e) => {
         e.preventDefault()
-        e.stopPropagation()
         form.handleSubmit()
       }}
     >
@@ -70,9 +71,10 @@ function RouteComponent() {
               type="text"
               placeholder="example@email.com"
             />
-            {!field.state.meta.isValid &&
-              field.state.meta.errors.map((error) => (
-                <p className="text-sm font-medium text-destructive">
+            {field.state.meta.isTouched &&
+              !field.state.meta.isValid &&
+              field.state.meta.errors.map((error, index) => (
+                <p key={index} className="text-sm font-medium text-destructive">
                   {error?.message}
                 </p>
               ))}
@@ -102,9 +104,10 @@ function RouteComponent() {
               type="password"
               placeholder="••••••••"
             />
-            {!field.state.meta.isValid &&
-              field.state.meta.errors.map((error) => (
-                <p className="text-sm font-medium text-destructive">
+            {field.state.meta.isTouched &&
+              !field.state.meta.isValid &&
+              field.state.meta.errors.map((error, index) => (
+                <p key={index} className="text-sm font-medium text-destructive">
                   {error?.message}
                 </p>
               ))}
@@ -118,6 +121,8 @@ function RouteComponent() {
             type="submit"
             className="w-full cursor-pointer"
             disabled={isSubmitting}
+            aria-busy={isSubmitting}
+            aria-disabled={isSubmitting}
           >
             {isSubmitting ? (
               <>
@@ -131,8 +136,8 @@ function RouteComponent() {
         )}
       />
       {message && (
-        <Alert variant="destructive">
-          <AlertCircleIcon />
+        <Alert variant="destructive" className="border-destructive">
+          <AlertCircleIcon className="size-4" />
           <AlertTitle>{message}</AlertTitle>
         </Alert>
       )}

@@ -1,6 +1,13 @@
 import { LayoutGrid } from "lucide-react"
 
-import { NavigationType, NavItem } from "@/lib/types"
+import { NavigationType, NavItemType } from "@/lib/types"
+
+export const authRoutes = [
+  "/login",
+  "/register",
+  "/forgot-password",
+  "/reset-password",
+]
 
 export const mainNavItems: NavigationType[] = [
   {
@@ -47,4 +54,4 @@ export const mainNavItems: NavigationType[] = [
   },
 ]
 
-export const footerNavItems: NavItem[] = []
+export const footerNavItems: NavItemType[] = []

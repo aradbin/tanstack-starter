@@ -9,6 +9,10 @@ export const users = pgTable("users", {
   email: table.text().notNull().unique(),
   dob: table.date(),
   image: table.text(),
+  role: table.text(),
+  banned: table.boolean(),
+  banReason: table.text("ban_reason"),
+  banExpires: table.date("ban_expires"),
   emailVerified: table
     .boolean("email_verified")
     .$defaultFn(() => false)
@@ -23,6 +27,8 @@ export const sessions = pgTable("sessions", {
   token: table.text().notNull().unique(),
   ipAddress: table.text("ip_address"),
   userAgent: table.text("user_agent"),
+  impersonatedBy: table.text("impersonated_by"),
+  activeOrganizationId: table.text("active_organization_id"),
   userId: table
     .text("user_id")
     .notNull()
@@ -54,4 +60,43 @@ export const verifications = pgTable("verifications", {
   value: table.text().notNull(),
   expiresAt: table.timestamp("expires_at").notNull(),
   ...timestamps,
+})
+
+export const organizations = pgTable("organizations", {
+  id: table.text().primaryKey(),
+  name: table.text().notNull(),
+  slug: table.text().unique(),
+  logo: table.text(),
+  metadata: table.jsonb().notNull().default({}),
+  ...timestamps,
+})
+
+export const members = pgTable("members", {
+  id: table.text().primaryKey(),
+  role: table.text().default("member").notNull(),
+  organizationId: table
+    .text("organization_id")
+    .notNull()
+    .references(() => organizations.id, { onDelete: "cascade" }),
+  userId: table
+    .text("user_id")
+    .notNull()
+    .references(() => users.id, { onDelete: "cascade" }),
+  ...timestamps,
+})
+
+export const invitations = pgTable("invitations", {
+  id: table.text().primaryKey(),
+  email: table.text().notNull(),
+  role: table.text(),
+  status: table.text().default("pending").notNull(),
+  expiresAt: table.timestamp("expires_at").notNull(),
+  organizationId: table
+    .text("organization_id")
+    .notNull()
+    .references(() => organizations.id, { onDelete: "cascade" }),
+  inviterId: table
+    .text("inviter_id")
+    .notNull()
+    .references(() => users.id, { onDelete: "cascade" }),
 })

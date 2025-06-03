@@ -2,7 +2,7 @@ import { Link, useNavigate, useRouteContext } from "@tanstack/react-router"
 import { LogOut, User, UserCog } from "lucide-react"
 
 import { authClient } from "@/lib/auth/client"
-import { getInitials } from "@/lib/utils"
+import { useInitials } from "@/hooks/use-initials"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Button } from "@/components/ui/button"
 import {
@@ -17,6 +17,7 @@ import {
 
 export function NavUser() {
   const { user } = useRouteContext({ from: "/_private" })
+  const getInitials = useInitials()
   const navigate = useNavigate()
 
   return (
