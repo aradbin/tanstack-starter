@@ -16,6 +16,7 @@ import { Route as AuthRouteImport } from './routes/_auth/route'
 import { Route as PrivateIndexImport } from './routes/_private/index'
 import { Route as AuthRegisterIndexImport } from './routes/_auth/register/index'
 import { Route as AuthLoginIndexImport } from './routes/_auth/login/index'
+import { Route as AuthRegisterOrganizationImport } from './routes/_auth/register/organization'
 
 // Create/Update Routes
 
@@ -47,6 +48,12 @@ const AuthLoginIndexRoute = AuthLoginIndexImport.update({
   getParentRoute: () => AuthRouteRoute,
 } as any)
 
+const AuthRegisterOrganizationRoute = AuthRegisterOrganizationImport.update({
+  id: '/register/organization',
+  path: '/register/organization',
+  getParentRoute: () => AuthRouteRoute,
+} as any)
+
 // Populate the FileRoutesByPath interface
 
 declare module '@tanstack/react-router' {
@@ -72,6 +79,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof PrivateIndexImport
       parentRoute: typeof PrivateRouteImport
     }
+    '/_auth/register/organization': {
+      id: '/_auth/register/organization'
+      path: '/register/organization'
+      fullPath: '/register/organization'
+      preLoaderRoute: typeof AuthRegisterOrganizationImport
+      parentRoute: typeof AuthRouteImport
+    }
     '/_auth/login/': {
       id: '/_auth/login/'
       path: '/login'
@@ -92,11 +106,13 @@ declare module '@tanstack/react-router' {
 // Create and export the route tree
 
 interface AuthRouteRouteChildren {
+  AuthRegisterOrganizationRoute: typeof AuthRegisterOrganizationRoute
   AuthLoginIndexRoute: typeof AuthLoginIndexRoute
   AuthRegisterIndexRoute: typeof AuthRegisterIndexRoute
 }
 
 const AuthRouteRouteChildren: AuthRouteRouteChildren = {
+  AuthRegisterOrganizationRoute: AuthRegisterOrganizationRoute,
   AuthLoginIndexRoute: AuthLoginIndexRoute,
   AuthRegisterIndexRoute: AuthRegisterIndexRoute,
 }
@@ -120,6 +136,7 @@ const PrivateRouteRouteWithChildren = PrivateRouteRoute._addFileChildren(
 export interface FileRoutesByFullPath {
   '': typeof PrivateRouteRouteWithChildren
   '/': typeof PrivateIndexRoute
+  '/register/organization': typeof AuthRegisterOrganizationRoute
   '/login': typeof AuthLoginIndexRoute
   '/register': typeof AuthRegisterIndexRoute
 }
@@ -127,6 +144,7 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '': typeof AuthRouteRouteWithChildren
   '/': typeof PrivateIndexRoute
+  '/register/organization': typeof AuthRegisterOrganizationRoute
   '/login': typeof AuthLoginIndexRoute
   '/register': typeof AuthRegisterIndexRoute
 }
@@ -136,20 +154,22 @@ export interface FileRoutesById {
   '/_auth': typeof AuthRouteRouteWithChildren
   '/_private': typeof PrivateRouteRouteWithChildren
   '/_private/': typeof PrivateIndexRoute
+  '/_auth/register/organization': typeof AuthRegisterOrganizationRoute
   '/_auth/login/': typeof AuthLoginIndexRoute
   '/_auth/register/': typeof AuthRegisterIndexRoute
 }
 
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '' | '/' | '/login' | '/register'
+  fullPaths: '' | '/' | '/register/organization' | '/login' | '/register'
   fileRoutesByTo: FileRoutesByTo
-  to: '' | '/' | '/login' | '/register'
+  to: '' | '/' | '/register/organization' | '/login' | '/register'
   id:
     | '__root__'
     | '/_auth'
     | '/_private'
     | '/_private/'
+    | '/_auth/register/organization'
     | '/_auth/login/'
     | '/_auth/register/'
   fileRoutesById: FileRoutesById
@@ -182,6 +202,7 @@ export const routeTree = rootRoute
     "/_auth": {
       "filePath": "_auth/route.tsx",
       "children": [
+        "/_auth/register/organization",
         "/_auth/login/",
         "/_auth/register/"
       ]
@@ -195,6 +216,10 @@ export const routeTree = rootRoute
     "/_private/": {
       "filePath": "_private/index.tsx",
       "parent": "/_private"
+    },
+    "/_auth/register/organization": {
+      "filePath": "_auth/register/organization.tsx",
+      "parent": "/_auth"
     },
     "/_auth/login/": {
       "filePath": "_auth/login/index.tsx",

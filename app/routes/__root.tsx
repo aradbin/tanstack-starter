@@ -39,15 +39,32 @@ export const Route = createRootRoute({
     return { user }
   },
   loader: ({ context, location }) => {
-    if (!context?.user && !authRoutes.includes(location.pathname)) {
+    console.log("context", context)
+    const isAuthRoute = authRoutes.includes(location.pathname)
+    const isLoggedIn = !!context?.user
+    const hasMembers = !!context?.user?.members?.length
+
+    if (!isLoggedIn && !isAuthRoute) {
       throw redirect({
         to: "/login",
         search: { redirect: location.href },
       })
     }
-    if (context?.user && authRoutes.includes(location.pathname)) {
+
+    if (isLoggedIn && isAuthRoute) {
       throw redirect({
         to: "/",
+      })
+    }
+
+    if (
+      isLoggedIn &&
+      !isAuthRoute &&
+      !hasMembers &&
+      location.pathname !== "/register/organization"
+    ) {
+      throw redirect({
+        to: "/register/organization",
       })
     }
   },

@@ -17,7 +17,7 @@ export const users = pgTable("users", {
     .boolean("email_verified")
     .$defaultFn(() => false)
     .notNull(),
-  metadata: table.jsonb().notNull().default({}),
+  metadata: table.jsonb().$type<Record<string, any>>().notNull().default({}),
   ...timestamps,
 })
 
@@ -67,7 +67,7 @@ export const organizations = pgTable("organizations", {
   name: table.text().notNull(),
   slug: table.text().unique(),
   logo: table.text(),
-  metadata: table.jsonb().notNull().default({}),
+  metadata: table.text(),
   ...timestamps,
 })
 

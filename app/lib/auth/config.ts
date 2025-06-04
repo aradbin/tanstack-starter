@@ -1,12 +1,22 @@
 import { betterAuth } from "better-auth"
 import { drizzleAdapter } from "better-auth/adapters/drizzle"
-import { admin, organization } from "better-auth/plugins"
+import { admin, customSession, organization } from "better-auth/plugins"
 import { reactStartCookies } from "better-auth/react-start"
 
 import { db } from "@/lib/db"
-import * as schema from "@/lib/db/schema/users"
+import {
+  accounts,
+  invitations,
+  members,
+  organizations,
+  sessions,
+  users,
+  verifications,
+} from "@/lib/db/schema"
 
 import "dotenv/config"
+
+import { eq, like } from "drizzle-orm"
 
 export const auth = betterAuth({
   appName: "TanStack Starter",
@@ -14,20 +24,54 @@ export const auth = betterAuth({
   database: drizzleAdapter(db, {
     provider: "pg",
     schema: {
-      user: schema.users,
-      session: schema.sessions,
-      account: schema.accounts,
-      verification: schema.verifications,
-      organization: schema.organizations,
-      member: schema.members,
-      invitation: schema.invitations,
+      user: users,
+      session: sessions,
+      account: accounts,
+      verification: verifications,
+      organization: organizations,
+      member: members,
+      invitation: invitations,
     },
   }),
   usePlural: true,
-  plugins: [admin(), organization(), reactStartCookies()],
+  user: {
+    additionalFields: {
+      dob: {
+        type: "date",
+      },
+      metadata: {
+        type: "string",
+      },
+    },
+  },
+  plugins: [
+    admin(),
+    organization(),
+    customSession(
+      async ({ user, session }) => {
+        const memberResponse = await db
+          .select()
+          .from(members)
+          .leftJoin(organizations, eq(members.organizationId, organizations.id))
+          .where(eq(members.userId, user.id))
+        return {
+          user: {
+            ...user,
+            members: memberResponse,
+            session,
+          },
+        }
+      },
+      {
+        plugins: [admin(), organization()],
+      }
+    ),
+    reactStartCookies(),
+  ],
   emailAndPassword: {
     enabled: true,
     requireEmailVerification: true,
+    revokeSessionsOnPasswordReset: true,
   },
   emailVerification: {
     sendOnSignUp: true,
@@ -50,14 +94,14 @@ export const auth = betterAuth({
   advanced: {
     cookiePrefix: "auth",
   },
-  // trustedOrigins: [
-  //   "http://localhost:3000",
-  //   "https://tanstack-starter.aradworkspace.workers.dev",
-  // ],
-  // session: {
-  //   cookieCache: {
-  //     enabled: true,
-  //     maxAge: 5 * 60, // 5 minutes
-  //   },
-  // },
+  trustedOrigins: [
+    // "http://localhost:3000",
+    // "https://tanstack-starter.aradworkspace.workers.dev",
+  ],
+  session: {
+    // cookieCache: {
+    //   enabled: true,
+    //   maxAge: 5 * 60, // 5 minutes
+    // },
+  },
 })

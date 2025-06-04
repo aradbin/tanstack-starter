@@ -9,15 +9,14 @@ import { capitalize } from "@/lib/utils"
 import {
   emailRequiredValidation,
   passwordRequiredValidation,
+  stringRequiredValidation,
 } from "@/lib/validations"
 import { Alert, AlertTitle } from "@/components/ui/alert"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 
-import AuthProviders from "../-auth-providers"
-
-export const Route = createFileRoute("/_auth/login/")({
+export const Route = createFileRoute("/_auth/register/organization")({
   component: RouteComponent,
 })
 
@@ -26,18 +25,18 @@ function RouteComponent() {
   const router = useRouter()
   const form = useForm({
     defaultValues: {
-      email: "",
-      password: "",
+      name: "",
+      slug: "",
     },
     validators: {
       onChange: z.object({
-        email: emailRequiredValidation("Email"),
-        password: passwordRequiredValidation("Password"),
+        name: stringRequiredValidation("Name"),
+        slug: stringRequiredValidation("Slug"),
       }),
     },
     onSubmit: async ({ value }) => {
       setMessage(null)
-      await authClient.signIn.email(value, {
+      await authClient.organization.create(value, {
         onError(context) {
           setMessage(
             context.error.message || "Something went wrong. Please try again."
@@ -52,11 +51,8 @@ function RouteComponent() {
 
   return (
     <div className="grid gap-6">
-      <AuthProviders />
-      <div className="relative text-center text-sm after:absolute after:inset-0 after:top-1/2 after:z-0 after:flex after:items-center after:border-t after:border-border">
-        <span className="relative z-10 bg-background px-2 text-muted-foreground">
-          Or continue with
-        </span>
+      <div className="text-center text-sm text-muted-foreground">
+        You're not in any organization yet. Create one to continue.
       </div>
       <form
         className="grid gap-4"
@@ -66,10 +62,15 @@ function RouteComponent() {
         }}
       >
         <form.Field
-          name="email"
+          name="name"
           children={(field) => (
             <div className="grid gap-2">
-              <Label htmlFor={field.name}>{capitalize(field.name)}</Label>
+              <Label
+                htmlFor={field.name}
+                className={!field.state.meta.isValid ? "text-destructive" : ""}
+              >
+                {capitalize(field.name)}
+              </Label>
               <Input
                 id={field.name}
                 name={field.name}
@@ -78,7 +79,7 @@ function RouteComponent() {
                 onChange={(e) => field.handleChange(e.target.value)}
                 aria-invalid={!field.state.meta.isValid}
                 type="text"
-                placeholder="example@email.com"
+                placeholder="Organization name"
               />
               {field.state.meta.isTouched &&
                 !field.state.meta.isValid &&
@@ -94,18 +95,10 @@ function RouteComponent() {
           )}
         />
         <form.Field
-          name="password"
+          name="slug"
           children={(field) => (
             <div className="grid gap-2">
-              <div className="flex items-center">
-                <Label htmlFor={field.name}>{capitalize(field.name)}</Label>
-                <a
-                  href="#"
-                  className="ml-auto text-sm underline-offset-4 hover:underline"
-                >
-                  Forgot your password?
-                </a>
-              </div>
+              <Label htmlFor={field.name}>{capitalize(field.name)}</Label>
               <Input
                 id={field.name}
                 name={field.name}
@@ -113,8 +106,8 @@ function RouteComponent() {
                 onBlur={field.handleBlur}
                 onChange={(e) => field.handleChange(e.target.value)}
                 aria-invalid={!field.state.meta.isValid}
-                type="password"
-                placeholder="••••••••"
+                type="text"
+                placeholder="example-organization"
               />
               {field.state.meta.isTouched &&
                 !field.state.meta.isValid &&
@@ -145,7 +138,7 @@ function RouteComponent() {
                   Please wait
                 </>
               ) : (
-                "Login"
+                "Create"
               )}
             </Button>
           )}
@@ -156,12 +149,19 @@ function RouteComponent() {
             <AlertTitle>{message}</AlertTitle>
           </Alert>
         )}
-        <div className="text-center text-sm">
-          Don&apos;t have an account?{" "}
-          <Link to="/register" className="underline underline-offset-4">
-            Register
-          </Link>
-        </div>
+        <Button
+          type="button"
+          variant="outline"
+          className="w-full cursor-pointer"
+          onClick={async () => {
+            await authClient.signOut()
+            router.navigate({
+              to: "/login",
+            })
+          }}
+        >
+          Login with a different account
+        </Button>
       </form>
     </div>
   )
