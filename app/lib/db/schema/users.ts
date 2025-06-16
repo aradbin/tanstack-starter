@@ -7,7 +7,6 @@ export const users = pgTable("users", {
   id: table.text().primaryKey(),
   name: table.text().notNull(),
   email: table.text().notNull().unique(),
-  dob: table.date(),
   image: table.text(),
   role: table.text(),
   banned: table.boolean(),
@@ -17,7 +16,6 @@ export const users = pgTable("users", {
     .boolean("email_verified")
     .$defaultFn(() => false)
     .notNull(),
-  metadata: table.jsonb().$type<Record<string, any>>().notNull().default({}),
   ...timestamps,
 })
 

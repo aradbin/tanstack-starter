@@ -35,14 +35,16 @@ export const Route = createRootRoute({
   }),
   component: RootComponent,
   beforeLoad: async () => {
-    const user = await getUser()
-    return { user }
+    let user = await getUser()
+
+    return {
+      user,
+    }
   },
   loader: ({ context, location }) => {
-    console.log("context", context)
     const isAuthRoute = authRoutes.includes(location.pathname)
     const isLoggedIn = !!context?.user
-    const hasMembers = !!context?.user?.members?.length
+    const hasOrganizations = !!context?.user?.organizations?.length
 
     if (!isLoggedIn && !isAuthRoute) {
       throw redirect({
@@ -60,7 +62,7 @@ export const Route = createRootRoute({
     if (
       isLoggedIn &&
       !isAuthRoute &&
-      !hasMembers &&
+      !hasOrganizations &&
       location.pathname !== "/register/organization"
     ) {
       throw redirect({

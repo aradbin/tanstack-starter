@@ -16,8 +16,6 @@ import {
 
 import "dotenv/config"
 
-import { eq, like } from "drizzle-orm"
-
 export const auth = betterAuth({
   appName: "TanStack Starter",
   baseURL: import.meta.env.VITE_BASE_URL,
@@ -34,40 +32,7 @@ export const auth = betterAuth({
     },
   }),
   usePlural: true,
-  user: {
-    additionalFields: {
-      dob: {
-        type: "date",
-      },
-      metadata: {
-        type: "string",
-      },
-    },
-  },
-  plugins: [
-    admin(),
-    organization(),
-    customSession(
-      async ({ user, session }) => {
-        const memberResponse = await db
-          .select()
-          .from(members)
-          .leftJoin(organizations, eq(members.organizationId, organizations.id))
-          .where(eq(members.userId, user.id))
-        return {
-          user: {
-            ...user,
-            members: memberResponse,
-            session,
-          },
-        }
-      },
-      {
-        plugins: [admin(), organization()],
-      }
-    ),
-    reactStartCookies(),
-  ],
+  plugins: [admin(), organization(), reactStartCookies()],
   emailAndPassword: {
     enabled: true,
     requireEmailVerification: true,
