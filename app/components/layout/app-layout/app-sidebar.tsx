@@ -16,14 +16,13 @@ import TeamSwitcher from "@/components/layout/app-layout/team-toggle"
 export function AppSidebar() {
   return (
     <Sidebar collapsible="icon" variant="inset">
-      <SidebarHeader>
+      <SidebarHeader className="mb-2">
         <SidebarMenu>
           <SidebarMenuItem>
             <TeamSwitcher />
           </SidebarMenuItem>
         </SidebarMenu>
       </SidebarHeader>
-      <Separator className="mb-2" />
       <ScrollArea>
         <SidebarContent className="gap-0">
           <NavMain />

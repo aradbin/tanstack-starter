@@ -5,5 +5,5 @@ export const Route = createFileRoute("/_private/")({
 })
 
 function Home() {
-  return <div></div>
+  return <div className="p-6">Dashboard</div>
 }

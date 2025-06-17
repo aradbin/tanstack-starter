@@ -1,6 +1,6 @@
 import { betterAuth } from "better-auth"
 import { drizzleAdapter } from "better-auth/adapters/drizzle"
-import { admin, customSession, organization } from "better-auth/plugins"
+import { admin, organization } from "better-auth/plugins"
 import { reactStartCookies } from "better-auth/react-start"
 
 import { db } from "@/lib/db"
