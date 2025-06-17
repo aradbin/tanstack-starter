@@ -36,7 +36,6 @@
     "dotenv": "^16.5.0",
     "drizzle-orm": "^0.43.1",
     "lucide-react": "^0.511.0",
-    "nitro-cloudflare-dev": "^0.2.2",
     "pg": "^8.16.0",
     "postcss": "^8.5.3",
     "react": "^19.1.0",
