@@ -9,30 +9,10 @@ import {
 } from "@tanstack/react-router"
 
 import { getUser } from "@/lib/auth/functions"
-import { authRoutes } from "@/lib/variables"
-import appCss from "@/styles/globals.css?url"
+import { authRoutes, head } from "@/lib/variables"
 
 export const Route = createRootRoute({
-  head: () => ({
-    meta: [
-      {
-        charSet: "utf-8",
-      },
-      {
-        name: "viewport",
-        content: "width=device-width, initial-scale=1",
-      },
-      {
-        title: "TanStack Starter",
-      },
-    ],
-    links: [
-      {
-        rel: "stylesheet",
-        href: appCss,
-      },
-    ],
-  }),
+  head: () => head,
   component: RootComponent,
   beforeLoad: async () => {
     let user = await getUser()

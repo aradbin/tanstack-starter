@@ -4,7 +4,7 @@ import { createFileRoute, Link, useRouter } from "@tanstack/react-router"
 import { AlertCircleIcon, Loader2Icon } from "lucide-react"
 import { z } from "zod"
 
-import { authClient } from "@/lib/auth/client"
+import { signIn } from "@/lib/auth/functions"
 import { capitalize } from "@/lib/utils"
 import {
   emailRequiredValidation,
@@ -37,16 +37,15 @@ function RouteComponent() {
     },
     onSubmit: async ({ value }) => {
       setMessage(null)
-      await authClient.signIn.email(value, {
-        onError(context) {
-          setMessage(
-            context.error.message || "Something went wrong. Please try again."
-          )
-        },
-        onSuccess() {
-          router.navigate({ to: "/" })
-        },
-      })
+      const { data, error } = await signIn(value)
+
+      if (error) {
+        setMessage(error.message || "Something went wrong. Please try again.")
+      }
+
+      if (data) {
+        router.navigate({ to: "/" })
+      }
     },
   })
 
@@ -134,7 +133,7 @@ function RouteComponent() {
           children={([isSubmitting]) => (
             <Button
               type="submit"
-              className="w-full cursor-pointer"
+              className="w-full"
               disabled={isSubmitting}
               aria-busy={isSubmitting}
               aria-disabled={isSubmitting}

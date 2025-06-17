@@ -1,6 +1,28 @@
 import { LayoutGrid } from "lucide-react"
 
 import { NavigationType, NavItemType } from "@/lib/types"
+import appCss from "@/styles/globals.css?url"
+
+export const head = {
+  meta: [
+    {
+      charSet: "utf-8",
+    },
+    {
+      name: "viewport",
+      content: "width=device-width, initial-scale=1",
+    },
+    {
+      title: "TanStack Starter",
+    },
+  ],
+  links: [
+    {
+      rel: "stylesheet",
+      href: appCss,
+    },
+  ],
+}
 
 export const authRoutes = [
   "/login",

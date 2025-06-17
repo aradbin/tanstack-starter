@@ -1,19 +1,13 @@
-import { authClient } from "@/lib/auth/client"
+import { signInSocial } from "@/lib/auth/functions"
 import { Button } from "@/components/ui/button"
 
 export default function AuthProviders() {
-  const signIn = async () => {
-    await authClient.signIn.social({
-      provider: "google",
-    })
-  }
-
   return (
     <div className="flex flex-col gap-4">
       <Button
         variant="outline"
-        className="w-full cursor-pointer"
-        onClick={signIn}
+        className="w-full"
+        onClick={() => signInSocial("google")}
       >
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
           <path

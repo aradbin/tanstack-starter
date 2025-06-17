@@ -4,13 +4,9 @@ import { createFileRoute, Link, useRouter } from "@tanstack/react-router"
 import { AlertCircleIcon, Loader2Icon } from "lucide-react"
 import { z } from "zod"
 
-import { authClient } from "@/lib/auth/client"
+import { createOrganization, signOut } from "@/lib/auth/functions"
 import { capitalize } from "@/lib/utils"
-import {
-  emailRequiredValidation,
-  passwordRequiredValidation,
-  stringRequiredValidation,
-} from "@/lib/validations"
+import { stringRequiredValidation } from "@/lib/validations"
 import { Alert, AlertTitle } from "@/components/ui/alert"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -36,16 +32,15 @@ function RouteComponent() {
     },
     onSubmit: async ({ value }) => {
       setMessage(null)
-      await authClient.organization.create(value, {
-        onError(context) {
-          setMessage(
-            context.error.message || "Something went wrong. Please try again."
-          )
-        },
-        onSuccess() {
-          router.navigate({ to: "/" })
-        },
-      })
+      const { data, error } = await createOrganization(value)
+
+      if (error) {
+        setMessage(error.message || "Something went wrong. Please try again.")
+      }
+
+      if (data) {
+        router.navigate({ to: "/" })
+      }
     },
   })
 
@@ -127,7 +122,7 @@ function RouteComponent() {
           children={([isSubmitting]) => (
             <Button
               type="submit"
-              className="w-full cursor-pointer"
+              className="w-full"
               disabled={isSubmitting}
               aria-busy={isSubmitting}
               aria-disabled={isSubmitting}
@@ -152,12 +147,14 @@ function RouteComponent() {
         <Button
           type="button"
           variant="outline"
-          className="w-full cursor-pointer"
+          className="w-full"
           onClick={async () => {
-            await authClient.signOut()
-            router.navigate({
-              to: "/login",
-            })
+            const response = await signOut()
+            if (response) {
+              router.navigate({
+                to: "/login",
+              })
+            }
           }}
         >
           Login with a different account

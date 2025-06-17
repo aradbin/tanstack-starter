@@ -3,8 +3,6 @@ import { GalleryVerticalEnd } from "lucide-react"
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 
-import AuthProviders from "./-auth-providers"
-
 export const Route = createFileRoute("/_auth")({
   component: RouteComponent,
 })

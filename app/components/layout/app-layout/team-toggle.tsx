@@ -1,7 +1,6 @@
-import { useRouteContext } from "@tanstack/react-router"
 import { ChevronsUpDown, Landmark, Plus } from "lucide-react"
 
-import { capitalize } from "@/lib/utils"
+import { useAuth } from "@/lib/auth/hook"
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -13,7 +12,7 @@ import {
 import { SidebarMenuButton, useSidebar } from "@/components/ui/sidebar"
 
 export default function TeamToggle() {
-  const user = useRouteContext({ from: "/_private" }).user
+  const user = useAuth()
   const active = user?.session?.activeOrganizationId
     ? user?.organizations?.find(
         (organization) => organization?.id === user.session.activeOrganizationId
@@ -26,7 +25,7 @@ export default function TeamToggle() {
       <DropdownMenuTrigger asChild>
         <SidebarMenuButton
           size="lg"
-          className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground cursor-pointer"
+          className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
         >
           <div className="flex aspect-square size-8 items-center justify-center rounded-lg bg-sidebar-primary text-sidebar-primary-foreground">
             {active?.logo ? (
@@ -53,7 +52,7 @@ export default function TeamToggle() {
         {user?.organizations?.map((organization, index) => (
           <DropdownMenuItem
             key={index}
-            className={`gap-2 p-2 cursor-pointer ${organization?.id === active?.id ? "bg-accent text-accent-foreground" : ""}`}
+            className={`gap-2 p-2 ${organization?.id === active?.id ? "bg-accent text-accent-foreground" : ""}`}
           >
             <div className="flex size-6 items-center justify-center rounded-sm border">
               {organization?.logo ? (
@@ -70,7 +69,7 @@ export default function TeamToggle() {
           </DropdownMenuItem>
         ))}
         <DropdownMenuSeparator />
-        <DropdownMenuItem className="gap-2 p-2 cursor-pointer">
+        <DropdownMenuItem className="gap-2 p-2">
           <div className="flex size-6 items-center justify-center rounded-md border bg-background">
             <Plus className="size-4" />
           </div>

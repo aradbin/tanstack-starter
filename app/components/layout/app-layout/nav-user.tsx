@@ -1,7 +1,7 @@
 import { Link, useNavigate, useRouteContext } from "@tanstack/react-router"
 import { LogOut, User, UserCog } from "lucide-react"
 
-import { authClient } from "@/lib/auth/client"
+import { signOut } from "@/lib/auth/functions"
 import { useInitials } from "@/hooks/use-initials"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Button } from "@/components/ui/button"
@@ -70,10 +70,13 @@ export function NavUser() {
         <DropdownMenuSeparator />
         <DropdownMenuItem
           onClick={async () => {
-            await authClient.signOut()
-            navigate({
-              to: "/login",
-            })
+            const response = await signOut()
+
+            if (response) {
+              navigate({
+                to: "/login",
+              })
+            }
           }}
         >
           <LogOut className="me-2 size-4" />

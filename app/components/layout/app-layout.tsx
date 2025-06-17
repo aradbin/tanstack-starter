@@ -19,7 +19,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
         <header className="sticky top-0 z-50 w-full bg-background border-b border-sidebar-border rounded-t-xl">
           <div className="flex h-14 justify-between items-center gap-4 px-4">
             <div className="flex items-center gap-2">
-              <SidebarTrigger className="cursor-pointer" />
+              <SidebarTrigger />
               <Separator
                 orientation="vertical"
                 className="mx-2 data-[orientation=vertical]:h-4"
