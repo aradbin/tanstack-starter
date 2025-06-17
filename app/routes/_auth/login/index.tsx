@@ -2,13 +2,13 @@ import { useState } from "react"
 import { useForm } from "@tanstack/react-form"
 import { createFileRoute, Link, useRouter } from "@tanstack/react-router"
 import { AlertCircleIcon, Loader2Icon } from "lucide-react"
-import { z } from "zod"
 
 import { signIn } from "@/lib/auth/functions"
 import { capitalize } from "@/lib/utils"
 import {
   emailRequiredValidation,
   passwordRequiredValidation,
+  validateForm,
 } from "@/lib/validations"
 import { Alert, AlertTitle } from "@/components/ui/alert"
 import { Button } from "@/components/ui/button"
@@ -30,7 +30,7 @@ function RouteComponent() {
       password: "",
     },
     validators: {
-      onChange: z.object({
+      onChange: validateForm({
         email: emailRequiredValidation("Email"),
         password: passwordRequiredValidation("Password"),
       }),
