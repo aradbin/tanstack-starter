@@ -1,8 +1,7 @@
-import { FieldType } from "@/lib/types"
-
+import { FormFieldType } from "@/lib/types"
 import InputField from "./input-field"
 
-export default function RenderField({ field }: { field: FieldType }) {
+export default function RenderField({ field }: { field: FormFieldType }) {
   switch (field.type) {
     case "file":
       break

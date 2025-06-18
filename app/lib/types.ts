@@ -13,14 +13,17 @@ export interface NavigationType {
   items?: NavItemType[]
 }
 
-export interface FieldType {
+export interface FormFieldType {
   name: string
-  state: {
-    value: string
-  }
-  handleBlur: () => void
-  handleChange: (value: string) => void
   type?: string
   label?: string
   placeholder?: string
+  defaultValue?: any
+  value?: any
+  validationOnBlur?: any
+  validationOnChange?: any
+  validationOnSubmit?: any
+  handleBlur?: any
+  handleChange?: any
+  isValid?: boolean
 }
