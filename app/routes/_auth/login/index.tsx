@@ -1,20 +1,9 @@
-import { useState } from "react"
-import { useForm } from "@tanstack/react-form"
 import { createFileRoute, Link, useRouter } from "@tanstack/react-router"
-import { AlertCircleIcon, Loader2Icon } from "lucide-react"
-
 import { signIn } from "@/lib/auth/functions"
-import { capitalize } from "@/lib/utils"
 import {
   emailRequiredValidation,
   passwordRequiredValidation,
-  validateForm,
 } from "@/lib/validations"
-import { Alert, AlertTitle } from "@/components/ui/alert"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-
 import AuthProviders from "../-auth-providers"
 import { FormFieldType } from "@/lib/types"
 import FormComponent from "@/components/form/form-component"
@@ -41,7 +30,7 @@ function RouteComponent() {
         placeholder: "••••••••",
       },
     ],
-    ]
+  ]
 
   return (
     <div className="grid gap-6">
@@ -52,7 +41,9 @@ function RouteComponent() {
         onSuccess={() => {
           router.navigate({ to: "/" })
         }}
-        submitText="Login"
+        config={{
+          submitText: "Login"
+        }}
       />
       <div className="flex flex-col gap-2">
         <div className="text-center text-sm">

@@ -39,7 +39,9 @@ function RouteComponent() {
       <AuthProviders />
       <FormComponent fields={fields} handleSubmit={signUp} onSuccess={() => {
         router.navigate({ to: "/" })
-      }} submitText="Register" />
+      }} config={{
+        submitText: "Register"
+      }} />
       <div className="text-center text-sm">
         Already have an account?{" "}
         <Link to="/login" className="underline underline-offset-4">

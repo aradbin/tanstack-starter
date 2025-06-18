@@ -3,16 +3,21 @@ import { validateForm } from "@/lib/validations"
 import { useForm } from "@tanstack/react-form"
 import RenderField from "@/components/form/render-field";
 import { Button } from "@/components/ui/button";
-import { AlertCircleIcon, Loader2Icon } from "lucide-react";
+import { AlertCircleIcon, CheckCircle2Icon, Loader2Icon } from "lucide-react";
 import { useState } from "react";
 import { Alert, AlertTitle } from "@/components/ui/alert";
 
-export default function FormComponent({ fields, handleSubmit, onSuccess, onError, submitText }: {
+export default function FormComponent({ fields, handleSubmit, onSuccess, onError, onCancel, config }: {
   fields: FormFieldType[][]
   handleSubmit: any;
   onSuccess?: any;
   onError?: any;
-  submitText?: string;
+  onCancel?: any;
+  config?: {
+    submitText?: string
+    cancelText?: string
+    loadingText?: string
+  }
 }) {
   const [messageSuccess, setMessageSuccess] = useState<string | null | undefined>(null)
   const [messageError, setMessageError] = useState<string | null | undefined>(null)
@@ -58,6 +63,8 @@ export default function FormComponent({ fields, handleSubmit, onSuccess, onError
       } : {},
     },
     onSubmit: async ({ value }) => {
+      setMessageSuccess(null)
+      setMessageError(null)
       const { data, error } = await handleSubmit(value)
       if (error) {
         if (onError) {
@@ -72,6 +79,7 @@ export default function FormComponent({ fields, handleSubmit, onSuccess, onError
         if(data.message) {
           setMessageSuccess(data.message)
         }
+        form.reset()
       }
     },
   })
@@ -116,37 +124,49 @@ export default function FormComponent({ fields, handleSubmit, onSuccess, onError
           ))}
         </div>
       ))}
-      <form.Subscribe
-        selector={(state) => [state.isSubmitting]}
-        children={([isSubmitting]) => (
+      <div className="flex flex-wrap gap-2">
+        <form.Subscribe
+          selector={(state) => [state.isSubmitting]}
+          children={([isSubmitting]) => (
+            <Button
+              type="submit"
+              className="w-full"
+              disabled={isSubmitting}
+              aria-busy={isSubmitting}
+              aria-disabled={isSubmitting}
+            >
+              {isSubmitting ? (
+                <>
+                  <Loader2Icon className="animate-spin" />
+                  Please wait
+                </>
+              ) : (
+                config?.submitText || "Submit"
+              )}
+            </Button>
+          )}
+        />
+        {onCancel && (
           <Button
-            type="submit"
+            type="button"
+            variant="outline"
             className="w-full"
-            disabled={isSubmitting}
-            aria-busy={isSubmitting}
-            aria-disabled={isSubmitting}
+            onClick={onCancel}
           >
-            {isSubmitting ? (
-              <>
-                <Loader2Icon className="animate-spin" />
-                Please wait
-              </>
-            ) : (
-              submitText || "Submit"
-            )}
+            {config?.cancelText || "Cancel"}
           </Button>
         )}
-      />
+      </div>
+      {messageSuccess && (
+        <Alert variant="default" className="border-green-800 text-green-800">
+          <CheckCircle2Icon className="size-4" />
+          <AlertTitle>{messageSuccess}</AlertTitle>
+        </Alert>
+      )}
       {messageError && (
         <Alert variant="destructive" className="border-destructive">
           <AlertCircleIcon className="size-4" />
           <AlertTitle>{messageError}</AlertTitle>
-        </Alert>
-      )}
-      {messageSuccess && (
-        <Alert variant="default" className="border-success">
-          <AlertCircleIcon className="size-4" />
-          <AlertTitle>{messageSuccess}</AlertTitle>
         </Alert>
       )}
     </form>

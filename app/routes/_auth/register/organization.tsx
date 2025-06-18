@@ -1,164 +1,44 @@
-import { useState } from "react"
-import { useForm } from "@tanstack/react-form"
-import { createFileRoute, Link, useRouter } from "@tanstack/react-router"
-import { AlertCircleIcon, Loader2Icon } from "lucide-react"
-
+import { createFileRoute, useRouter } from "@tanstack/react-router"
 import { createOrganization, signOut } from "@/lib/auth/functions"
-import { capitalize } from "@/lib/utils"
-import { stringRequiredValidation, validateForm } from "@/lib/validations"
-import { Alert, AlertTitle } from "@/components/ui/alert"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
+import { stringRequiredValidation } from "@/lib/validations"
+import { FormFieldType } from "@/lib/types"
+import FormComponent from "@/components/form/form-component"
 
 export const Route = createFileRoute("/_auth/register/organization")({
   component: RouteComponent,
 })
 
 function RouteComponent() {
-  const [message, setMessage] = useState<string | null | undefined>(null)
   const router = useRouter()
-  const form = useForm({
-    defaultValues: {
-      name: "",
-      slug: "",
-    },
-    validators: {
-      onChange: validateForm({
-        name: stringRequiredValidation("Name"),
-        slug: stringRequiredValidation("Slug"),
-      }),
-    },
-    onSubmit: async ({ value }) => {
-      setMessage(null)
-      const { data, error } = await createOrganization(value)
-
-      if (error) {
-        setMessage(error.message || "Something went wrong. Please try again.")
-      }
-
-      if (data) {
-        router.navigate({ to: "/" })
-      }
-    },
-  })
+  const fields: FormFieldType[][] = [
+    [{
+      name: "name",
+      validationOnSubmit: stringRequiredValidation("Name"),
+      placeholder: "Enter organization name",
+    }],
+    [{
+      name: "slug",
+      validationOnSubmit: stringRequiredValidation("Slug"),
+      placeholder: "Enter organization slug",
+    }]
+  ]
 
   return (
     <div className="grid gap-6">
       <div className="text-center text-sm text-muted-foreground">
         You're not in any organization yet. Create one to continue.
       </div>
-      <form
-        className="grid gap-4"
-        onSubmit={(e) => {
-          e.preventDefault()
-          form.handleSubmit()
+      <FormComponent
+        fields={fields}
+        handleSubmit={createOrganization}
+        onSuccess={() => {
+          router.navigate({ to: "/" })
         }}
-      >
-        <form.Field
-          name="name"
-          children={(field) => (
-            <div className="grid gap-2">
-              <Label
-                htmlFor={field.name}
-                className={!field.state.meta.isValid ? "text-destructive" : ""}
-              >
-                {capitalize(field.name)}
-              </Label>
-              <Input
-                id={field.name}
-                name={field.name}
-                value={field.state.value}
-                onBlur={field.handleBlur}
-                onChange={(e) => field.handleChange(e.target.value)}
-                aria-invalid={!field.state.meta.isValid}
-                type="text"
-                placeholder="Organization name"
-              />
-              {field.state.meta.isTouched &&
-                !field.state.meta.isValid &&
-                field.state.meta.errors.map((error, index) => (
-                  <p
-                    key={index}
-                    className="text-sm font-medium text-destructive"
-                  >
-                    {error?.message}
-                  </p>
-                ))}
-            </div>
-          )}
-        />
-        <form.Field
-          name="slug"
-          children={(field) => (
-            <div className="grid gap-2">
-              <Label htmlFor={field.name}>{capitalize(field.name)}</Label>
-              <Input
-                id={field.name}
-                name={field.name}
-                value={field.state.value}
-                onBlur={field.handleBlur}
-                onChange={(e) => field.handleChange(e.target.value)}
-                aria-invalid={!field.state.meta.isValid}
-                type="text"
-                placeholder="example-organization"
-              />
-              {field.state.meta.isTouched &&
-                !field.state.meta.isValid &&
-                field.state.meta.errors.map((error, index) => (
-                  <p
-                    key={index}
-                    className="text-sm font-medium text-destructive"
-                  >
-                    {error?.message}
-                  </p>
-                ))}
-            </div>
-          )}
-        />
-        <form.Subscribe
-          selector={(state) => [state.isSubmitting]}
-          children={([isSubmitting]) => (
-            <Button
-              type="submit"
-              className="w-full"
-              disabled={isSubmitting}
-              aria-busy={isSubmitting}
-              aria-disabled={isSubmitting}
-            >
-              {isSubmitting ? (
-                <>
-                  <Loader2Icon className="animate-spin" />
-                  Please wait
-                </>
-              ) : (
-                "Create"
-              )}
-            </Button>
-          )}
-        />
-        {message && (
-          <Alert variant="destructive" className="border-destructive">
-            <AlertCircleIcon className="size-4" />
-            <AlertTitle>{message}</AlertTitle>
-          </Alert>
-        )}
-        <Button
-          type="button"
-          variant="outline"
-          className="w-full"
-          onClick={async () => {
-            const response = await signOut()
-            if (response) {
-              router.navigate({
-                to: "/login",
-              })
-            }
-          }}
-        >
-          Login with a different account
-        </Button>
-      </form>
+        onCancel={() => {
+          signOut()
+          router.navigate({ to: "/" })
+        }}
+      />
     </div>
   )
 }

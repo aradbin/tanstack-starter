@@ -4,16 +4,34 @@ import { getHeaders } from "@tanstack/react-start/server"
 import { authClient } from "./client"
 import { authMiddleware } from "./middleware"
 
-export const signUp = (value: {
+export const signUp = async (value: {
   name: string
   email: string
   password: string
 }) => {
-  return authClient.signUp.email(value)
+  const { data, error } =  await authClient.signUp.email(value)
+
+  if(data){
+    return { data: {
+      ...data,
+      message: 'Registration Successful'
+    }, error }
+  }
+
+  return { data, error }
 }
 
-export const signIn = (value: { email: string; password: string }) => {
-  return authClient.signIn.email(value)
+export const signIn = async (value: { email: string; password: string }) => {
+  const { data, error } = await authClient.signIn.email(value)
+
+  if(data){
+    return { data: {
+      ...data,
+      message: 'Login Successful'
+    }, error }
+  }
+
+  return { data, error }
 }
 
 export const signInSocial = async (provider: "google") => {
@@ -45,7 +63,7 @@ export const getUser = createServerFn()
 
       return {
         ...context?.user,
-        session: context?.session,
+        activeOrganizationId: context?.session?.activeOrganizationId,
         organizations,
       }
     }
@@ -53,11 +71,20 @@ export const getUser = createServerFn()
     return null
   })
 
-export const createOrganization = (value: { name: string; slug: string }) => {
-  return authClient.organization.create(value)
+export const createOrganization = async (value: { name: string; slug: string }) => {
+  const { data, error } =  await authClient.organization.create(value)
+
+  if(data){
+    return { data: {
+      ...data,
+      message: 'Organization Created Successfully'
+    }, error }
+  }
+
+  return { data, error }
 }
 
-export const getUserOrganizations = async () => {
+const getUserOrganizations = async () => {
   const { data } = await authClient.organization.list({
     fetchOptions: {
       headers: getHeaders() as HeadersInit,
@@ -67,7 +94,7 @@ export const getUserOrganizations = async () => {
   return data
 }
 
-export const setActiveOrganization = async (organizationId: string) => {
+const setActiveOrganization = async (organizationId: string) => {
   const { data } = await authClient.organization.setActive({
     fetchOptions: {
       headers: getHeaders() as HeadersInit,

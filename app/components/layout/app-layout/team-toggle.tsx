@@ -13,9 +13,9 @@ import { SidebarMenuButton, useSidebar } from "@/components/ui/sidebar"
 
 export default function TeamToggle() {
   const user = useAuth()
-  const active = user?.session?.activeOrganizationId
+  const active = user?.activeOrganizationId
     ? user?.organizations?.find(
-        (organization) => organization?.id === user.session.activeOrganizationId
+        (organization) => organization?.id === user?.activeOrganizationId
       )
     : user?.organizations?.[0]
 
