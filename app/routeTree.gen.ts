@@ -14,6 +14,7 @@ import { Route as rootRoute } from './routes/__root'
 import { Route as PrivateRouteImport } from './routes/_private/route'
 import { Route as AuthRouteImport } from './routes/_auth/route'
 import { Route as PrivateIndexImport } from './routes/_private/index'
+import { Route as PrivateMembersIndexImport } from './routes/_private/members/index'
 import { Route as AuthRegisterIndexImport } from './routes/_auth/register/index'
 import { Route as AuthLoginIndexImport } from './routes/_auth/login/index'
 import { Route as AuthRegisterOrganizationImport } from './routes/_auth/register/organization'
@@ -33,6 +34,12 @@ const AuthRouteRoute = AuthRouteImport.update({
 const PrivateIndexRoute = PrivateIndexImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => PrivateRouteRoute,
+} as any)
+
+const PrivateMembersIndexRoute = PrivateMembersIndexImport.update({
+  id: '/members/',
+  path: '/members/',
   getParentRoute: () => PrivateRouteRoute,
 } as any)
 
@@ -100,6 +107,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthRegisterIndexImport
       parentRoute: typeof AuthRouteImport
     }
+    '/_private/members/': {
+      id: '/_private/members/'
+      path: '/members'
+      fullPath: '/members'
+      preLoaderRoute: typeof PrivateMembersIndexImport
+      parentRoute: typeof PrivateRouteImport
+    }
   }
 }
 
@@ -123,10 +137,12 @@ const AuthRouteRouteWithChildren = AuthRouteRoute._addFileChildren(
 
 interface PrivateRouteRouteChildren {
   PrivateIndexRoute: typeof PrivateIndexRoute
+  PrivateMembersIndexRoute: typeof PrivateMembersIndexRoute
 }
 
 const PrivateRouteRouteChildren: PrivateRouteRouteChildren = {
   PrivateIndexRoute: PrivateIndexRoute,
+  PrivateMembersIndexRoute: PrivateMembersIndexRoute,
 }
 
 const PrivateRouteRouteWithChildren = PrivateRouteRoute._addFileChildren(
@@ -139,6 +155,7 @@ export interface FileRoutesByFullPath {
   '/register/organization': typeof AuthRegisterOrganizationRoute
   '/login': typeof AuthLoginIndexRoute
   '/register': typeof AuthRegisterIndexRoute
+  '/members': typeof PrivateMembersIndexRoute
 }
 
 export interface FileRoutesByTo {
@@ -147,6 +164,7 @@ export interface FileRoutesByTo {
   '/register/organization': typeof AuthRegisterOrganizationRoute
   '/login': typeof AuthLoginIndexRoute
   '/register': typeof AuthRegisterIndexRoute
+  '/members': typeof PrivateMembersIndexRoute
 }
 
 export interface FileRoutesById {
@@ -157,13 +175,20 @@ export interface FileRoutesById {
   '/_auth/register/organization': typeof AuthRegisterOrganizationRoute
   '/_auth/login/': typeof AuthLoginIndexRoute
   '/_auth/register/': typeof AuthRegisterIndexRoute
+  '/_private/members/': typeof PrivateMembersIndexRoute
 }
 
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '' | '/' | '/register/organization' | '/login' | '/register'
+  fullPaths:
+    | ''
+    | '/'
+    | '/register/organization'
+    | '/login'
+    | '/register'
+    | '/members'
   fileRoutesByTo: FileRoutesByTo
-  to: '' | '/' | '/register/organization' | '/login' | '/register'
+  to: '' | '/' | '/register/organization' | '/login' | '/register' | '/members'
   id:
     | '__root__'
     | '/_auth'
@@ -172,6 +197,7 @@ export interface FileRouteTypes {
     | '/_auth/register/organization'
     | '/_auth/login/'
     | '/_auth/register/'
+    | '/_private/members/'
   fileRoutesById: FileRoutesById
 }
 
@@ -210,7 +236,8 @@ export const routeTree = rootRoute
     "/_private": {
       "filePath": "_private/route.tsx",
       "children": [
-        "/_private/"
+        "/_private/",
+        "/_private/members/"
       ]
     },
     "/_private/": {
@@ -228,6 +255,10 @@ export const routeTree = rootRoute
     "/_auth/register/": {
       "filePath": "_auth/register/index.tsx",
       "parent": "/_auth"
+    },
+    "/_private/members/": {
+      "filePath": "_private/members/index.tsx",
+      "parent": "/_private"
     }
   }
 }

@@ -1,4 +1,4 @@
-import { LayoutGrid } from "lucide-react"
+import { LayoutGrid, Users } from "lucide-react"
 
 import { NavigationType, NavItemType } from "@/lib/types"
 import appCss from "@/styles/globals.css?url"
@@ -42,36 +42,35 @@ export const mainNavItems: NavigationType[] = [
     ],
   },
   {
-    title: "Pages",
+    title: "Organization",
     items: [
       {
-        title: "Landing",
-        href: "#",
-        label: "Soon",
-        icon: LayoutGrid,
+        title: "Members",
+        href: "/members",
+        icon: Users,
       },
-      {
-        title: "Fallback",
-        icon: LayoutGrid,
-        items: [
-          {
-            title: "Coming Soon",
-            href: "/pages/coming-soon",
-          },
-          {
-            title: "Not Found 404",
-            href: "/pages/not-found-404",
-          },
-          {
-            title: "Unauthorized 401",
-            href: "/pages/unauthorized-401",
-          },
-          {
-            title: "Maintenance",
-            href: "/pages/maintenance",
-          },
-        ],
-      },
+      // {
+      //   title: "Fallback",
+      //   icon: LayoutGrid,
+      //   items: [
+      //     {
+      //       title: "Coming Soon",
+      //       href: "/pages/coming-soon",
+      //     },
+      //     {
+      //       title: "Not Found 404",
+      //       href: "/pages/not-found-404",
+      //     },
+      //     {
+      //       title: "Unauthorized 401",
+      //       href: "/pages/unauthorized-401",
+      //     },
+      //     {
+      //       title: "Maintenance",
+      //       href: "/pages/maintenance",
+      //     },
+      //   ],
+      // },
     ],
   },
 ]
