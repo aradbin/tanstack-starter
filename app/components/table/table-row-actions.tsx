@@ -1,5 +1,3 @@
-"use client"
-
 import { Row } from "@tanstack/react-table"
 import { MoreHorizontal } from "lucide-react"
 
@@ -21,13 +19,13 @@ import {
 import { labels } from "./data"
 import { taskSchema } from "./schema"
 
-interface DataTableRowActionsProps<TData> {
+interface TableRowActionsProps<TData> {
   row: Row<TData>
 }
 
-export function DataTableRowActions<TData>({
+export function TableRowActions<TData>({
   row,
-}: DataTableRowActionsProps<TData>) {
+}: TableRowActionsProps<TData>) {
   const task = taskSchema.parse(row.original)
 
   return (

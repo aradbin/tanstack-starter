@@ -1,22 +1,20 @@
-"use client"
-
 import { Table } from "@tanstack/react-table"
 import { X } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-import { DataTableViewOptions } from "./data-table-view-options"
+import { TableViewOptions } from "./table-view-options"
 
 import { priorities, statuses } from "./data"
-import { DataTableFacetedFilter } from "./data-table-faceted-filter"
+import { TableFilter } from "./table-filter"
 
-interface DataTableToolbarProps<TData> {
+interface TableToolbarProps<TData> {
   table: Table<TData>
 }
 
-export function DataTableToolbar<TData>({
+export function TableToolbar<TData>({
   table,
-}: DataTableToolbarProps<TData>) {
+}: TableToolbarProps<TData>) {
   const isFiltered = table.getState().columnFilters.length > 0
 
   return (
@@ -31,14 +29,14 @@ export function DataTableToolbar<TData>({
           className="h-8 w-[150px] lg:w-[250px]"
         />
         {table.getColumn("status") && (
-          <DataTableFacetedFilter
+          <TableFilter
             column={table.getColumn("status")}
             title="Status"
             options={statuses}
           />
         )}
         {table.getColumn("priority") && (
-          <DataTableFacetedFilter
+          <TableFilter
             column={table.getColumn("priority")}
             title="Priority"
             options={priorities}
@@ -56,7 +54,7 @@ export function DataTableToolbar<TData>({
         )}
       </div>
       <div className="flex items-center gap-2">
-        <DataTableViewOptions table={table} />
+        <TableViewOptions table={table} />
         <Button size="sm">Add Task</Button>
       </div>
     </div>

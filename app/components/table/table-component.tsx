@@ -22,11 +22,11 @@ import {
   TableRow,
 } from "@/components/ui/table"
 
-import { DataTablePagination } from "./data-table-pagination"
-import { DataTableToolbar } from "./data-table-toolbar"
+import { TablePagination } from "./table-pagination"
+import { TableToolbar } from "./table-toolbar"
 import { useState } from "react"
 
-interface DataTableProps<TData, TValue> {
+interface TableComponentProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[]
   data: TData[]
 }
@@ -34,7 +34,7 @@ interface DataTableProps<TData, TValue> {
 export default function TableComponent<TData, TValue>({
   columns,
   data,
-}: DataTableProps<TData, TValue>) {
+}: TableComponentProps<TData, TValue>) {
   const [rowSelection, setRowSelection] = useState({})
   const [columnVisibility, setColumnVisibility] =
     useState<VisibilityState>({})
@@ -72,7 +72,7 @@ export default function TableComponent<TData, TValue>({
 
   return (
     <div className="flex flex-col gap-4">
-      <DataTableToolbar table={table} />
+      <TableToolbar table={table} />
       <div className="rounded-md border">
         <Table>
           <TableHeader>
@@ -123,7 +123,7 @@ export default function TableComponent<TData, TValue>({
           </TableBody>
         </Table>
       </div>
-      <DataTablePagination table={table} />
+      <TablePagination table={table} />
     </div>
   )
 }

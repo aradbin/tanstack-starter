@@ -1,5 +1,3 @@
-"use client"
-
 import { DropdownMenuTrigger } from "@radix-ui/react-dropdown-menu"
 import { Table } from "@tanstack/react-table"
 import { Settings2 } from "lucide-react"
@@ -13,7 +11,7 @@ import {
   DropdownMenuSeparator,
 } from "@/components/ui/dropdown-menu"
 
-export function DataTableViewOptions<TData>({
+export function TableViewOptions<TData>({
   table,
 }: {
   table: Table<TData>
