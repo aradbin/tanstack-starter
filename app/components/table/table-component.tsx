@@ -24,7 +24,8 @@ import {
 
 import { TablePagination } from "./table-pagination"
 import { TableToolbar } from "./table-toolbar"
-import { useState } from "react"
+import { useEffect, useState } from "react"
+import { getMembers } from "@/lib/db/functions"
 
 interface TableComponentProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[]
@@ -69,6 +70,10 @@ export default function TableComponent<TData, TValue>({
     getFacetedRowModel: getFacetedRowModel(),
     getFacetedUniqueValues: getFacetedUniqueValues(),
   })
+
+  useEffect(() => {
+    getMembers()
+  },[])
 
   return (
     <div className="flex flex-col gap-4">
