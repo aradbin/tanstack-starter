@@ -7,8 +7,7 @@ export const Route = createFileRoute('/_private/members/')({
 })
 
 function RouteComponent() {
-  const tasks: any = []
   return (
-    <TableComponent data={tasks} columns={columns} />
+    <TableComponent columns={columns} />
   )
 }

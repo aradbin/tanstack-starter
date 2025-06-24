@@ -25,15 +25,19 @@ import {
 import { TablePagination } from "./table-pagination"
 import { TableToolbar } from "./table-toolbar"
 import { useEffect, useState } from "react"
-import { getMembers } from "@/lib/db/functions"
+import { getMembers } from "@/routes/_private/members/-functions"
+import { useGetQuery } from "@/lib/queries"
+import { Skeleton } from "@/components/ui/skeleton"
 
 interface TableComponentProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[]
-  data: TData[]
+  params?: unknown
+  data?: TData[]
 }
 
 export default function TableComponent<TData, TValue>({
   columns,
+  params,
   data,
 }: TableComponentProps<TData, TValue>) {
   const [rowSelection, setRowSelection] = useState({})
@@ -43,9 +47,13 @@ export default function TableComponent<TData, TValue>({
     []
   )
   const [sorting, setSorting] = useState<SortingState>([])
+  const { data: tableData, isLoading } = useGetQuery('members', getMembers, {
+    params,
+    initialData: data
+  })
 
   const table = useReactTable({
-    data,
+    data: data || tableData || [],
     columns,
     state: {
       sorting,
@@ -113,6 +121,17 @@ export default function TableComponent<TData, TValue>({
                       )}
                     </TableCell>
                   ))}
+                </TableRow>
+              ))
+            ) : isLoading ? (
+              Array.from({ length: table.initialState.pagination.pageSize }).map((_, i) => (
+                <TableRow key={i}>
+                  <TableCell
+                    colSpan={columns.length}
+                    className="h-12"
+                  >
+                    <Skeleton className="h-6 w-full rounded-full" />
+                  </TableCell>
                 </TableRow>
               ))
             ) : (

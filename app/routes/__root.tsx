@@ -10,6 +10,7 @@ import {
 
 import { getUser } from "@/lib/auth/functions"
 import { authRoutes, head } from "@/lib/variables"
+import { QueryProvider } from "@/providers/query-provider"
 
 export const Route = createRootRoute({
   head: () => head,
@@ -68,7 +69,9 @@ function RootDocument({ children }: Readonly<{ children: ReactNode }>) {
       </head>
       <body className="bg-background text-foreground antialiased overscroll-none">
         <ThemeProvider defaultTheme="system" storageKey="mode">
-          {children}
+          <QueryProvider>
+            {children}
+          </QueryProvider>
         </ThemeProvider>
         <Scripts />
       </body>

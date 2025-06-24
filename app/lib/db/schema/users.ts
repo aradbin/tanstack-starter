@@ -2,6 +2,7 @@ import { pgTable } from "drizzle-orm/pg-core"
 import * as table from "drizzle-orm/pg-core"
 
 import { timestamps } from "./columns.helpers"
+import { relations } from "drizzle-orm"
 
 export const users = pgTable("users", {
   id: table.text().primaryKey(),
@@ -82,6 +83,17 @@ export const members = pgTable("members", {
     .references(() => users.id, { onDelete: "cascade" }),
   ...timestamps,
 })
+
+export const memberRelations = relations(members, ({ one }) => ({
+  organization: one(organizations, {
+    fields: [members.organizationId],
+    references: [organizations.id],
+  }),
+  user: one(users, {
+    fields: [members.userId],
+    references: [users.id],
+  }),
+}))
 
 export const invitations = pgTable("invitations", {
   id: table.text().primaryKey(),
