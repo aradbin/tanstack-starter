@@ -3,6 +3,9 @@ import { getHeaders } from "@tanstack/react-start/server"
 
 import { authClient } from "./client"
 import { authMiddleware } from "./middleware"
+import { db } from "@/lib/db"
+import { sessions } from "@/lib/db/schema"
+import { eq } from "drizzle-orm"
 
 export const signUp = async (value: {
   name: string
@@ -56,7 +59,9 @@ export const getUser = createServerFn()
         const activeOrganizationId = await setActiveOrganization(
           organizations[0].id
         )
+        
         if (context?.session) {
+          await db.update(sessions).set({ activeOrganizationId: organizations[0].id }).where(eq(sessions.id, context.session.id))
           context.session.activeOrganizationId = activeOrganizationId
         }
       }

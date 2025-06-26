@@ -16,7 +16,7 @@ export const getQuery = async <TTable extends TableType>(data: QueryParam<TTable
 const getQueryFn = createServerFn()
   .middleware([authMiddleware])
   .validator((data: { table: TableType; relations?: unknown }) => data)
-  .handler(async ({ data }) => {
+  .handler(async ({ context, data }) => {
     const { table, relations } = data
     
     const query = db.query[table]
