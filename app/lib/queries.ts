@@ -1,6 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 
-export function useGetQuery(key: string, queryFn: Function, payload: {
+export function useGetQuery(key: string, queryFn: Function, payload?: {
   params?: unknown
   initialData?: unknown
 }) {

@@ -24,21 +24,18 @@ import {
 
 import { TablePagination } from "./table-pagination"
 import { TableToolbar } from "./table-toolbar"
-import { useEffect, useState } from "react"
-import { getMembers } from "@/routes/_private/members/-functions"
+import { useState } from "react"
 import { useGetQuery } from "@/lib/queries"
 import { Skeleton } from "@/components/ui/skeleton"
 
 interface TableComponentProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[]
-  params?: unknown
-  data?: TData[]
+  queryFn: Function
 }
 
 export default function TableComponent<TData, TValue>({
   columns,
-  params,
-  data,
+  queryFn,
 }: TableComponentProps<TData, TValue>) {
   const [rowSelection, setRowSelection] = useState({})
   const [columnVisibility, setColumnVisibility] =
@@ -47,13 +44,13 @@ export default function TableComponent<TData, TValue>({
     []
   )
   const [sorting, setSorting] = useState<SortingState>([])
-  const { data: tableData, isLoading } = useGetQuery('members', getMembers, {
-    params,
-    initialData: data
-  })
+
+  const { data: tableData, isLoading } = useGetQuery('members', queryFn)
+
+  console.log('table',tableData)
 
   const table = useReactTable({
-    data: data || tableData || [],
+    data: tableData || [],
     columns,
     state: {
       sorting,
@@ -78,10 +75,6 @@ export default function TableComponent<TData, TValue>({
     getFacetedRowModel: getFacetedRowModel(),
     getFacetedUniqueValues: getFacetedUniqueValues(),
   })
-
-  useEffect(() => {
-    getMembers()
-  },[])
 
   return (
     <div className="flex flex-col gap-4">
