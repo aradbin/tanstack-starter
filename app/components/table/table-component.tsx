@@ -27,27 +27,32 @@ import { TableToolbar } from "./table-toolbar"
 import { useState } from "react"
 import { useGetQuery } from "@/lib/queries"
 import { Skeleton } from "@/components/ui/skeleton"
+import { getQuery, RelationType, TableType } from "@/lib/db/functions"
 
-interface TableComponentProps<TData, TValue> {
+interface TableComponentProps<TData, TValue, TTable extends TableType> {
   columns: ColumnDef<TData, TValue>[]
-  queryFn: Function
+  query: {
+    table: TTable
+    relations?: RelationType<TTable>
+    params?: unknown
+  }
 }
 
-export default function TableComponent<TData, TValue>({
+export default function TableComponent<TData, TValue, TTable extends TableType>({
   columns,
-  queryFn,
-}: TableComponentProps<TData, TValue>) {
+  query,
+}: TableComponentProps<TData, TValue, TTable>) {
   const [rowSelection, setRowSelection] = useState({})
-  const [columnVisibility, setColumnVisibility] =
-    useState<VisibilityState>({})
-  const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>(
-    []
-  )
+  const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({})
+  const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([])
   const [sorting, setSorting] = useState<SortingState>([])
 
-  const { data: tableData, isLoading } = useGetQuery('members', queryFn)
+  const { data: tableData, isLoading } = useGetQuery(query.table, () => getQuery(query), {
+    params: query.params,
+    initialData: null,
+  })
 
-  console.log('table',tableData)
+  console.log('table', isLoading, tableData)
 
   const table = useReactTable({
     data: tableData || [],
