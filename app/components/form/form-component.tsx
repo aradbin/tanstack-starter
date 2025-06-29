@@ -1,5 +1,5 @@
 import { FormFieldType } from "@/lib/types";
-import { validateForm } from "@/lib/validations"
+import { validate } from "@/lib/validations"
 import { useForm } from "@tanstack/react-form"
 import RenderField from "@/components/form/render-field";
 import { Button } from "@/components/ui/button";
@@ -53,13 +53,13 @@ export default function FormComponent({ fields, handleSubmit, onSuccess, onError
     defaultValues: defaultValues,
     validators: {
       ...Object.keys(schemaOnSubmit)?.length ? {
-        onSubmit: validateForm(schemaOnSubmit)
+        onSubmit: validate(schemaOnSubmit)
       } : {},
       ...Object.keys(schemaOnBlur)?.length ? {
-        onBlur: validateForm(schemaOnBlur)
+        onBlur: validate(schemaOnBlur)
       } : {},
       ...Object.keys(schemaOnChange)?.length ? {
-        onChange: validateForm(schemaOnChange)
+        onChange: validate(schemaOnChange)
       } : {},
     },
     onSubmit: async ({ value }) => {

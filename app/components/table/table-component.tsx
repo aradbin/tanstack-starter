@@ -28,6 +28,7 @@ import { useState } from "react"
 import { useGetQuery } from "@/lib/queries"
 import { Skeleton } from "@/components/ui/skeleton"
 import { getQuery, RelationType, TableType } from "@/lib/db/functions"
+import { defaultPageSize } from "@/lib/variables"
 
 interface TableComponentProps<TData, TValue, TTable extends TableType> {
   columns: ColumnDef<TData, TValue>[]
@@ -52,7 +53,7 @@ export default function TableComponent<TData, TValue, TTable extends TableType>(
     initialData: null,
   })
 
-  console.log('table', isLoading, tableData)
+  console.log('table', isLoading, query.params, tableData)
 
   const table = useReactTable({
     data: tableData || [],
@@ -65,7 +66,7 @@ export default function TableComponent<TData, TValue, TTable extends TableType>(
     },
     initialState: {
       pagination: {
-        pageSize: 25,
+        pageSize: defaultPageSize,
       },
     },
     enableRowSelection: true,

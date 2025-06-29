@@ -2,10 +2,23 @@ import { z, ZodObject, ZodRawShape } from "zod/v4"
 
 const maxLength = 35
 
-export const validateForm = <T extends ZodRawShape>(
+export const validate = <T extends ZodRawShape>(
   schema: T
 ): ZodObject<T> => {
   return z.object(schema)
+}
+
+export const numberValidation = (
+  key: string
+) => {
+  return z.number({ error: `${key} has to be number` }).optional()
+}
+
+export const stringValidation = (
+  key: string,
+  max: number = maxLength
+) => {
+  return z.string({ error: `${key} has to be string` }).max(max, { error: `${key} is too long` })
 }
 
 export const stringRequiredValidation = (
