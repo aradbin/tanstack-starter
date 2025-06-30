@@ -6,8 +6,9 @@ import { TableRowActions } from "@/components/table/table-row-actions"
 
 import { members, users } from "@/lib/db/schema"
 import UserAvatar from "@/components/common/user-avatar"
+import { capitalize } from "@/lib/utils"
 
-export const columns: ColumnDef<typeof members.$inferSelect & {
+export const memberColumns: ColumnDef<typeof members.$inferSelect & {
   user: typeof users.$inferSelect
 }>[] = [
   {
@@ -31,20 +32,20 @@ export const columns: ColumnDef<typeof members.$inferSelect & {
         className="translate-y-[2px]"
       />
     ),
-    enableSorting: false,
-    enableHiding: false,
   },
   {
-    accessorKey: "user.id",
-    header: ({ column }) => (
-      <TableColumnHeader column={column} title="Member" />
-    ),
-    cell: ({ row }) => {
-      return <UserAvatar user={row.original.user} />
-    },
+    id: "user",
+    header: ({ column }) => <TableColumnHeader column={column} title="Member" />,
+    cell: ({ row }) => <UserAvatar user={row.original.user} />,
+  },
+  {
+    id: "role",
+    header: ({ column }) => <TableColumnHeader column={column} title="Role" />,
+    cell: ({ row }) => capitalize(row.original.role),
   },
   {
     id: "actions",
+    header: ({ column }) => <TableColumnHeader column={column} title="Actions" className="text-right" />,
     cell: ({ row }) => <TableRowActions row={row} />,
   },
 ]

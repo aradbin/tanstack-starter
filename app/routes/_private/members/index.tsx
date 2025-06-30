@@ -1,8 +1,8 @@
-import { columns } from '@/components/table/columns'
 import TableComponent from '@/components/table/table-component'
 import { numberValidation, validate } from '@/lib/validations'
 import { defaultPageSize } from '@/lib/variables'
 import { createFileRoute } from '@tanstack/react-router'
+import { memberColumns } from './-columns'
 
 export const Route = createFileRoute('/_private/members/')({
   component: RouteComponent,
@@ -16,7 +16,7 @@ function RouteComponent() {
   const search = Route.useSearch()
   
   return (
-    <TableComponent columns={columns} query={{
+    <TableComponent columns={memberColumns} query={{
       table: "members",
       relations: {
         user: true,

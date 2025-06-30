@@ -6,7 +6,6 @@ import {
   getFacetedRowModel,
   getFacetedUniqueValues,
   getFilteredRowModel,
-  getPaginationRowModel,
   getSortedRowModel,
   SortingState,
   useReactTable,
@@ -28,6 +27,7 @@ import { useState } from "react"
 import { useGetQuery } from "@/lib/queries"
 import { Skeleton } from "@/components/ui/skeleton"
 import { getQuery, RelationType, TableType } from "@/lib/db/functions"
+import { AnyType } from "@/lib/types"
 import { defaultPageSize } from "@/lib/variables"
 
 interface TableComponentProps<TData, TValue, TTable extends TableType> {
@@ -35,7 +35,7 @@ interface TableComponentProps<TData, TValue, TTable extends TableType> {
   query: {
     table: TTable
     relations?: RelationType<TTable>
-    params?: unknown
+    params?: AnyType
   }
 }
 
@@ -49,25 +49,26 @@ export default function TableComponent<TData, TValue, TTable extends TableType>(
   const [sorting, setSorting] = useState<SortingState>([])
 
   const { data: tableData, isLoading } = useGetQuery(query.table, () => getQuery(query), {
-    params: query.params,
-    initialData: null,
+    params: query.params
   })
 
-  console.log('table', isLoading, query.params, tableData)
+  console.log('table', isLoading, query, tableData, sorting)
 
   const table = useReactTable({
-    data: tableData || [],
+    data: tableData?.result || [],
     columns,
+    rowCount: tableData?.count || tableData?.result?.length || 0,
     state: {
+      ...(query?.params?.hasPagination === false ? {} : {
+        pagination: {
+          pageIndex: query?.params?.page ? query.params.page - 1 : 0,
+          pageSize: query?.params?.pageSize || defaultPageSize,
+        }
+      }),
       sorting,
       columnVisibility,
       rowSelection,
       columnFilters,
-    },
-    initialState: {
-      pagination: {
-        pageSize: defaultPageSize,
-      },
     },
     enableRowSelection: true,
     onRowSelectionChange: setRowSelection,
@@ -76,7 +77,6 @@ export default function TableComponent<TData, TValue, TTable extends TableType>(
     onColumnVisibilityChange: setColumnVisibility,
     getCoreRowModel: getCoreRowModel(),
     getFilteredRowModel: getFilteredRowModel(),
-    getPaginationRowModel: getPaginationRowModel(),
     getSortedRowModel: getSortedRowModel(),
     getFacetedRowModel: getFacetedRowModel(),
     getFacetedUniqueValues: getFacetedUniqueValues(),
@@ -123,7 +123,7 @@ export default function TableComponent<TData, TValue, TTable extends TableType>(
                 </TableRow>
               ))
             ) : isLoading ? (
-              Array.from({ length: table.initialState.pagination.pageSize }).map((_, i) => (
+              Array.from({ length: table.getState().pagination.pageSize }).map((_, i) => (
                 <TableRow key={i}>
                   <TableCell
                     colSpan={columns.length}
@@ -146,7 +146,13 @@ export default function TableComponent<TData, TValue, TTable extends TableType>(
           </TableBody>
         </Table>
       </div>
-      <TablePagination table={table} />
+      <div className="flex items-center justify-between px-2">
+        <div className="text-muted-foreground flex-1 text-sm">
+          {table.getFilteredSelectedRowModel().rows.length} of{" "}
+          {table.getFilteredRowModel().rows.length} row(s) selected.
+        </div>
+        {query?.params?.hasPagination !== false && <TablePagination table={table} />}
+      </div>
     </div>
   )
 }

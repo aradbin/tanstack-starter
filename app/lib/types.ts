@@ -1,5 +1,7 @@
 import { LucideIcon } from "lucide-react"
 
+export type AnyType = any
+
 export interface NavItemType {
   title?: string
   href?: string

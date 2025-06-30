@@ -6,9 +6,16 @@ export function cn(...inputs: ClassValue[]) {
 }
 
 export const capitalize = (text: string | undefined) => {
-  if (!text || text.length === 0) return ""
+  if (!text || text.trim().length === 0) return ""
 
-  return text.charAt(0).toUpperCase() + text.slice(1)
+  return text
+    .split(" ")
+    .map(word =>
+      word.length > 0
+        ? word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()
+        : ""
+    )
+    .join(" ")
 }
 
 export const getInitials = (fullName: string | undefined | null): string => {

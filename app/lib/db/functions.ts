@@ -22,28 +22,35 @@ const getQueryFn = createServerFn()
     const tableSchema = schema[table] as any
     const query = db.query[table]
 
-    if (!query) {
-      throw new Error(`Table ${String(table)} not found`)
-    }
-
     type TTable = typeof table
     type Relation = RelationType<TTable>
     type FindManyArgs = Parameters<typeof db.query[TTable]['findMany']>[0]
 
-    const args: FindManyArgs = {
-      ...(relations ? { with: relations as Relation } : {}),
-      where: and(
-        // eq(tableSchema?.organizationId, context?.session?.activeOrganizationId),
-        isNull(tableSchema?.deletedAt)
-      ),
-      ...((params?.page || params?.pageSize) ? {
+    const pagination = {
+      ...(params?.hasPagination === false ? {} : {
         limit: params?.pageSize ?? defaultPageSize,
         offset: ((params?.page ?? 1) - 1) * (params?.pageSize ?? defaultPageSize),
-        
-      } : {}),
+      }),
     }
 
-    return await (query.findMany as (args?: FindManyArgs) => Promise<any>)(args)
+    const where = and(
+      // eq(tableSchema?.organizationId, context?.session?.activeOrganizationId),
+      isNull(tableSchema?.deletedAt)
+    )
+
+    const args: FindManyArgs = {
+      ...(relations ? { with: relations as Relation } : {}),
+      ...pagination,
+      where,
+    }
+    
+    const result = await (query.findMany as (args?: FindManyArgs) => Promise<any>)(args)
+    const count = await db.$count(tableSchema, where)
+
+    return {
+      result,
+      count,
+    }
   })
 
 export const getQuery = async <TTable extends TableType>(data: QueryParam<TTable>) => {
