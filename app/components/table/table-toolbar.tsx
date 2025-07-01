@@ -7,11 +7,11 @@ import { TableViewOptions } from "./table-view-options"
 
 import { priorities, statuses } from "./data"
 import { TableFilter } from "./table-filter"
-import { TableFilterProps } from "@/lib/db/functions"
+import { TableFilterType } from "@/lib/db/functions"
 
 interface TableToolbarProps<TData> {
   table: Table<TData>
-  filters: TableFilterProps[]
+  filters: TableFilterType[]
 }
 
 export function TableToolbar<TData>({

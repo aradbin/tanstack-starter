@@ -7,7 +7,7 @@ import { defaultPageSize } from "../variables"
 
 export type TableType = keyof typeof db.query
 export type RelationType<TTable extends TableType> = NonNullable<Parameters<typeof db.query[TTable]['findMany']>[0]>['with']
-export type TableFilterProps = {
+export type TableFilterType = {
   title: string
   options: {
     label: string
@@ -16,7 +16,7 @@ export type TableFilterProps = {
   }[],
   selected: any[]
 }
-export type QueryParam<TTable extends TableType> = {
+export type QueryParamType<TTable extends TableType> = {
   table: TTable
   relations?: RelationType<TTable>
   pagination?: {
@@ -24,7 +24,7 @@ export type QueryParam<TTable extends TableType> = {
     pageSize?: number
     hasPagination?: boolean
   }
-  filters?: TableFilterProps[]
+  filters?: TableFilterType[]
 }
 
 const getQueryFn = createServerFn()
@@ -70,6 +70,6 @@ const getQueryFn = createServerFn()
     }
   })
 
-export const getQuery = async <TTable extends TableType>(data: QueryParam<TTable>) => {
+export const getQuery = async <TTable extends TableType>(data: QueryParamType<TTable>) => {
   return await getQueryFn({ data })
 }

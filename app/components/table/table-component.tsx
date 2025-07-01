@@ -26,13 +26,13 @@ import { TableToolbar } from "./table-toolbar"
 import { useState } from "react"
 import { useGetQuery } from "@/lib/queries"
 import { Skeleton } from "@/components/ui/skeleton"
-import { getQuery, QueryParam, RelationType, TableType } from "@/lib/db/functions"
+import { getQuery, QueryParamType, TableType } from "@/lib/db/functions"
 import { AnyType } from "@/lib/types"
 import { defaultPageSize } from "@/lib/variables"
 
 interface TableComponentProps<TData, TValue, TTable extends TableType> {
   columns: ColumnDef<TData, TValue>[]
-  query: QueryParam<TTable>
+  query: QueryParamType<TTable>
 }
 
 export default function TableComponent<TData, TValue, TTable extends TableType>({

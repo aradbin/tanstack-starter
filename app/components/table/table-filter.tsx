@@ -19,12 +19,12 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover"
 import { Separator } from "@/components/ui/separator"
-import { TableFilterProps } from "@/lib/db/functions"
+import { TableFilterType } from "@/lib/db/functions"
 
 export function TableFilter({
   filter
 }: {
-  filter: TableFilterProps
+  filter: TableFilterType
 }) {
   const { title, options, selected } = filter
 
