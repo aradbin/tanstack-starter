@@ -1,4 +1,4 @@
-import { z, ZodObject, ZodRawShape } from "zod/v4"
+import { z, ZodObject, ZodRawShape, ZodType } from "zod/v4"
 
 const maxLength = 35
 
@@ -18,7 +18,20 @@ export const stringValidation = (
   key: string,
   max: number = maxLength
 ) => {
-  return z.string({ error: `${key} has to be string` }).max(max, { error: `${key} is too long` })
+  return z.string({ error: `${key} has to be string` }).max(max, { error: `${key} is too long` }).optional()
+}
+
+export const arrayValidation = (
+  key: string,
+  max: number = maxLength
+) => {
+  return z
+    .union([
+      stringValidation(key, max),
+      numberValidation(key),
+      z.array(z.union([stringValidation(key, max), numberValidation(key)]))
+    ])
+    .optional()
 }
 
 export const stringRequiredValidation = (
@@ -48,4 +61,11 @@ export const passwordRequiredValidation = (
     .string()
     .min(8, { error: `${key} must be at least 8 characters` })
     .max(max, { error: `${key} is too long` })
+}
+
+export const enamValidation = (
+  key: string,
+  options: string[]
+) => {
+  return z.enum(options).optional()
 }

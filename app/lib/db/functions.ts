@@ -7,17 +7,31 @@ import { defaultPageSize } from "../variables"
 
 export type TableType = keyof typeof db.query
 export type RelationType<TTable extends TableType> = NonNullable<Parameters<typeof db.query[TTable]['findMany']>[0]>['with']
-type QueryParam<TTable extends TableType> = {
+export type TableFilterProps = {
+  title: string
+  options: {
+    label: string
+    value: string
+    icon?: React.ComponentType<{ className?: string }>
+  }[],
+  selected: any[]
+}
+export type QueryParam<TTable extends TableType> = {
   table: TTable
   relations?: RelationType<TTable>
-  params?: any
+  pagination?: {
+    page?: number
+    pageSize?: number
+    hasPagination?: boolean
+  }
+  filters?: TableFilterProps[]
 }
 
 const getQueryFn = createServerFn()
   .middleware([authMiddleware])
-  .validator((data: { table: TableType; relations?: unknown; params?: any }) => data)
+  .validator((data: { table: TableType; relations?: unknown; pagination?: any }) => data)
   .handler(async ({ context, data }) => {
-    const { table, relations, params } = data
+    const { table, relations, pagination } = data
     
     const tableSchema = schema[table] as any
     const query = db.query[table]
@@ -26,10 +40,13 @@ const getQueryFn = createServerFn()
     type Relation = RelationType<TTable>
     type FindManyArgs = Parameters<typeof db.query[TTable]['findMany']>[0]
 
-    const pagination = {
-      ...(params?.hasPagination === false ? {} : {
-        limit: params?.pageSize ?? defaultPageSize,
-        offset: ((params?.page ?? 1) - 1) * (params?.pageSize ?? defaultPageSize),
+    const relationArgs = {
+      ...(relations ? { with: relations as Relation } : {}),
+    }
+    const paginationArgs = {
+      ...(pagination?.hasPagination === false ? {} : {
+        limit: pagination?.pageSize ?? defaultPageSize,
+        offset: ((pagination?.page ?? 1) - 1) * (pagination?.pageSize ?? defaultPageSize),
       }),
     }
 
@@ -39,8 +56,8 @@ const getQueryFn = createServerFn()
     )
 
     const args: FindManyArgs = {
-      ...(relations ? { with: relations as Relation } : {}),
-      ...pagination,
+      ...relationArgs,
+      ...paginationArgs,
       where,
     }
     

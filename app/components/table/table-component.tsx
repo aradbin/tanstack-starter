@@ -26,17 +26,13 @@ import { TableToolbar } from "./table-toolbar"
 import { useState } from "react"
 import { useGetQuery } from "@/lib/queries"
 import { Skeleton } from "@/components/ui/skeleton"
-import { getQuery, RelationType, TableType } from "@/lib/db/functions"
+import { getQuery, QueryParam, RelationType, TableType } from "@/lib/db/functions"
 import { AnyType } from "@/lib/types"
 import { defaultPageSize } from "@/lib/variables"
 
 interface TableComponentProps<TData, TValue, TTable extends TableType> {
   columns: ColumnDef<TData, TValue>[]
-  query: {
-    table: TTable
-    relations?: RelationType<TTable>
-    params?: AnyType
-  }
+  query: QueryParam<TTable>
 }
 
 export default function TableComponent<TData, TValue, TTable extends TableType>({
@@ -45,11 +41,13 @@ export default function TableComponent<TData, TValue, TTable extends TableType>(
 }: TableComponentProps<TData, TValue, TTable>) {
   const [rowSelection, setRowSelection] = useState({})
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({})
-  const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([])
   const [sorting, setSorting] = useState<SortingState>([])
 
   const { data: tableData, isLoading } = useGetQuery(query.table, () => getQuery(query), {
-    params: query.params
+    params: {
+      ...query.pagination,
+      ...query.filters,
+    }
   })
 
   console.log('table', isLoading, query, tableData, sorting)
@@ -59,24 +57,21 @@ export default function TableComponent<TData, TValue, TTable extends TableType>(
     columns,
     rowCount: tableData?.count || tableData?.result?.length || 0,
     state: {
-      ...(query?.params?.hasPagination === false ? {} : {
+      ...(query?.pagination?.hasPagination === false ? {} : {
         pagination: {
-          pageIndex: query?.params?.page ? query.params.page - 1 : 0,
-          pageSize: query?.params?.pageSize || defaultPageSize,
+          pageIndex: query?.pagination?.page ? query.pagination.page - 1 : 0,
+          pageSize: query?.pagination?.pageSize || defaultPageSize,
         }
       }),
       sorting,
       columnVisibility,
       rowSelection,
-      columnFilters,
     },
     enableRowSelection: true,
     onRowSelectionChange: setRowSelection,
     onSortingChange: setSorting,
-    onColumnFiltersChange: setColumnFilters,
     onColumnVisibilityChange: setColumnVisibility,
     getCoreRowModel: getCoreRowModel(),
-    getFilteredRowModel: getFilteredRowModel(),
     getSortedRowModel: getSortedRowModel(),
     getFacetedRowModel: getFacetedRowModel(),
     getFacetedUniqueValues: getFacetedUniqueValues(),
@@ -84,7 +79,7 @@ export default function TableComponent<TData, TValue, TTable extends TableType>(
 
   return (
     <div className="flex flex-col gap-4">
-      <TableToolbar table={table} />
+      <TableToolbar table={table} filters={query.filters || []} />
       <div className="rounded-md border">
         <Table>
           <TableHeader>
@@ -151,7 +146,7 @@ export default function TableComponent<TData, TValue, TTable extends TableType>(
           {table.getFilteredSelectedRowModel().rows.length} of{" "}
           {table.getFilteredRowModel().rows.length} row(s) selected.
         </div>
-        {query?.params?.hasPagination !== false && <TablePagination table={table} />}
+        {query?.pagination?.hasPagination !== false && <TablePagination table={table} />}
       </div>
     </div>
   )

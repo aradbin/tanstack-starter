@@ -34,7 +34,7 @@ export const memberColumns: ColumnDef<typeof members.$inferSelect & {
     ),
   },
   {
-    id: "user",
+    id: "member",
     header: ({ column }) => <TableColumnHeader column={column} title="Member" />,
     cell: ({ row }) => <UserAvatar user={row.original.user} />,
   },

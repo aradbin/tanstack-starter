@@ -31,8 +31,9 @@ export function TablePagination<TData>({
       search: (prev: AnyType) => ({
         ...prev,
         page: index + 1
-      })
-    })
+      }),
+      replace: true
+    })  
   }
 
   const onPageSizeChange = (size: number) => {
@@ -40,7 +41,8 @@ export function TablePagination<TData>({
       search: (prev: AnyType) => ({
         ...prev,
         pageSize: size
-      })
+      }),
+      replace: true
     })
   }
 

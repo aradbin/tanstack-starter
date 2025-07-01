@@ -1,5 +1,4 @@
 import * as React from "react"
-import { Column } from "@tanstack/react-table"
 import { Check, PlusCircle } from "lucide-react"
 
 import { cn } from "@/lib/utils"
@@ -20,24 +19,14 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover"
 import { Separator } from "@/components/ui/separator"
+import { TableFilterProps } from "@/lib/db/functions"
 
-interface TableFilterProps<TData, TValue> {
-  column?: Column<TData, TValue>
-  title?: string
-  options: {
-    label: string
-    value: string
-    icon?: React.ComponentType<{ className?: string }>
-  }[]
-}
-
-export function TableFilter<TData, TValue>({
-  column,
-  title,
-  options,
-}: TableFilterProps<TData, TValue>) {
-  const facets = column?.getFacetedUniqueValues()
-  const selectedValues = new Set(column?.getFilterValue() as string[])
+export function TableFilter({
+  filter
+}: {
+  filter: TableFilterProps
+}) {
+  const { title, options, selected } = filter
 
   return (
     <Popover>
@@ -45,26 +34,26 @@ export function TableFilter<TData, TValue>({
         <Button variant="outline" size="sm" className="h-8 border-dashed">
           <PlusCircle />
           {title}
-          {selectedValues?.size > 0 && (
+          {selected?.length > 0 && (
             <>
               <Separator orientation="vertical" className="mx-2 h-4" />
               <Badge
                 variant="secondary"
                 className="rounded-sm px-1 font-normal lg:hidden"
               >
-                {selectedValues.size}
+                {selected?.length}
               </Badge>
               <div className="hidden gap-1 lg:flex">
-                {selectedValues.size > 2 ? (
+                {selected?.length > 2 ? (
                   <Badge
                     variant="secondary"
                     className="rounded-sm px-1 font-normal"
                   >
-                    {selectedValues.size} selected
+                    {selected?.length} selected
                   </Badge>
                 ) : (
                   options
-                    .filter((option) => selectedValues.has(option.value))
+                    .filter((option) => selected?.includes(option.value))
                     .map((option) => (
                       <Badge
                         variant="secondary"
@@ -87,20 +76,18 @@ export function TableFilter<TData, TValue>({
             <CommandEmpty>No results found.</CommandEmpty>
             <CommandGroup>
               {options.map((option) => {
-                const isSelected = selectedValues.has(option.value)
+                const isSelected = selected?.includes(option.value)
                 return (
                   <CommandItem
                     key={option.value}
                     onSelect={() => {
                       if (isSelected) {
-                        selectedValues.delete(option.value)
+                        selected?.filter(
+                          (value) => value !== option.value
+                        )
                       } else {
-                        selectedValues.add(option.value)
+                        selected.push(option.value)
                       }
-                      const filterValues = Array.from(selectedValues)
-                      column?.setFilterValue(
-                        filterValues.length ? filterValues : undefined
-                      )
                     }}
                   >
                     <div
@@ -117,21 +104,21 @@ export function TableFilter<TData, TValue>({
                       <option.icon className="text-muted-foreground size-4" />
                     )}
                     <span>{option.label}</span>
-                    {facets?.get(option.value) && (
+                    {/* {facets?.get(option.value) && (
                       <span className="text-muted-foreground ml-auto flex size-4 items-center justify-center font-mono text-xs">
                         {facets.get(option.value)}
                       </span>
-                    )}
+                    )} */}
                   </CommandItem>
                 )
               })}
             </CommandGroup>
-            {selectedValues.size > 0 && (
+            {selected?.length > 0 && (
               <>
                 <CommandSeparator />
                 <CommandGroup>
                   <CommandItem
-                    onSelect={() => column?.setFilterValue(undefined)}
+                    onSelect={() => console.log("Clear filters")}
                     className="justify-center text-center"
                   >
                     Clear filters
