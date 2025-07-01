@@ -21,7 +21,7 @@ export const stringValidation = (
   return z.string({ error: `${key} has to be string` }).max(max, { error: `${key} is too long` }).optional()
 }
 
-export const arrayValidation = (
+export const unionValidation = (
   key: string,
   max: number = maxLength
 ) => {
@@ -29,8 +29,11 @@ export const arrayValidation = (
     .union([
       stringValidation(key, max),
       numberValidation(key),
-      z.array(z.union([stringValidation(key, max), numberValidation(key)]))
+      z.array(stringValidation(key, max)),
+      z.array(numberValidation(key)),
+      z.array(z.union([stringValidation(key, max), numberValidation(key)])),
     ])
+    .transform((val) => (Array.isArray(val) ? val : [val]))
     .optional()
 }
 

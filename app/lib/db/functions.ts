@@ -4,6 +4,7 @@ import { db } from "@/lib/db"
 import * as schema from "@/lib/db/schema"
 import { and, eq, isNull } from "drizzle-orm"
 import { defaultPageSize } from "../variables"
+import { AnyType } from "../types"
 
 export type TableType = keyof typeof db.query
 export type RelationType<TTable extends TableType> = NonNullable<Parameters<typeof db.query[TTable]['findMany']>[0]>['with']
@@ -14,7 +15,7 @@ export type TableFilterType = {
     value: string
     icon?: React.ComponentType<{ className?: string }>
   }[],
-  selected: any[]
+  selected: AnyType
 }
 export type QueryParamType<TTable extends TableType> = {
   table: TTable

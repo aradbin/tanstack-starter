@@ -1,5 +1,5 @@
 import TableComponent from '@/components/table/table-component'
-import { numberValidation, arrayValidation, validate } from '@/lib/validations'
+import { numberValidation, unionValidation, validate } from '@/lib/validations'
 import { defaultPageSize } from '@/lib/variables'
 import { createFileRoute } from '@tanstack/react-router'
 import { memberColumns } from './-columns'
@@ -9,13 +9,15 @@ export const Route = createFileRoute('/_private/members/')({
   validateSearch: validate({
     page: numberValidation('Page').catch(1),
     pageSize: numberValidation('Page Size').catch(defaultPageSize),
-    role: arrayValidation('Role').catch([]),
-  })
+    role: unionValidation('Role').catch([]),
+  }),
 })
 
 function RouteComponent() {
   const search = Route.useSearch()
+
   console.log('search', search)
+  
   return (
     <TableComponent columns={memberColumns} query={{
       table: "members",
@@ -39,7 +41,7 @@ function RouteComponent() {
               value: 'member'
             }
           ],
-          selected: search.role ? Array.isArray(search.role) ? search.role : [search.role] : []
+          selected: search.role
         }
       ]
     }} />

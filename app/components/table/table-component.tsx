@@ -27,7 +27,6 @@ import { useState } from "react"
 import { useGetQuery } from "@/lib/queries"
 import { Skeleton } from "@/components/ui/skeleton"
 import { getQuery, QueryParamType, TableType } from "@/lib/db/functions"
-import { AnyType } from "@/lib/types"
 import { defaultPageSize } from "@/lib/variables"
 
 interface TableComponentProps<TData, TValue, TTable extends TableType> {

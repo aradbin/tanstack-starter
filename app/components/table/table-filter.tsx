@@ -20,6 +20,7 @@ import {
 } from "@/components/ui/popover"
 import { Separator } from "@/components/ui/separator"
 import { TableFilterType } from "@/lib/db/functions"
+import { AnyType } from "@/lib/types"
 
 export function TableFilter({
   filter
@@ -83,7 +84,7 @@ export function TableFilter({
                     onSelect={() => {
                       if (isSelected) {
                         selected?.filter(
-                          (value) => value !== option.value
+                          (value: AnyType) => value !== option.value
                         )
                       } else {
                         selected.push(option.value)
