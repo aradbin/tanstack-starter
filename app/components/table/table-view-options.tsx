@@ -16,6 +16,8 @@ export function TableViewOptions<TData>({
 }: {
   table: Table<TData>
 }) {
+  if(table.getAllColumns().filter((column) => typeof column.accessorFn !== "undefined" && column.getCanHide()).length === 0) return null
+  
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>

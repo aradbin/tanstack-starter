@@ -5,9 +5,9 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { TableViewOptions } from "./table-view-options"
 
-import { priorities, statuses } from "./data"
 import { TableFilter } from "./table-filter"
 import { TableFilterType } from "@/lib/db/functions"
+import { useNavigate } from "@tanstack/react-router"
 
 interface TableToolbarProps<TData> {
   table: Table<TData>
@@ -16,9 +16,10 @@ interface TableToolbarProps<TData> {
 
 export function TableToolbar<TData>({
   table,
-  filters
+  filters,
 }: TableToolbarProps<TData>) {
-  const isFiltered = table.getState().columnFilters.length > 0
+  const navigate = useNavigate()
+  const isFiltered = filters?.map(filter => filter.selected).some(Boolean)
 
   return (
     <div className="flex items-center justify-between">
@@ -36,7 +37,9 @@ export function TableToolbar<TData>({
           <Button
             variant="ghost"
             size="sm"
-            onClick={() => table.resetColumnFilters()}
+            onClick={() => {
+              navigate({ replace: true })
+            }}
           >
             Reset
             <X />

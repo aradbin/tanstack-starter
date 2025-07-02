@@ -30,7 +30,7 @@ function RouteComponent() {
       },
       filters: [
         {
-          title: 'Role',
+          key: 'role',
           options: [
             {
               label: 'Owner',

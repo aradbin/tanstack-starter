@@ -33,7 +33,7 @@ export const unionValidation = (
       z.array(numberValidation(key)),
       z.array(z.union([stringValidation(key, max), numberValidation(key)])),
     ])
-    .transform((val) => (Array.isArray(val) ? val : [val]))
+    .transform((val) => (val ? Array.isArray(val) ? val : [val] : []))
     .optional()
 }
 
@@ -70,5 +70,5 @@ export const enamValidation = (
   key: string,
   options: string[]
 ) => {
-  return z.enum(options).optional()
+  return z.enum(options, { error: `${key} must be one of ${options.join(', ')}` }).optional()
 }

@@ -1,7 +1,6 @@
-import * as React from "react"
 import { Check, PlusCircle } from "lucide-react"
 
-import { cn } from "@/lib/utils"
+import { capitalize, cn } from "@/lib/utils"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import {
@@ -21,20 +20,39 @@ import {
 import { Separator } from "@/components/ui/separator"
 import { TableFilterType } from "@/lib/db/functions"
 import { AnyType } from "@/lib/types"
+import { useNavigate } from "@tanstack/react-router"
 
 export function TableFilter({
   filter
 }: {
   filter: TableFilterType
 }) {
-  const { title, options, selected } = filter
+  const navigate: AnyType = useNavigate()
+  const { key, title, options, selected } = filter
+
+  const onSelect = (value: AnyType) => {
+    navigate({
+      search: (prev: AnyType) => {
+        const key = filter.key.toLowerCase()
+        const current = selected ? Array.isArray(selected) ? selected : [selected] : []
+        const updated = current.includes(value) ? current.filter((v) => v !== value) : [...current, value]
+        const { [key]: _, ...rest } = prev
+        return {
+          ...rest,
+          ...(rest.page ? { page: 1 } : {}),
+          ...(updated.length > 0) ? { [key]: updated } : {},
+        }
+      },
+      replace: true
+    })
+  }
 
   return (
     <Popover>
       <PopoverTrigger asChild>
         <Button variant="outline" size="sm" className="h-8 border-dashed">
           <PlusCircle />
-          {title}
+          {capitalize(title || key)}
           {selected?.length > 0 && (
             <>
               <Separator orientation="vertical" className="mx-2 h-4" />
@@ -53,17 +71,15 @@ export function TableFilter({
                     {selected?.length} selected
                   </Badge>
                 ) : (
-                  options
-                    .filter((option) => selected?.includes(option.value))
-                    .map((option) => (
-                      <Badge
-                        variant="secondary"
-                        key={option.value}
-                        className="rounded-sm px-1 font-normal"
-                      >
-                        {option.label}
-                      </Badge>
-                    ))
+                  options?.filter((option) => selected?.includes(option.value)).map((option) => (
+                    <Badge
+                      variant="secondary"
+                      key={option.value}
+                      className="rounded-sm px-1 font-normal"
+                    >
+                      {option.label}
+                    </Badge>
+                  ))
                 )}
               </div>
             </>
@@ -72,24 +88,16 @@ export function TableFilter({
       </PopoverTrigger>
       <PopoverContent className="w-[200px] p-0" align="start">
         <Command>
-          <CommandInput placeholder={title} />
+          <CommandInput placeholder={capitalize(title || key)} />
           <CommandList>
             <CommandEmpty>No results found.</CommandEmpty>
             <CommandGroup>
-              {options.map((option) => {
+              {options?.map((option) => {
                 const isSelected = selected?.includes(option.value)
                 return (
                   <CommandItem
                     key={option.value}
-                    onSelect={() => {
-                      if (isSelected) {
-                        selected?.filter(
-                          (value: AnyType) => value !== option.value
-                        )
-                      } else {
-                        selected.push(option.value)
-                      }
-                    }}
+                    onSelect={() => onSelect(option.value)}
                   >
                     <div
                       className={cn(
@@ -105,11 +113,6 @@ export function TableFilter({
                       <option.icon className="text-muted-foreground size-4" />
                     )}
                     <span>{option.label}</span>
-                    {/* {facets?.get(option.value) && (
-                      <span className="text-muted-foreground ml-auto flex size-4 items-center justify-center font-mono text-xs">
-                        {facets.get(option.value)}
-                      </span>
-                    )} */}
                   </CommandItem>
                 )
               })}

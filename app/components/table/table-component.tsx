@@ -1,11 +1,9 @@
 import {
   ColumnDef,
-  ColumnFiltersState,
   flexRender,
   getCoreRowModel,
   getFacetedRowModel,
   getFacetedUniqueValues,
-  getFilteredRowModel,
   getSortedRowModel,
   SortingState,
   useReactTable,
@@ -49,7 +47,7 @@ export default function TableComponent<TData, TValue, TTable extends TableType>(
     }
   })
 
-  console.log('table', isLoading, query, tableData, sorting)
+  console.log('table', isLoading, query, tableData)
 
   const table = useReactTable({
     data: tableData?.result || [],
@@ -142,8 +140,8 @@ export default function TableComponent<TData, TValue, TTable extends TableType>(
       </div>
       <div className="flex items-center justify-between px-2">
         <div className="text-muted-foreground flex-1 text-sm">
-          {table.getFilteredSelectedRowModel().rows.length} of{" "}
-          {table.getFilteredRowModel().rows.length} row(s) selected.
+          {table.getSelectedRowModel().rows.length} of{" "}
+          {table.getRowModel().rows.length} row(s) selected.
         </div>
         {query?.pagination?.hasPagination !== false && <TablePagination table={table} />}
       </div>

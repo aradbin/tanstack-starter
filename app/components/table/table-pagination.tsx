@@ -33,14 +33,15 @@ export function TablePagination<TData>({
         page: index + 1
       }),
       replace: true
-    })  
+    })
   }
 
   const onPageSizeChange = (size: number) => {
     navigate({
       search: (prev: AnyType) => ({
         ...prev,
-        pageSize: size
+        page: 1,
+        pageSize: size,
       }),
       replace: true
     })
