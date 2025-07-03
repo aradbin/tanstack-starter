@@ -16,7 +16,7 @@ export const Route = createFileRoute('/_private/members/')({
 function RouteComponent() {
   const search = Route.useSearch()
 
-  console.log('search', search)
+  console.count('RouteComponent')
   
   return (
     <TableComponent columns={memberColumns} query={{

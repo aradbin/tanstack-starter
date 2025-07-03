@@ -48,6 +48,20 @@ export function TableFilter({
     })
   }
 
+  const onClear = () => {
+    navigate({
+      search: (prev: AnyType) => {
+        const filterKey = filter.key.toLowerCase()
+        const { [filterKey]: _, ...rest } = prev
+        return {
+          ...rest,
+          ...(rest.page ? { page: 1 } : {}),
+        }
+      },
+      replace: true
+    })
+  }
+
   return (
     <Popover>
       <PopoverTrigger asChild>
@@ -123,7 +137,7 @@ export function TableFilter({
                 <CommandSeparator />
                 <CommandGroup>
                   <CommandItem
-                    onSelect={() => console.log("Clear filters")}
+                    onSelect={() => onClear()}
                     className="justify-center text-center"
                   >
                     Clear filters

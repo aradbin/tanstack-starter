@@ -8,9 +8,10 @@ export function useGetQuery(key: string, queryFn: () => Promise<any>, payload: {
   initialData: null
 }) {
   return useQuery({
-    queryKey: [key, JSON.stringify(payload?.params)],
+    queryKey: [key, payload?.params],
     queryFn,
     retry: false,
+    refetchOnWindowFocus: false,
     ...payload?.initialData ? { initialData: payload?.initialData } : {},
   })
 }
