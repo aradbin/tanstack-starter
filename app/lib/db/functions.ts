@@ -8,32 +8,22 @@ import { AnyType } from "../types"
 
 export type TableType = keyof typeof db.query
 export type RelationType<TTable extends TableType> = NonNullable<Parameters<typeof db.query[TTable]['findMany']>[0]>['with']
-export type TableFilterType = {
-  key: string
-  title?: string
-  options?: {
-    label: string
-    value: string
-    icon?: React.ComponentType<{ className?: string }>
-  }[],
-  selected?: AnyType
-}
 export type QueryParamType<TTable extends TableType> = {
   table: TTable
-  relations?: RelationType<TTable>
+  relation?: RelationType<TTable>
   pagination?: {
     page?: number
     pageSize?: number
     hasPagination?: boolean
   }
-  filters?: TableFilterType[]
+  where?: Record<string, AnyType>
 }
 
 const getQueryFn = createServerFn()
   .middleware([authMiddleware])
-  .validator((data: { table: TableType; relations?: unknown; pagination?: AnyType, filters?: AnyType }) => data)
+  .validator((data: { table: TableType; relation?: unknown; pagination?: AnyType, where?: Record<string, AnyType> }) => data)
   .handler(async ({ context, data }) => {
-    const { table, relations, pagination, filters } = data
+    const { table, relation, pagination, where } = data
     const tableSchema = schema[table] as AnyType
     const query = db.query[table]
 
@@ -41,9 +31,9 @@ const getQueryFn = createServerFn()
     type Relation = RelationType<TTable>
     type FindManyArgs = Parameters<typeof db.query[TTable]['findMany']>[0]
 
-    // relations
+    // relation
     const relationArgs = {
-      ...(relations ? { with: relations as Relation } : {}),
+      ...(relation ? { with: relation as Relation } : {}),
     }
 
     // pagination
@@ -54,17 +44,16 @@ const getQueryFn = createServerFn()
       }),
     }
 
-    // filters
+    // where
     const baseConditions = [
       isNull(tableSchema?.deletedAt),
       // eq(tableSchema?.organizationId, context?.session?.activeOrganizationId)
     ]
-    const dynamicConditions = filters.flatMap((filter: TableFilterType) => {
-      const key = filter.key.toLowerCase()
+    const dynamicConditions = Object.entries(where ?? {}).flatMap(([key, value]) => {
       const column = tableSchema?.[key]
-      if (!column || !filter.selected?.length) return []
+      if (!column || !value || !value.length) return []
 
-      return [inArray(column, filter.selected)]
+      return Array.isArray(value) ? inArray(column, value) : eq(column, value)
     })
     const whereArg = {
       where: and(...baseConditions, ...dynamicConditions)

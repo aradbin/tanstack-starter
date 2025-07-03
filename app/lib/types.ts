@@ -29,3 +29,15 @@ export interface FormFieldType {
   handleChange?: any
   isValid?: boolean
 }
+
+export interface OptionType {
+  label: string
+  value: string
+  icon?: React.ComponentType<{ className?: string }>
+}
+
+export interface TableFilterType {
+  key: string
+  title?: string
+  options?: OptionType[],
+}

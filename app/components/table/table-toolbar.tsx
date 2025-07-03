@@ -6,20 +6,22 @@ import { Input } from "@/components/ui/input"
 import { TableViewOptions } from "./table-view-options"
 
 import { TableFilter } from "./table-filter"
-import { TableFilterType } from "@/lib/db/functions"
 import { useNavigate } from "@tanstack/react-router"
+import { AnyType, TableFilterType } from "@/lib/types"
 
 interface TableToolbarProps<TData> {
   table: Table<TData>
   filters: TableFilterType[]
+  selected: Record<string, AnyType>
 }
 
 export function TableToolbar<TData>({
   table,
   filters,
+  selected
 }: TableToolbarProps<TData>) {
   const navigate = useNavigate()
-  const isFiltered = filters?.map(filter => filter.selected).some(Boolean)
+  const isFiltered = Object.entries(selected)?.some(([_, value]) => value?.length > 0)
 
   return (
     <div className="flex items-center justify-between">
@@ -32,7 +34,7 @@ export function TableToolbar<TData>({
           }
           className="h-8 w-[150px] lg:w-[250px]"
         />
-        {filters?.map((filter, index) => <TableFilter key={index} filter={filter} /> )}
+        {filters?.map((filter, index) => <TableFilter key={index} filter={filter} selected={selected[filter.key] || null} /> )}
         {isFiltered && (
           <Button
             variant="ghost"

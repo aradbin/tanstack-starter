@@ -18,17 +18,18 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover"
 import { Separator } from "@/components/ui/separator"
-import { TableFilterType } from "@/lib/db/functions"
-import { AnyType } from "@/lib/types"
+import { AnyType, TableFilterType } from "@/lib/types"
 import { useNavigate } from "@tanstack/react-router"
 
 export function TableFilter({
-  filter
+  filter,
+  selected
 }: {
   filter: TableFilterType
+  selected: AnyType
 }) {
   const navigate: AnyType = useNavigate()
-  const { key, title, options, selected } = filter
+  const { key, title, options } = filter
 
   const onSelect = (value: AnyType) => {
     navigate({

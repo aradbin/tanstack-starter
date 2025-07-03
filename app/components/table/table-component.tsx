@@ -26,14 +26,17 @@ import { useGetQuery } from "@/lib/queries"
 import { Skeleton } from "@/components/ui/skeleton"
 import { getQuery, QueryParamType, TableType } from "@/lib/db/functions"
 import { defaultPageSize } from "@/lib/variables"
+import { TableFilterType } from "@/lib/types"
 
 interface TableComponentProps<TData, TValue, TTable extends TableType> {
   columns: ColumnDef<TData, TValue>[]
+  filters: TableFilterType[]
   query: QueryParamType<TTable>
 }
 
 export default function TableComponent<TData, TValue, TTable extends TableType>({
   columns,
+  filters,
   query,
 }: TableComponentProps<TData, TValue, TTable>) {
   const [rowSelection, setRowSelection] = useState({})
@@ -43,11 +46,12 @@ export default function TableComponent<TData, TValue, TTable extends TableType>(
   const { data: tableData, isLoading } = useGetQuery(query.table, () => getQuery(query), {
     params: {
       ...query.pagination,
-      ...query.filters,
+      ...query.where,
     }
   })
 
-  console.log('table', isLoading, query, tableData)
+  // console.log('table', isLoading, query, tableData)
+  console.count('table')
 
   const table = useReactTable({
     data: tableData?.result || [],
@@ -76,7 +80,7 @@ export default function TableComponent<TData, TValue, TTable extends TableType>(
 
   return (
     <div className="flex flex-col gap-4">
-      <TableToolbar table={table} filters={query.filters || []} />
+      <TableToolbar table={table} filters={filters || []} selected={query.where || {}} />
       <div className="rounded-md border">
         <Table>
           <TableHeader>

@@ -1,3 +1,4 @@
+import { scan } from "react-scan";
 import type { ReactNode } from "react"
 import { ThemeProvider } from "@/providers/theme-provider"
 import {
@@ -62,6 +63,9 @@ function RootComponent() {
 }
 
 function RootDocument({ children }: Readonly<{ children: ReactNode }>) {
+  scan({
+    enabled: true,
+  });
   return (
     <html className="dark" lang="en" dir="ltr" suppressHydrationWarning>
       <head>

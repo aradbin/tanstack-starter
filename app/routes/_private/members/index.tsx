@@ -21,29 +21,30 @@ function RouteComponent() {
   return (
     <TableComponent columns={memberColumns} query={{
       table: "members",
-      relations: {
+      relation: {
         user: true,
       },
       pagination: {
         page: search.page,
         pageSize: search.pageSize
       },
-      filters: [
-        {
-          key: 'role',
-          options: [
-            {
-              label: 'Owner',
-              value: 'owner'
-            },
-            {
-              label: 'Member',
-              value: 'member'
-            }
-          ],
-          selected: search.role
-        }
-      ]
-    }} />
+      where: {
+        role: search.role
+      }
+    }} filters={[
+      {
+        key: 'role',
+        options: [
+          {
+            label: 'Owner',
+            value: 'owner'
+          },
+          {
+            label: 'Member',
+            value: 'member'
+          }
+        ]
+      }
+    ]} />
   )
 }
