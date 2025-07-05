@@ -12,6 +12,7 @@ export function useGetQuery(key: string, queryFn: () => Promise<any>, payload: {
     queryFn,
     retry: false,
     refetchOnWindowFocus: false,
+    structuralSharing: true,
     ...payload?.initialData ? { initialData: payload?.initialData } : {},
   })
 }
