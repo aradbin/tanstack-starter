@@ -1,23 +1,14 @@
 import { useMemo, useState } from 'react'
-import {
-  ColumnDef,
-  flexRender,
-  getCoreRowModel,
-  getFacetedRowModel,
-  getFacetedUniqueValues,
-  getSortedRowModel,
-  SortingState,
-  useReactTable,
-  VisibilityState,
+import { ColumnDef, flexRender, getCoreRowModel, getFacetedRowModel, getFacetedUniqueValues, getSortedRowModel, useReactTable, VisibilityState,
 } from "@tanstack/react-table"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { TablePagination } from "./table-pagination"
 import { TableToolbar } from "./table-toolbar"
-import { useGetQuery } from "@/lib/queries"
 import { Skeleton } from "@/components/ui/skeleton"
-import { getQuery, QueryParamType, TableType } from "@/lib/db/functions"
+import { getData, QueryParamType, TableType } from "@/lib/db/functions"
 import { defaultPageSize } from "@/lib/variables"
 import { AnyType, TableFilterType } from "@/lib/types"
+import { useQuery } from '@tanstack/react-query'
 
 interface TableComponentProps<TData, TValue, TTable extends TableType> {
   columns: ColumnDef<TData, TValue>[]
@@ -32,19 +23,18 @@ export default function TableComponent<TData, TValue, TTable extends TableType>(
 }: TableComponentProps<TData, TValue, TTable>) {
   const [rowSelection, setRowSelection] = useState({})
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({})
-  const [sorting, setSorting] = useState<SortingState>([])
-
-  const { data: tableData, isLoading } = useGetQuery(query.table, () => getQuery(query), {
-    params: {
+  
+  const { data: tableData, isLoading } = useQuery({
+    queryKey: [query.table, {
+      ...query.sort ? { sort: query.sort } : {},
+      ...query.order ? { order: query.order } : {},
       ...query.pagination,
       ...query.where,
-    }
+    }],
+    queryFn: () => getData(query),
   })
 
-  console.count('TableComponent')
-
-  // SOLUTION: Memoize the table configuration
-  const tableConfig: AnyType = useMemo(() => ({
+  const tableOptions: AnyType = useMemo(() => ({
     data: tableData?.result || [],
     columns,
     rowCount: tableData?.count || tableData?.result?.length || 0,
@@ -55,38 +45,38 @@ export default function TableComponent<TData, TValue, TTable extends TableType>(
           pageSize: query?.pagination?.pageSize || defaultPageSize,
         }
       }),
-      sorting,
+      sorting: [
+        ...query.sort ? [{ id: query.sort, desc: query.order === 'desc' }] : []
+      ],
       columnVisibility,
       rowSelection,
     },
     enableRowSelection: true,
     onRowSelectionChange: setRowSelection,
-    onSortingChange: setSorting,
     onColumnVisibilityChange: setColumnVisibility,
     getCoreRowModel: getCoreRowModel(),
-    getSortedRowModel: getSortedRowModel(),
     getFacetedRowModel: getFacetedRowModel(),
     getFacetedUniqueValues: getFacetedUniqueValues(),
   }), [
     tableData?.result,
     tableData?.count,
     columns,
+    query?.sort,
+    query?.order,
     query?.pagination?.hasPagination,
     query?.pagination?.page,
     query?.pagination?.pageSize,
-    sorting,
     columnVisibility,
     rowSelection,
   ])
 
-  const table = useReactTable(tableConfig)
+  const table = useReactTable(tableOptions)
 
-  // Memoize the selected filters to prevent TableToolbar re-renders
-  const selectedFilters = useMemo(() => query.where || {}, [query.where])
+  console.count('TableComponent')
 
   return (
     <div className="flex flex-col gap-4">
-      <TableToolbar table={table} filters={filters || []} selected={selectedFilters} />
+      <TableToolbar table={table} filters={filters || []} selected={query.where || {}} />
       <div className="rounded-md border">
         <Table>
           <TableHeader>
@@ -127,18 +117,17 @@ export default function TableComponent<TData, TValue, TTable extends TableType>(
             ) : isLoading ? (
               Array.from({ length: table.getState().pagination.pageSize }).map((_, i) => (
                 <TableRow key={i}>
-                  <TableCell
-                    colSpan={columns.length}
-                    className="h-12"
-                  >
-                    <Skeleton className="h-6 w-full rounded-full" />
-                  </TableCell>
+                  {Array.from({ length: table.getVisibleFlatColumns().length }).map((_, j) => (
+                    <TableCell className="h-12" key={j}>
+                      <Skeleton className="h-6 w-full rounded-full" />
+                    </TableCell>
+                  ))}
                 </TableRow>
               ))
             ) : (
               <TableRow>
                 <TableCell
-                  colSpan={columns.length}
+                  colSpan={table.getVisibleFlatColumns().length}
                   className="h-24 text-center"
                 >
                   No results.

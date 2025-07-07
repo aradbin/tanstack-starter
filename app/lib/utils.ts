@@ -1,5 +1,6 @@
 import { clsx, type ClassValue } from "clsx"
 import { twMerge } from "tailwind-merge"
+import { format, isValid } from "date-fns"
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
@@ -30,4 +31,9 @@ export const getInitials = (fullName: string | undefined | null): string => {
   const lastInitial = names[names.length - 1].charAt(0)
 
   return `${firstInitial}${lastInitial}`.toUpperCase()
+}
+
+export const formatDate = (date: Date) => {
+  if (!date || !isValid(date)) return ""
+  return format(new Date(date), "do MMM, yyyy hh:mm a")
 }

@@ -10,6 +10,8 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
+import { AnyType } from "@/lib/types"
+import { useNavigate } from "@tanstack/react-router"
 
 interface TableColumnHeaderProps<TData, TValue>
   extends React.HTMLAttributes<HTMLDivElement> {
@@ -24,6 +26,24 @@ export function TableColumnHeader<TData, TValue>({
 }: TableColumnHeaderProps<TData, TValue>) {
   if (!column.getCanSort()) {
     return <div className={cn(className)}>{title}</div>
+  }
+
+  const navigate: AnyType = useNavigate()
+
+  const sort = (order: 'asc' | 'desc') => {
+    navigate({
+      search: (prev: AnyType) => ({
+        ...prev,
+        ...(prev.page ? { page: 1 } : {}),
+        ...((prev.sort === column.id && prev.order === order) ? {
+          sort: '',
+          order: ''
+        } : {
+          sort: column.id,
+          order
+        }),
+      })
+    })
   }
 
   return (
@@ -46,11 +66,11 @@ export function TableColumnHeader<TData, TValue>({
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent align="start">
-          <DropdownMenuItem onClick={() => column.toggleSorting(false)}>
+          <DropdownMenuItem onClick={() => sort('asc')} className={`${column.getIsSorted() === 'asc' ? 'bg-accent text-accent-foreground' : ''}`}>
             <ArrowUp />
             Asc
           </DropdownMenuItem>
-          <DropdownMenuItem onClick={() => column.toggleSorting(true)}>
+          <DropdownMenuItem onClick={() => sort('desc')} className={`${column.getIsSorted() === 'desc' ? 'bg-accent text-accent-foreground' : ''}`}>
             <ArrowDown />
             Desc
           </DropdownMenuItem>

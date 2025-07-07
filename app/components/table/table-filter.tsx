@@ -34,14 +34,22 @@ export function TableFilter({
   const onSelect = (value: AnyType) => {
     navigate({
       search: (prev: AnyType) => {
-        const key = filter.key.toLowerCase()
-        const current = selected ? Array.isArray(selected) ? selected : [selected] : []
-        const updated = current.includes(value) ? current.filter((v) => v !== value) : [...current, value]
-        const { [key]: _, ...rest } = prev
+        if(filter?.multiple){
+          const key = filter.key.toLowerCase()
+          const current = selected ? Array.isArray(selected) ? selected : [selected] : []
+          const updated = current.includes(value) ? current.filter((v) => v !== value) : [...current, value]
+          const { [key]: _, ...rest } = prev
+          return {
+            ...rest,
+            ...(rest.page ? { page: 1 } : {}),
+            ...(updated.length > 0) ? { [key]: updated } : {},
+          }
+        }
+
         return {
-          ...rest,
-          ...(rest.page ? { page: 1 } : {}),
-          ...(updated.length > 0) ? { [key]: updated } : {},
+          ...prev,
+          ...(prev.page ? { page: 1 } : {}),
+          [key]: value
         }
       },
       replace: true
@@ -75,10 +83,10 @@ export function TableFilter({
                 variant="secondary"
                 className="rounded-sm px-1 font-normal lg:hidden"
               >
-                {selected?.length}
+                {filter.multiple ? selected?.length : 1}
               </Badge>
               <div className="hidden gap-1 lg:flex">
-                {selected?.length > 2 ? (
+                {filter.multiple && selected?.length > 2 ? (
                   <Badge
                     variant="secondary"
                     className="rounded-sm px-1 font-normal"
@@ -116,10 +124,9 @@ export function TableFilter({
                   >
                     <div
                       className={cn(
-                        "flex size-4 items-center justify-center rounded-[4px] border",
-                        isSelected
-                          ? "bg-primary border-primary text-primary-foreground"
-                          : "border-input [&_svg]:invisible"
+                        "flex size-4 items-center justify-center border",
+                        filter?.multiple ? "rounded-[4px]" : "rounded-full",
+                        isSelected ? "bg-primary border-primary text-primary-foreground" : "border-input [&_svg]:invisible"
                       )}
                     >
                       <Check className="text-primary-foreground size-3.5" />

@@ -1,5 +1,5 @@
 import { Table } from "@tanstack/react-table"
-import { X } from "lucide-react"
+import { ArrowDown, ArrowUp, X } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -8,6 +8,7 @@ import { TableViewOptions } from "./table-view-options"
 import { TableFilter } from "./table-filter"
 import { useNavigate } from "@tanstack/react-router"
 import { AnyType, TableFilterType } from "@/lib/types"
+import { capitalize } from "@/lib/utils"
 
 interface TableToolbarProps<TData> {
   table: Table<TData>
@@ -20,7 +21,7 @@ export function TableToolbar<TData>({
   filters,
   selected
 }: TableToolbarProps<TData>) {
-  const navigate = useNavigate()
+  const navigate: AnyType = useNavigate()
   const isFiltered = Object.entries(selected)?.some(([_, value]) => value?.length > 0)
 
   return (
@@ -35,12 +36,24 @@ export function TableToolbar<TData>({
           className="h-8 w-[150px] lg:w-[250px]"
         />
         {filters?.map((filter, index) => <TableFilter key={index} filter={filter} selected={selected[filter.key] || null} /> )}
-        {isFiltered && (
+        {/* {table.getState().sorting.length > 0 && (
+          <Button variant="outline" size="sm" className="h-8 border-dashed">
+            {table.getState().sorting[0].desc ? <ArrowDown /> : <ArrowUp />}
+            {capitalize(table.getState().sorting[0].id)}
+          </Button>
+        )} */}
+        {(isFiltered || table.getState().sorting.length > 0) && (
           <Button
             variant="ghost"
             size="sm"
             onClick={() => {
-              navigate({ replace: true })
+              navigate({
+                search: (prev: AnyType) => ({
+                  ...prev?.page ? { page: prev?.page } : {},
+                  ...prev?.pageSize ? { pageSize: prev?.pageSize } : {},
+                }),
+                replace: true
+              })
             }}
           >
             Reset

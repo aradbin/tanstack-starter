@@ -6,7 +6,7 @@ import { TableRowActions } from "@/components/table/table-row-actions"
 
 import { members, users } from "@/lib/db/schema"
 import UserAvatar from "@/components/common/user-avatar"
-import { capitalize } from "@/lib/utils"
+import { capitalize, formatDate } from "@/lib/utils"
 
 export const memberColumns: ColumnDef<typeof members.$inferSelect & {
   user: typeof users.$inferSelect
@@ -39,9 +39,14 @@ export const memberColumns: ColumnDef<typeof members.$inferSelect & {
     cell: ({ row }) => <UserAvatar user={row.original.user} />,
   },
   {
-    id: "role",
+    accessorKey: "role",
     header: ({ column }) => <TableColumnHeader column={column} title="Role" />,
     cell: ({ row }) => capitalize(row.original.role),
+  },
+  {
+    accessorKey: "createdAt",
+    header: ({ column }) => <TableColumnHeader column={column} title="Joined" />,
+    cell: ({ row }) => formatDate(row.original.createdAt),
   },
   {
     id: "actions",

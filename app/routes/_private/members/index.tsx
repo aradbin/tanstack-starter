@@ -1,22 +1,19 @@
 import TableComponent from '@/components/table/table-component'
-import { numberValidation, unionValidation, validate } from '@/lib/validations'
-import { defaultPageSize } from '@/lib/variables'
+import { defaultSearchParamValidation, enamValidation, validate } from '@/lib/validations'
 import { createFileRoute } from '@tanstack/react-router'
 import { memberColumns } from './-columns'
 
 export const Route = createFileRoute('/_private/members/')({
   component: RouteComponent,
   validateSearch: validate({
-    page: numberValidation('Page').catch(1),
-    pageSize: numberValidation('Page Size').catch(defaultPageSize),
-    role: unionValidation('Role').catch([]),
+    ...defaultSearchParamValidation,
+    sort: enamValidation('Sort', ['role', 'createdAt']).catch(undefined),
+    role: enamValidation('Role', ['owner', 'member']).catch(undefined),
   }),
 })
 
 function RouteComponent() {
   const search = Route.useSearch()
-
-  console.count('RouteComponent')
   
   return (
     <TableComponent columns={memberColumns} query={{
@@ -24,6 +21,8 @@ function RouteComponent() {
       relation: {
         user: true,
       },
+      sort: search.sort,
+      order: search.order,
       pagination: {
         page: search.page,
         pageSize: search.pageSize

@@ -39,5 +39,6 @@ export interface OptionType {
 export interface TableFilterType {
   key: string
   title?: string
+  multiple?: boolean
   options?: OptionType[],
 }

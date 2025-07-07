@@ -1,5 +1,4 @@
 import { createServerFn } from "@tanstack/react-start"
-import { authMiddleware } from "@/lib/auth/middleware"
 import { db } from "@/lib/db"
 import * as schema from "@/lib/db/schema"
 import { and, desc, eq, inArray, isNull } from "drizzle-orm"
@@ -11,6 +10,8 @@ export type RelationType<TTable extends TableType> = NonNullable<Parameters<type
 export type QueryParamType<TTable extends TableType> = {
   table: TTable
   relation?: RelationType<TTable>
+  sort?: string,
+  order?: string,
   pagination?: {
     page?: number
     pageSize?: number
@@ -19,11 +20,10 @@ export type QueryParamType<TTable extends TableType> = {
   where?: Record<string, AnyType>
 }
 
-const getQueryFn = createServerFn()
-  .middleware([authMiddleware])
-  .validator((data: { table: TableType; relation?: unknown; pagination?: AnyType, where?: Record<string, AnyType> }) => data)
-  .handler(async ({ context, data }) => {
-    const { table, relation, pagination, where } = data
+const getDataFn = createServerFn()
+  .validator((data: { table: TableType; relation?: unknown; sort?: string, order?: string, pagination?: AnyType, where?: Record<string, AnyType> }) => data)
+  .handler(async ({ data }) => {
+    const { table, relation, sort, order, pagination, where } = data
     const tableSchema = schema[table] as AnyType
     const query = db.query[table]
 
@@ -61,7 +61,9 @@ const getQueryFn = createServerFn()
 
     // ordering
     const orderArgs = {
-      orderBy: [desc(tableSchema.createdAt)]
+      orderBy: [
+        ...sort ? order === 'desc' ? [desc(tableSchema[sort])] : [tableSchema[sort]] : order === 'asc' ? [tableSchema.createdAt] : [desc(tableSchema.createdAt)],
+      ]
     }
 
     // query
@@ -81,6 +83,6 @@ const getQueryFn = createServerFn()
     }
   })
 
-export const getQuery = async <TTable extends TableType>(data: QueryParamType<TTable>) => {
-  return await getQueryFn({ data })
+export const getData = async <TTable extends TableType>(data: QueryParamType<TTable>) => {
+  return await getDataFn({ data })
 }

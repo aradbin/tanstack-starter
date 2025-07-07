@@ -64,7 +64,7 @@ function RootComponent() {
 
 function RootDocument({ children }: Readonly<{ children: ReactNode }>) {
   scan({
-    enabled: true,
+    enabled: false,
   });
   return (
     <html className="dark" lang="en" dir="ltr" suppressHydrationWarning>
