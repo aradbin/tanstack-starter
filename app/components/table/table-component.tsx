@@ -1,3 +1,4 @@
+import { useMemo, useState } from 'react'
 import {
   ColumnDef,
   flexRender,
@@ -9,24 +10,14 @@ import {
   useReactTable,
   VisibilityState,
 } from "@tanstack/react-table"
-
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table"
-
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { TablePagination } from "./table-pagination"
 import { TableToolbar } from "./table-toolbar"
-import { useState } from "react"
 import { useGetQuery } from "@/lib/queries"
 import { Skeleton } from "@/components/ui/skeleton"
 import { getQuery, QueryParamType, TableType } from "@/lib/db/functions"
 import { defaultPageSize } from "@/lib/variables"
-import { TableFilterType } from "@/lib/types"
+import { AnyType, TableFilterType } from "@/lib/types"
 
 interface TableComponentProps<TData, TValue, TTable extends TableType> {
   columns: ColumnDef<TData, TValue>[]
@@ -50,10 +41,10 @@ export default function TableComponent<TData, TValue, TTable extends TableType>(
     }
   })
 
-  // console.log('table', isLoading, query, tableData)
-  console.count('table')
+  console.count('TableComponent')
 
-  const table = useReactTable({
+  // SOLUTION: Memoize the table configuration
+  const tableConfig: AnyType = useMemo(() => ({
     data: tableData?.result || [],
     columns,
     rowCount: tableData?.count || tableData?.result?.length || 0,
@@ -76,11 +67,26 @@ export default function TableComponent<TData, TValue, TTable extends TableType>(
     getSortedRowModel: getSortedRowModel(),
     getFacetedRowModel: getFacetedRowModel(),
     getFacetedUniqueValues: getFacetedUniqueValues(),
-  })
+  }), [
+    tableData?.result,
+    tableData?.count,
+    columns,
+    query?.pagination?.hasPagination,
+    query?.pagination?.page,
+    query?.pagination?.pageSize,
+    sorting,
+    columnVisibility,
+    rowSelection,
+  ])
+
+  const table = useReactTable(tableConfig)
+
+  // Memoize the selected filters to prevent TableToolbar re-renders
+  const selectedFilters = useMemo(() => query.where || {}, [query.where])
 
   return (
     <div className="flex flex-col gap-4">
-      <TableToolbar table={table} filters={filters || []} selected={query.where || {}} />
+      <TableToolbar table={table} filters={filters || []} selected={selectedFilters} />
       <div className="rounded-md border">
         <Table>
           <TableHeader>
