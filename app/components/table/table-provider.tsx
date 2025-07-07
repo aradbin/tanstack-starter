@@ -2,7 +2,6 @@ import { AnyType, TableFilterType } from "@/lib/types";
 import { useSearch } from "@tanstack/react-router";
 import { createContext, ReactNode, useContext, useState } from "react";
 import { Input } from "@/components/ui/input";
-import { TableFilter } from "./table-filter-copy";
 
 const TableProviderContext = createContext<{
   from: AnyType
@@ -42,7 +41,6 @@ export function TableProvider({
               placeholder="Search"
               className="h-8 w-[150px] lg:w-[250px]"
             />
-            {filters?.map((filter, index) => <TableFilter key={index} filter={filter} /> )}
           </div>
         </div>
       </div>
