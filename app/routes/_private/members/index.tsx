@@ -45,10 +45,6 @@ function RouteComponent() {
       },
       where: {
         role: params.role
-      },
-      search: {
-        term: params.search,
-        key: ['user.name', 'user.email']
       }
     }} />
   )

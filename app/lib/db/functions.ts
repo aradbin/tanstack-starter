@@ -1,7 +1,7 @@
 import { createServerFn } from "@tanstack/react-start"
 import { db } from "@/lib/db"
 import * as schema from "@/lib/db/schema"
-import { and, desc, eq, inArray, isNull } from "drizzle-orm"
+import { and, desc, eq, inArray, isNull, like, or } from "drizzle-orm"
 import { defaultPageSize } from "../variables"
 import { AnyType } from "../types"
 
@@ -20,19 +20,16 @@ export type QueryParamType<TTable extends TableType> = {
     hasPagination?: boolean
   }
   where?: Record<string, AnyType>
-  search: {
+  search?: {
     term: AnyType
     key: AnyType
   }
 }
 
 const getDataFn = createServerFn()
-  .validator((data: { table: TableType; relation?: unknown; sort?: AnyType, pagination?: AnyType, where?: Record<string, AnyType>, search?: {
-    term: AnyType
-    key: AnyType
-  } }) => data)
+  .validator((data: { table: TableType; relation?: unknown; sort?: AnyType, pagination?: AnyType, where?: Record<string, AnyType> }) => data)
   .handler(async ({ data }) => {
-    const { table, relation, sort, pagination, where, search } = data
+    const { table, relation, sort, pagination, where } = data
     const tableSchema = schema[table] as AnyType
     const query = db.query[table]
 
@@ -64,9 +61,8 @@ const getDataFn = createServerFn()
 
       return Array.isArray(value) ? inArray(column, value) : eq(column, value)
     })
-    const searchCondition = search?.term && search?.key?.length ? [eq(tableSchema[search?.key], search?.term)] : []
     const whereArg = {
-      where: and(...baseConditions, ...dynamicConditions, ...searchCondition),
+      where: and(...baseConditions, ...dynamicConditions),
     }
 
     // ordering
