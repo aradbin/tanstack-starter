@@ -26,7 +26,7 @@ export type QueryParamType<TTable extends TableType> = {
   }
 }
 
-const getDataFn = createServerFn()
+const getDatasFn = createServerFn()
   .validator((data: { table: TableType; relation?: unknown; sort?: AnyType, pagination?: AnyType, where?: Record<string, AnyType> }) => data)
   .handler(async ({ data }) => {
     const { table, relation, sort, pagination, where } = data
@@ -89,6 +89,6 @@ const getDataFn = createServerFn()
     }
   })
 
-export const getData = async <TTable extends TableType>(data: QueryParamType<TTable>) => {
-  return await getDataFn({ data })
+export const getDatas = async <TTable extends TableType>(data: QueryParamType<TTable>) => {
+  return await getDatasFn({ data })
 }

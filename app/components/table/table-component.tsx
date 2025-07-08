@@ -2,7 +2,7 @@ import { useMemo, useState } from 'react'
 import { ColumnDef, getCoreRowModel, getFacetedRowModel, getFacetedUniqueValues, useReactTable, VisibilityState,
 } from "@tanstack/react-table"
 import { TablePagination } from "@/components/table/table-pagination"
-import { getData, QueryParamType, TableType } from "@/lib/db/functions"
+import { getDatas, QueryParamType, TableType } from "@/lib/db/functions"
 import { defaultPageSize } from "@/lib/variables"
 import { AnyType, TableFilterType } from "@/lib/types"
 import { useQuery } from '@tanstack/react-query'
@@ -17,12 +17,14 @@ interface TableComponentProps<TData, TValue, TTable extends TableType> {
   columns: ColumnDef<TData, TValue>[]
   filters: TableFilterType[]
   query: QueryParamType<TTable>
+  queryFn?: AnyType
 }
 
 export default function TableComponent<TData, TValue, TTable extends TableType>({
   columns,
   filters,
   query,
+  queryFn
 }: TableComponentProps<TData, TValue, TTable>) {
   const [rowSelection, setRowSelection] = useState({})
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({})
@@ -34,7 +36,7 @@ export default function TableComponent<TData, TValue, TTable extends TableType>(
       ...query?.where,
       ...query?.search
     }],
-    queryFn: () => getData(query),
+    queryFn: () => queryFn ? queryFn() : getDatas(query),
   })
 
   const tableOptions: AnyType = useMemo(() => ({

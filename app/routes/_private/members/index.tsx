@@ -2,6 +2,7 @@ import TableComponent from '@/components/table/table-component'
 import { defaultSearchParamValidation, enamValidation, validate } from '@/lib/validations'
 import { createFileRoute } from '@tanstack/react-router'
 import { memberColumns } from './-columns'
+import { getMembers } from './-functions'
 
 export const Route = createFileRoute('/_private/members/')({
   component: RouteComponent,
@@ -46,6 +47,6 @@ function RouteComponent() {
       where: {
         role: params.role
       }
-    }} />
+    }} queryFn={getMembers} />
   )
 }
