@@ -16,7 +16,21 @@ function RouteComponent() {
   const search = Route.useSearch()
   
   return (
-    <TableComponent columns={memberColumns} query={{
+    <TableComponent columns={memberColumns} filters={[
+      {
+        key: 'role',
+        options: [
+          {
+            label: 'Owner',
+            value: 'owner'
+          },
+          {
+            label: 'Member',
+            value: 'member'
+          }
+        ]
+      }
+    ]} query={{
       table: "members",
       relation: {
         user: true,
@@ -32,20 +46,6 @@ function RouteComponent() {
       where: {
         role: search.role
       }
-    }} filters={[
-      {
-        key: 'role',
-        options: [
-          {
-            label: 'Owner',
-            value: 'owner'
-          },
-          {
-            label: 'Member',
-            value: 'member'
-          }
-        ]
-      }
-    ]} />
+    }} />
   )
 }

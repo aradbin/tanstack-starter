@@ -1,13 +1,17 @@
 import { useMemo, useState } from 'react'
-import { ColumnDef, getCoreRowModel, getFacetedRowModel, getFacetedUniqueValues, getSortedRowModel, useReactTable, VisibilityState,
+import { ColumnDef, getCoreRowModel, getFacetedRowModel, getFacetedUniqueValues, useReactTable, VisibilityState,
 } from "@tanstack/react-table"
 import { TablePagination } from "@/components/table/table-pagination"
-import { TableToolbar } from "@/components/table/table-toolbar"
 import { getData, QueryParamType, TableType } from "@/lib/db/functions"
 import { defaultPageSize } from "@/lib/variables"
 import { AnyType, TableFilterType } from "@/lib/types"
 import { useQuery } from '@tanstack/react-query'
 import TableStructure from '@/components/table/table-structure'
+import TableSearch from '@/components/table/table-search'
+import { TableFilter } from '@/components/table/table-filter'
+import TableReset from '@/components/table/table-reset'
+import { TableViewOptions } from '@/components/table/table-view-options'
+import { Button } from '@/components/ui/button'
 
 interface TableComponentProps<TData, TValue, TTable extends TableType> {
   columns: ColumnDef<TData, TValue>[]
@@ -22,7 +26,6 @@ export default function TableComponent<TData, TValue, TTable extends TableType>(
 }: TableComponentProps<TData, TValue, TTable>) {
   const [rowSelection, setRowSelection] = useState({})
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({})
-  const [params, setParams] = useState(query)
   
   const { data: tableData, isLoading } = useQuery({
     queryKey: [query.table, {
@@ -75,7 +78,17 @@ export default function TableComponent<TData, TValue, TTable extends TableType>(
 
   return (
     <div className="flex flex-col gap-4">
-      <TableToolbar table={table} filters={filters || []} selected={query.where || {}} />
+      <div className="flex items-center justify-between">
+        <div className="flex flex-1 items-center gap-2">
+          <TableSearch />
+          {filters?.map((filter, index) => <TableFilter key={index} filter={filter} selected={query?.where?.[filter.key] || null} /> )}
+          <TableReset hasReset={Object.entries(query?.where || {})?.some(([_, value]) => value?.length > 0) || table.getState().sorting.length > 0} />
+        </div>
+        <div className="flex items-center gap-2">
+          <TableViewOptions table={table} />
+          <Button size="sm">Add Task</Button>
+        </div>
+      </div>
       <div className="rounded-md border">
         <TableStructure table={table} isLoading={isLoading} />
       </div>
