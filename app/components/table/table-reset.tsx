@@ -17,10 +17,7 @@ export default function TableReset({
         size="sm"
         onClick={() => {
           navigate({
-            search: (prev: AnyType) => ({
-              ...prev?.page ? { page: prev?.page } : {},
-              ...prev?.pageSize ? { pageSize: prev?.pageSize } : {},
-            }),
+            search: {},
             replace: true
           })
         }}
