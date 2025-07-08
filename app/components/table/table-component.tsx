@@ -76,12 +76,6 @@ export default function TableComponent<TData, TValue, TTable extends TableType>(
   const table = useReactTable(tableOptions)
 
   console.count('TableComponent')
-  console.log('query', {
-    ...query?.sort,
-    ...query?.pagination,
-    ...query?.where,
-    ...query?.search
-  })
 
   return (
     <div className="flex flex-col gap-4">
