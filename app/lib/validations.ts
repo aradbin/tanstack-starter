@@ -1,4 +1,4 @@
-import { z, ZodObject, ZodRawShape, ZodType } from "zod/v4"
+import { union, z, ZodObject, ZodRawShape, ZodType } from "zod/v4"
 import { defaultPageSize } from "./variables"
 
 const maxLength = 35
@@ -86,4 +86,8 @@ export const defaultSearchParamValidation = {
   pageSize: numberValidation('Page Size').catch(defaultPageSize),
   sort: stringValidation('Sort').catch(undefined),
   order: enamValidation('Order', ['asc', 'desc']).catch(undefined),
+  search: unionValidation('Search', [
+    stringValidation('Search'),
+    numberValidation('Search'),
+  ]).catch(undefined),
 }

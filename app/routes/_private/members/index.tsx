@@ -13,7 +13,7 @@ export const Route = createFileRoute('/_private/members/')({
 })
 
 function RouteComponent() {
-  const search = Route.useSearch()
+  const params = Route.useSearch()
   
   return (
     <TableComponent columns={memberColumns} filters={[
@@ -36,15 +36,19 @@ function RouteComponent() {
         user: true,
       },
       sort: {
-        field: search.sort,
-        order: search.order
+        field: params.sort,
+        order: params.order
       },
       pagination: {
-        page: search.page,
-        pageSize: search.pageSize
+        page: params.page,
+        pageSize: params.pageSize
       },
       where: {
-        role: search.role
+        role: params.role
+      },
+      search: {
+        term: params.search,
+        key: ['user.name', 'user.email']
       }
     }} />
   )

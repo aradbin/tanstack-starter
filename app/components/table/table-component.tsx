@@ -32,6 +32,7 @@ export default function TableComponent<TData, TValue, TTable extends TableType>(
       ...query?.sort,
       ...query?.pagination,
       ...query?.where,
+      ...query?.search
     }],
     queryFn: () => getData(query),
   })
@@ -80,9 +81,9 @@ export default function TableComponent<TData, TValue, TTable extends TableType>(
     <div className="flex flex-col gap-4">
       <div className="flex items-center justify-between">
         <div className="flex flex-1 items-center gap-2">
-          <TableSearch />
+          <TableSearch search={query?.search?.term} />
           {filters?.map((filter, index) => <TableFilter key={index} filter={filter} selected={query?.where?.[filter.key] || null} /> )}
-          <TableReset hasReset={Object.entries(query?.where || {})?.some(([_, value]) => value?.length > 0) || table.getState().sorting.length > 0} />
+          <TableReset hasReset={Object.entries(query?.where || {})?.some(([_, value]) => value?.length > 0) || table.getState().sorting.length > 0 || query?.search?.term} />
         </div>
         <div className="flex items-center gap-2">
           <TableViewOptions table={table} />

@@ -11,8 +11,8 @@ export type QueryParamType<TTable extends TableType> = {
   table: TTable
   relation?: RelationType<TTable>
   sort?: {
-    field?: string,
-    order?: string,
+    field?: string
+    order?: string
   }
   pagination?: {
     page?: number
@@ -20,12 +20,19 @@ export type QueryParamType<TTable extends TableType> = {
     hasPagination?: boolean
   }
   where?: Record<string, AnyType>
+  search: {
+    term: AnyType
+    key: AnyType
+  }
 }
 
 const getDataFn = createServerFn()
-  .validator((data: { table: TableType; relation?: unknown; sort?: AnyType, pagination?: AnyType, where?: Record<string, AnyType> }) => data)
+  .validator((data: { table: TableType; relation?: unknown; sort?: AnyType, pagination?: AnyType, where?: Record<string, AnyType>, search?: {
+    term: AnyType
+    key: AnyType
+  } }) => data)
   .handler(async ({ data }) => {
-    const { table, relation, sort, pagination, where } = data
+    const { table, relation, sort, pagination, where, search } = data
     const tableSchema = schema[table] as AnyType
     const query = db.query[table]
 
@@ -57,8 +64,9 @@ const getDataFn = createServerFn()
 
       return Array.isArray(value) ? inArray(column, value) : eq(column, value)
     })
+    const searchCondition = search?.term && search?.key?.length ? [eq(tableSchema[search?.key], search?.term)] : []
     const whereArg = {
-      where: and(...baseConditions, ...dynamicConditions)
+      where: and(...baseConditions, ...dynamicConditions, ...searchCondition),
     }
 
     // ordering
