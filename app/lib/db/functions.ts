@@ -10,8 +10,10 @@ export type RelationType<TTable extends TableType> = NonNullable<Parameters<type
 export type QueryParamType<TTable extends TableType> = {
   table: TTable
   relation?: RelationType<TTable>
-  sort?: string,
-  order?: string,
+  sort?: {
+    field?: string,
+    order?: string,
+  }
   pagination?: {
     page?: number
     pageSize?: number
@@ -21,9 +23,9 @@ export type QueryParamType<TTable extends TableType> = {
 }
 
 const getDataFn = createServerFn()
-  .validator((data: { table: TableType; relation?: unknown; sort?: string, order?: string, pagination?: AnyType, where?: Record<string, AnyType> }) => data)
+  .validator((data: { table: TableType; relation?: unknown; sort?: AnyType, pagination?: AnyType, where?: Record<string, AnyType> }) => data)
   .handler(async ({ data }) => {
-    const { table, relation, sort, order, pagination, where } = data
+    const { table, relation, sort, pagination, where } = data
     const tableSchema = schema[table] as AnyType
     const query = db.query[table]
 
@@ -62,7 +64,7 @@ const getDataFn = createServerFn()
     // ordering
     const orderArgs = {
       orderBy: [
-        ...sort ? order === 'desc' ? [desc(tableSchema[sort])] : [tableSchema[sort]] : order === 'asc' ? [tableSchema.createdAt] : [desc(tableSchema.createdAt)],
+        ...sort?.field ? sort?.order === 'desc' ? [desc(tableSchema[sort?.field])] : [tableSchema[sort?.field]] : sort?.order === 'asc' ? [tableSchema.createdAt] : [desc(tableSchema.createdAt)],
       ]
     }
 

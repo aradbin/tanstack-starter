@@ -21,8 +21,10 @@ function RouteComponent() {
       relation: {
         user: true,
       },
-      sort: search.sort,
-      order: search.order,
+      sort: {
+        field: search.sort,
+        order: search.order
+      },
       pagination: {
         page: search.page,
         pageSize: search.pageSize

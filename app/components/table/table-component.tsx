@@ -1,14 +1,13 @@
 import { useMemo, useState } from 'react'
-import { ColumnDef, flexRender, getCoreRowModel, getFacetedRowModel, getFacetedUniqueValues, getSortedRowModel, useReactTable, VisibilityState,
+import { ColumnDef, getCoreRowModel, getFacetedRowModel, getFacetedUniqueValues, getSortedRowModel, useReactTable, VisibilityState,
 } from "@tanstack/react-table"
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
-import { TablePagination } from "./table-pagination"
-import { TableToolbar } from "./table-toolbar"
-import { Skeleton } from "@/components/ui/skeleton"
+import { TablePagination } from "@/components/table/table-pagination"
+import { TableToolbar } from "@/components/table/table-toolbar"
 import { getData, QueryParamType, TableType } from "@/lib/db/functions"
 import { defaultPageSize } from "@/lib/variables"
 import { AnyType, TableFilterType } from "@/lib/types"
 import { useQuery } from '@tanstack/react-query'
+import TableStructure from '@/components/table/table-structure'
 
 interface TableComponentProps<TData, TValue, TTable extends TableType> {
   columns: ColumnDef<TData, TValue>[]
@@ -23,13 +22,13 @@ export default function TableComponent<TData, TValue, TTable extends TableType>(
 }: TableComponentProps<TData, TValue, TTable>) {
   const [rowSelection, setRowSelection] = useState({})
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({})
+  const [params, setParams] = useState(query)
   
   const { data: tableData, isLoading } = useQuery({
     queryKey: [query.table, {
-      ...query.sort ? { sort: query.sort } : {},
-      ...query.order ? { order: query.order } : {},
-      ...query.pagination,
-      ...query.where,
+      ...query?.sort,
+      ...query?.pagination,
+      ...query?.where,
     }],
     queryFn: () => getData(query),
   })
@@ -46,7 +45,7 @@ export default function TableComponent<TData, TValue, TTable extends TableType>(
         }
       }),
       sorting: [
-        ...query.sort ? [{ id: query.sort, desc: query.order === 'desc' }] : []
+        ...query.sort?.field ? [{ id: query?.sort?.field, desc: query?.sort?.order === 'desc' }] : []
       ],
       columnVisibility,
       rowSelection,
@@ -61,8 +60,8 @@ export default function TableComponent<TData, TValue, TTable extends TableType>(
     tableData?.result,
     tableData?.count,
     columns,
-    query?.sort,
-    query?.order,
+    query?.sort?.field,
+    query?.sort?.order,
     query?.pagination?.hasPagination,
     query?.pagination?.page,
     query?.pagination?.pageSize,
@@ -78,64 +77,7 @@ export default function TableComponent<TData, TValue, TTable extends TableType>(
     <div className="flex flex-col gap-4">
       <TableToolbar table={table} filters={filters || []} selected={query.where || {}} />
       <div className="rounded-md border">
-        <Table>
-          <TableHeader>
-            {table.getHeaderGroups().map((headerGroup) => (
-              <TableRow key={headerGroup.id}>
-                {headerGroup.headers.map((header) => {
-                  return (
-                    <TableHead key={header.id} colSpan={header.colSpan}>
-                      {header.isPlaceholder
-                        ? null
-                        : flexRender(
-                            header.column.columnDef.header,
-                            header.getContext()
-                          )}
-                    </TableHead>
-                  )
-                })}
-              </TableRow>
-            ))}
-          </TableHeader>
-          <TableBody>
-            {table.getRowModel().rows?.length ? (
-              table.getRowModel().rows.map((row) => (
-                <TableRow
-                  key={row.id}
-                  data-state={row.getIsSelected() && "selected"}
-                >
-                  {row.getVisibleCells().map((cell) => (
-                    <TableCell key={cell.id}>
-                      {flexRender(
-                        cell.column.columnDef.cell,
-                        cell.getContext()
-                      )}
-                    </TableCell>
-                  ))}
-                </TableRow>
-              ))
-            ) : isLoading ? (
-              Array.from({ length: table.getState().pagination.pageSize }).map((_, i) => (
-                <TableRow key={i}>
-                  {Array.from({ length: table.getVisibleFlatColumns().length }).map((_, j) => (
-                    <TableCell className="h-12" key={j}>
-                      <Skeleton className="h-6 w-full rounded-full" />
-                    </TableCell>
-                  ))}
-                </TableRow>
-              ))
-            ) : (
-              <TableRow>
-                <TableCell
-                  colSpan={table.getVisibleFlatColumns().length}
-                  className="h-24 text-center"
-                >
-                  No results.
-                </TableCell>
-              </TableRow>
-            )}
-          </TableBody>
-        </Table>
+        <TableStructure table={table} isLoading={isLoading} />
       </div>
       <div className="flex items-center justify-between px-2">
         <div className="text-muted-foreground flex-1 text-sm">
