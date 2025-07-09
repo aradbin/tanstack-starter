@@ -42,3 +42,21 @@ export interface TableFilterType {
   multiple?: boolean
   options?: OptionType[],
 }
+
+export interface SortType {
+  field?: string
+  order?: string
+}
+
+export interface PaginationType {
+  page?: number
+  pageSize?: number
+  hasPagination?: boolean
+}
+
+export interface SearchType {
+  term: AnyType
+  key?: AnyType
+}
+
+export type WhereType = Record<string, AnyType>

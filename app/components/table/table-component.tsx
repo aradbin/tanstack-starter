@@ -1,5 +1,5 @@
-import { useMemo, useState } from 'react'
-import { ColumnDef, getCoreRowModel, getFacetedRowModel, getFacetedUniqueValues, useReactTable, VisibilityState,
+import { ReactNode, useMemo, useState } from 'react'
+import { ColumnDef, getCoreRowModel, useReactTable, VisibilityState,
 } from "@tanstack/react-table"
 import { TablePagination } from "@/components/table/table-pagination"
 import { getDatas, QueryParamType, TableType } from "@/lib/db/functions"
@@ -15,16 +15,22 @@ import { Button } from '@/components/ui/button'
 
 interface TableComponentProps<TData, TValue, TTable extends TableType> {
   columns: ColumnDef<TData, TValue>[]
-  filters: TableFilterType[]
   query: QueryParamType<TTable>
+  filters?: TableFilterType[]
   queryFn?: AnyType
+  options?: {
+    hasSearch?: boolean
+  }
+  toolbar?: ReactNode
 }
 
 export default function TableComponent<TData, TValue, TTable extends TableType>({
   columns,
   filters,
   query,
-  queryFn
+  queryFn,
+  options,
+  toolbar
 }: TableComponentProps<TData, TValue, TTable>) {
   const [rowSelection, setRowSelection] = useState({})
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({})
@@ -36,13 +42,13 @@ export default function TableComponent<TData, TValue, TTable extends TableType>(
       ...query?.where,
       ...query?.search
     }],
-    queryFn: () => queryFn ? queryFn() : getDatas(query),
+    queryFn: () => queryFn?.({ data: query }) ?? getDatas({ data: query }),
   })
 
   const tableOptions: AnyType = useMemo(() => ({
     data: tableData?.result || [],
-    columns,
     rowCount: tableData?.count || tableData?.result?.length || 0,
+    columns,
     state: {
       ...(query?.pagination?.hasPagination === false ? {} : {
         pagination: {
@@ -50,18 +56,22 @@ export default function TableComponent<TData, TValue, TTable extends TableType>(
           pageSize: query?.pagination?.pageSize || defaultPageSize,
         }
       }),
-      sorting: [
-        ...query.sort?.field ? [{ id: query?.sort?.field, desc: query?.sort?.order === 'desc' }] : []
-      ],
+      ...query.sort?.field ? { sorting: [{ id: query?.sort?.field, desc: query?.sort?.order === 'desc' }] } : {},
       columnVisibility,
       rowSelection,
     },
+    defaultColumn: {
+      enableSorting: false,
+      enableHiding: false,
+      enablePinning: false,
+      enableResizing: false
+    },
+    manualSorting: true,
+    manualPagination: true,
     enableRowSelection: true,
     onRowSelectionChange: setRowSelection,
     onColumnVisibilityChange: setColumnVisibility,
     getCoreRowModel: getCoreRowModel(),
-    getFacetedRowModel: getFacetedRowModel(),
-    getFacetedUniqueValues: getFacetedUniqueValues(),
   }), [
     tableData?.result,
     tableData?.count,
@@ -81,20 +91,31 @@ export default function TableComponent<TData, TValue, TTable extends TableType>(
 
   return (
     <div className="flex flex-col gap-4">
-      <div className="flex items-center justify-between">
-        <div className="flex flex-1 items-center gap-2">
-          {/* <TableSearch search={query?.search?.term} /> */}
-          {filters?.map((filter, index) => <TableFilter key={index} filter={filter} selected={query?.where?.[filter.key] || null} /> )}
-          <TableReset hasReset={Object.entries(query?.where || {})?.some(([_, value]) => value?.length > 0) || table.getState().sorting.length > 0 || query?.search?.term} />
+      {/* Table Toolbar */}
+      {(
+        options?.hasSearch ||
+        (filters && filters?.length > 0) ||
+        Object.entries(query?.where || {})?.some(([_, value]) => value?.length > 0)
+      ) && (
+        <div className="flex items-center justify-between">
+          <div className="flex flex-1 items-center gap-2">
+            {options?.hasSearch && <TableSearch search={query?.search?.term} />}
+            {filters?.map((filter, index) => <TableFilter key={index} filter={filter} selected={query?.where?.[filter.key] || null} /> )}
+            <TableReset hasReset={filters && filters?.length > 0 && Object.entries(query?.where || {})?.some(([_, value]) => value?.length > 0) || table.getState().sorting.length > 0 || query?.search?.term} />
+          </div>
+          <div className="flex items-center gap-2">
+            <TableViewOptions table={table} />
+            {toolbar}
+          </div>
         </div>
-        <div className="flex items-center gap-2">
-          <TableViewOptions table={table} />
-          <Button size="sm">Add Task</Button>
-        </div>
-      </div>
+      )}
+
+      {/* Table */}
       <div className="rounded-md border">
         <TableStructure table={table} isLoading={isLoading} />
       </div>
+
+      {/* Table Footer */}
       <div className="flex items-center justify-between px-2">
         <div className="text-muted-foreground flex-1 text-sm">
           {table.getSelectedRowModel().rows.length} of{" "}

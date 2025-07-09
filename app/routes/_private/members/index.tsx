@@ -3,6 +3,12 @@ import { defaultSearchParamValidation, enamValidation, validate } from '@/lib/va
 import { createFileRoute } from '@tanstack/react-router'
 import { memberColumns } from './-columns'
 import { getMembers } from './-functions'
+import { useMemo } from 'react'
+import { QueryParamType } from '@/lib/db/functions'
+import { TableFilterType } from '@/lib/types'
+import { Button } from '@/components/ui/button'
+import { Send } from 'lucide-react'
+import { Label } from '@/components/ui/label'
 
 export const Route = createFileRoute('/_private/members/')({
   component: RouteComponent,
@@ -16,26 +22,9 @@ export const Route = createFileRoute('/_private/members/')({
 function RouteComponent() {
   const params = Route.useSearch()
   
-  return (
-    <TableComponent columns={memberColumns} filters={[
-      {
-        key: 'role',
-        options: [
-          {
-            label: 'Owner',
-            value: 'owner'
-          },
-          {
-            label: 'Member',
-            value: 'member'
-          }
-        ]
-      }
-    ]} query={{
+  const query: QueryParamType<"members"> = useMemo(() => (
+    {
       table: "members",
-      relation: {
-        user: true,
-      },
       sort: {
         field: params.sort,
         order: params.order
@@ -46,7 +35,34 @@ function RouteComponent() {
       },
       where: {
         role: params.role
+      },
+      search: {
+        term: params.search
       }
-    }} queryFn={getMembers} />
+    }
+  ), [params.sort, params.order, params.page, params.pageSize, params.role])
+  
+  const filters: TableFilterType[] = [
+    {
+      key: 'role',
+      options: [
+        {
+          label: 'Owner',
+          value: 'owner'
+        },
+        {
+          label: 'Member',
+          value: 'member'
+        }
+      ]
+    }
+  ]
+  
+  return (
+    <>
+      <TableComponent columns={memberColumns} filters={filters} query={query} queryFn={getMembers} toolbar={(
+        <Button size="sm" variant="outline"><Send /> Invite</Button>
+      )} />
+    </>
   )
 }

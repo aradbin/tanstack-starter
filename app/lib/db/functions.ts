@@ -1,33 +1,59 @@
 import { createServerFn } from "@tanstack/react-start"
 import { db } from "@/lib/db"
 import * as schema from "@/lib/db/schema"
-import { and, desc, eq, inArray, isNull, like, or } from "drizzle-orm"
+import { and, desc, eq, inArray, isNull } from "drizzle-orm"
 import { defaultPageSize } from "../variables"
-import { AnyType } from "../types"
+import { AnyType, PaginationType, SearchType, SortType, WhereType } from "../types"
 
 export type TableType = keyof typeof db.query
 export type RelationType<TTable extends TableType> = NonNullable<Parameters<typeof db.query[TTable]['findMany']>[0]>['with']
 export type QueryParamType<TTable extends TableType> = {
   table: TTable
   relation?: RelationType<TTable>
-  sort?: {
-    field?: string
-    order?: string
+  sort?: SortType
+  pagination?: PaginationType
+  where?: WhereType
+  search?: SearchType
+}
+
+export const getPaginationArgs = (pagination?: PaginationType): { limit?: number; offset?: number } => {
+  if(!pagination || pagination?.hasPagination === false){
+    return {}
   }
-  pagination?: {
-    page?: number
-    pageSize?: number
-    hasPagination?: boolean
+
+  return {
+    limit: pagination?.pageSize ?? defaultPageSize,
+    offset: ((pagination?.page ?? 1) - 1) * (pagination?.pageSize ?? defaultPageSize),
   }
-  where?: Record<string, AnyType>
-  search?: {
-    term: AnyType
-    key: AnyType
+}
+
+export const getOrderArgs = (schema?: AnyType, sort?: SortType): { orderBy?: AnyType } => {
+  return {
+    orderBy: [
+      ...sort?.field ? sort?.order === 'desc' ? [desc(schema[sort?.field])] : [schema[sort?.field]] : sort?.order === 'asc' ? [schema.createdAt] : [desc(schema.createdAt)],
+    ]
+  }
+}
+
+export const getWhereArgs = (schema?: AnyType, where?: WhereType): { where?: AnyType } => {
+  const baseConditions = [
+    isNull(schema?.deletedAt),
+    // eq(schema?.organizationId, context?.session?.activeOrganizationId)
+  ]
+  const dynamicConditions = Object.entries(where ?? {}).flatMap(([key, value]) => {
+    const column = schema?.[key]
+    if (!column || !value || !value.length) return []
+
+    return Array.isArray(value) ? inArray(column, value) : eq(column, value)
+  })
+  
+  return {
+    where: and(...baseConditions, ...dynamicConditions),
   }
 }
 
 const getDatasFn = createServerFn()
-  .validator((data: { table: TableType; relation?: unknown; sort?: AnyType, pagination?: AnyType, where?: Record<string, AnyType> }) => data)
+  .validator((data: { table: TableType; relation?: unknown; sort?: SortType, pagination?: PaginationType, where?: WhereType }) => data)
   .handler(async ({ data }) => {
     const { table, relation, sort, pagination, where } = data
     const tableSchema = schema[table] as AnyType
@@ -42,42 +68,15 @@ const getDatasFn = createServerFn()
       ...(relation ? { with: relation as Relation } : {}),
     }
 
-    // pagination
-    const paginationArgs = {
-      ...(pagination?.hasPagination === false ? {} : {
-        limit: pagination?.pageSize ?? defaultPageSize,
-        offset: ((pagination?.page ?? 1) - 1) * (pagination?.pageSize ?? defaultPageSize),
-      }),
-    }
-
     // where
-    const baseConditions = [
-      isNull(tableSchema?.deletedAt),
-      // eq(tableSchema?.organizationId, context?.session?.activeOrganizationId)
-    ]
-    const dynamicConditions = Object.entries(where ?? {}).flatMap(([key, value]) => {
-      const column = tableSchema?.[key]
-      if (!column || !value || !value.length) return []
-
-      return Array.isArray(value) ? inArray(column, value) : eq(column, value)
-    })
-    const whereArg = {
-      where: and(...baseConditions, ...dynamicConditions),
-    }
-
-    // ordering
-    const orderArgs = {
-      orderBy: [
-        ...sort?.field ? sort?.order === 'desc' ? [desc(tableSchema[sort?.field])] : [tableSchema[sort?.field]] : sort?.order === 'asc' ? [tableSchema.createdAt] : [desc(tableSchema.createdAt)],
-      ]
-    }
+    const whereArg = getWhereArgs(tableSchema, where)
 
     // query
     const args: FindManyArgs = {
       ...relationArgs,
-      ...paginationArgs,
       ...whereArg,
-      ...orderArgs,
+      ...getPaginationArgs(pagination),
+      ...getOrderArgs(tableSchema, sort),
     }
     
     const result = await (query.findMany as (args?: FindManyArgs) => Promise<any>)(args)
@@ -89,6 +88,8 @@ const getDatasFn = createServerFn()
     }
   })
 
-export const getDatas = async <TTable extends TableType>(data: QueryParamType<TTable>) => {
-  return await getDatasFn({ data })
+export const getDatas = async <TTable extends TableType>(
+  input: { data: QueryParamType<TTable> }
+) => {
+  return await getDatasFn(input)
 }

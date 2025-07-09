@@ -42,11 +42,18 @@ export const memberColumns: ColumnDef<typeof members.$inferSelect & {
     accessorKey: "role",
     header: ({ column }) => <TableColumnHeader column={column} title="Role" />,
     cell: ({ row }) => capitalize(row.original.role),
+    enableHiding: true,
+    enableSorting: true,
   },
   {
     accessorKey: "createdAt",
     header: ({ column }) => <TableColumnHeader column={column} title="Joined" />,
     cell: ({ row }) => formatDate(row.original.createdAt),
+    meta: {
+      label: 'Joined'
+    },
+    enableHiding: true,
+    enableSorting: true,
   },
   {
     id: "actions",
