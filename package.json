@@ -40,6 +40,7 @@
     "date-fns": "^4.1.0",
     "dotenv": "^16.5.0",
     "drizzle-orm": "^0.43.1",
+    "lodash.debounce": "^4.0.8",
     "lucide-react": "^0.511.0",
     "pg": "^8.16.0",
     "postcss": "^8.5.3",
@@ -53,6 +54,7 @@
     "zod": "^3.25.67"
   },
   "devDependencies": {
+    "@types/lodash.debounce": "^4.0.9",
     "@types/pg": "^8.15.2",
     "@types/react": "^19.1.5",
     "@types/react-dom": "^19.1.5",

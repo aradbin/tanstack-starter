@@ -88,6 +88,7 @@ export default function TableComponent<TData, TValue, TTable extends TableType>(
   const table = useReactTable(tableOptions)
 
   console.count('TableComponent')
+  console.log('tableData', tableData)
 
   return (
     <div className="flex flex-col gap-4">

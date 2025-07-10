@@ -3,12 +3,10 @@ import { defaultSearchParamValidation, enamValidation, validate } from '@/lib/va
 import { createFileRoute } from '@tanstack/react-router'
 import { memberColumns } from './-columns'
 import { getMembers } from './-functions'
-import { useMemo } from 'react'
 import { QueryParamType } from '@/lib/db/functions'
 import { TableFilterType } from '@/lib/types'
 import { Button } from '@/components/ui/button'
 import { Send } from 'lucide-react'
-import { Label } from '@/components/ui/label'
 
 export const Route = createFileRoute('/_private/members/')({
   component: RouteComponent,
@@ -22,25 +20,23 @@ export const Route = createFileRoute('/_private/members/')({
 function RouteComponent() {
   const params = Route.useSearch()
   
-  const query: QueryParamType<"members"> = useMemo(() => (
-    {
-      table: "members",
-      sort: {
-        field: params.sort,
-        order: params.order
-      },
-      pagination: {
-        page: params.page,
-        pageSize: params.pageSize
-      },
-      where: {
-        role: params.role
-      },
-      search: {
-        term: params.search
-      }
+  const query: QueryParamType<"members"> = {
+    table: "members",
+    sort: {
+      field: params.sort,
+      order: params.order
+    },
+    pagination: {
+      page: params.page,
+      pageSize: params.pageSize
+    },
+    where: {
+      role: params.role
+    },
+    search: {
+      term: params.search
     }
-  ), [params.sort, params.order, params.page, params.pageSize, params.role])
+  }
   
   const filters: TableFilterType[] = [
     {
@@ -60,7 +56,9 @@ function RouteComponent() {
   
   return (
     <>
-      <TableComponent columns={memberColumns} filters={filters} query={query} queryFn={getMembers} toolbar={(
+      <TableComponent columns={memberColumns} filters={filters} query={query} queryFn={getMembers} options={{
+        hasSearch: true
+      }} toolbar={(
         <Button size="sm" variant="outline"><Send /> Invite</Button>
       )} />
     </>

@@ -27,29 +27,51 @@ export const getPaginationArgs = (pagination?: PaginationType): { limit?: number
   }
 }
 
-export const getOrderArgs = (schema?: AnyType, sort?: SortType): { orderBy?: AnyType } => {
-  return {
-    orderBy: [
-      ...sort?.field ? sort?.order === 'desc' ? [desc(schema[sort?.field])] : [schema[sort?.field]] : sort?.order === 'asc' ? [schema.createdAt] : [desc(schema.createdAt)],
-    ]
+export const getOrderArgs = (tableSchema?: AnyType, sort?: SortType) => {
+  const order: any[] = []
+
+  if (sort?.field && sort.field !== "createdAt" && tableSchema?.[sort.field]) {
+    order.push(sort.order === "desc" ? desc(tableSchema[sort.field]) : tableSchema[sort.field])
   }
+
+  if (tableSchema?.createdAt) {
+    order.push(sort?.order === "desc" ? desc(tableSchema.createdAt) : tableSchema.createdAt)
+  }
+
+  return order
 }
 
-export const getWhereArgs = (schema?: AnyType, where?: WhereType): { where?: AnyType } => {
+export const getWhereArgs = (tableSchema?: AnyType, where?: WhereType) => {
   const baseConditions = [
-    isNull(schema?.deletedAt),
-    // eq(schema?.organizationId, context?.session?.activeOrganizationId)
+    isNull(tableSchema?.deletedAt),
+    // eq(tableSchema?.organizationId, context?.session?.activeOrganizationId)
   ]
   const dynamicConditions = Object.entries(where ?? {}).flatMap(([key, value]) => {
-    const column = schema?.[key]
+    const column = tableSchema?.[key]
     if (!column || !value || !value.length) return []
 
     return Array.isArray(value) ? inArray(column, value) : eq(column, value)
   })
   
-  return {
-    where: and(...baseConditions, ...dynamicConditions),
+  return [...baseConditions, ...dynamicConditions]
+}
+
+export const addPagination = (query: AnyType, pagination?: PaginationType) => {
+  const paginationArgs = getPaginationArgs(pagination)
+
+  if(paginationArgs?.limit !== undefined){
+    query.limit(paginationArgs.limit)
   }
+
+  if(paginationArgs.offset !== undefined){
+    query.offset(paginationArgs.offset)
+  }
+
+  return query
+}
+
+export const addOrder = (query: AnyType, tableSchema?: AnyType, sort?: SortType) => {
+  return query.orderBy(...getOrderArgs(tableSchema, sort))
 }
 
 const getDatasFn = createServerFn()
@@ -69,18 +91,18 @@ const getDatasFn = createServerFn()
     }
 
     // where
-    const whereArg = getWhereArgs(tableSchema, where)
+    const whereArg = and(...getWhereArgs(tableSchema, where))
 
     // query
     const args: FindManyArgs = {
       ...relationArgs,
-      ...whereArg,
       ...getPaginationArgs(pagination),
-      ...getOrderArgs(tableSchema, sort),
+      orderBy: getOrderArgs(tableSchema, sort),
+      where: whereArg
     }
     
     const result = await (query.findMany as (args?: FindManyArgs) => Promise<any>)(args)
-    const count = await db.$count(tableSchema, whereArg?.where)
+    const count = await db.$count(tableSchema, whereArg)
     
     return {
       result,
