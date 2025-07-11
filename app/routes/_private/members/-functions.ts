@@ -1,9 +1,9 @@
 import { db } from "@/lib/db";
 import { addOrder, addPagination, getWhereArgs } from "@/lib/db/functions";
 import { members, users } from "@/lib/db/schema";
-import { AnyType, PaginationType, SearchType, SortType, WhereType } from "@/lib/types";
+import { PaginationType, SearchType, SortType, WhereType } from "@/lib/types";
 import { createServerFn } from "@tanstack/react-start";
-import { and, eq, getTableColumns, ilike, or } from "drizzle-orm";
+import { and, eq, getTableColumns, ilike, or, sql } from "drizzle-orm";
 
 export const getMembers = createServerFn()
   .validator((data: { sort?: SortType, pagination?: PaginationType, where?: WhereType, search: SearchType }) => data)
@@ -21,6 +21,7 @@ export const getMembers = createServerFn()
       .select({
         ...getTableColumns(members),
         user: getTableColumns(users),
+        count: sql<number>`count(*) over()`
       })
       .from(members)
       .leftJoin(users, eq(members.userId, users.id))
@@ -31,7 +32,7 @@ export const getMembers = createServerFn()
 
     const result = await query
 
-    const count = await db.$count(members, whereArgs)
+    const count = result?.length > 0 ? result[0].count : 0
 
     return {
       result,

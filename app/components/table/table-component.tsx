@@ -11,7 +11,6 @@ import TableSearch from '@/components/table/table-search'
 import { TableFilter } from '@/components/table/table-filter'
 import TableReset from '@/components/table/table-reset'
 import { TableViewOptions } from '@/components/table/table-view-options'
-import { Button } from '@/components/ui/button'
 
 interface TableComponentProps<TData, TValue, TTable extends TableType> {
   columns: ColumnDef<TData, TValue>[]
@@ -88,7 +87,6 @@ export default function TableComponent<TData, TValue, TTable extends TableType>(
   const table = useReactTable(tableOptions)
 
   console.count('TableComponent')
-  console.log('tableData', tableData)
 
   return (
     <div className="flex flex-col gap-4">

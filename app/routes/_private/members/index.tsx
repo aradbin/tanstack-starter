@@ -34,7 +34,7 @@ function RouteComponent() {
       role: params.role
     },
     search: {
-      term: params.search
+      term: params.search ?? ''
     }
   }
   
