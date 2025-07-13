@@ -29,7 +29,7 @@ function RouteComponent() {
       pageSize: params.pageSize
     },
     search: {
-      term: params.search
+      term: params.search,
     }
   }
 
@@ -54,7 +54,7 @@ function RouteComponent() {
               fields={fields}
               handleSubmit={(values: Record<string, any>) => createTask({ data: { values } })}
               onSuccess={() => {
-                props?.close()
+                props.close()
               }}
               onCancel={() => {}}
               options={{

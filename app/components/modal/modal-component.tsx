@@ -8,7 +8,7 @@ export default function ModalComponent ({
   variant = "default",
   options,
 }: {
-  children: (props?: { close: () => void }) => React.ReactNode
+  children: ReactNode | ((props: { close: () => void }) => ReactNode)
   variant?: "default" | "responsive" | "sheet"
   options?: {
     header?: string
@@ -16,6 +16,11 @@ export default function ModalComponent ({
   }
 }) {
   const [open, setOpen] = useState(false)
+
+  const renderContent =
+    typeof children === "function"
+      ? children({ close: () => setOpen(false) })
+      : children
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
@@ -29,7 +34,7 @@ export default function ModalComponent ({
             {options?.description && <DialogDescription>{options?.description}</DialogDescription>}
           </DialogHeader>
         )}
-        {children({ close: () => setOpen(false) })}
+        {renderContent}
       </DialogContent>
     </Dialog>
   )
