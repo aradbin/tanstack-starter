@@ -11,7 +11,11 @@ export const authClient = createAuthClient({
   baseURL: import.meta.env.VITE_BASE_URL,
   plugins: [
     adminClient(),
-    organizationClient(),
+    organizationClient({
+      teams: {
+        enabled: true
+      }
+    }),
     customSessionClient<typeof auth>(),
   ],
 })

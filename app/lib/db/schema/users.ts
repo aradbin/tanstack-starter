@@ -70,6 +70,16 @@ export const organizations = pgTable("organizations", {
   ...timestamps,
 })
 
+export const teams = pgTable("teams", {
+  id: table.text('id').primaryKey(),
+  name: table.text('name').notNull(),
+  organizationId: table
+    .text("organization_id")
+    .notNull()
+    .references(() => organizations.id, { onDelete: "cascade" }),
+ ...timestamps,
+});
+
 export const members = pgTable("members", {
   id: table.text().primaryKey(),
   role: table.text().default("member").notNull(),
@@ -77,6 +87,7 @@ export const members = pgTable("members", {
     .text("organization_id")
     .notNull()
     .references(() => organizations.id, { onDelete: "cascade" }),
+  teamId: table.text('team_id'),
   userId: table
     .text("user_id")
     .notNull()
@@ -105,6 +116,7 @@ export const invitations = pgTable("invitations", {
     .text("organization_id")
     .notNull()
     .references(() => organizations.id, { onDelete: "cascade" }),
+  teamId: table.text('team_id'),
   inviterId: table
     .text("inviter_id")
     .notNull()

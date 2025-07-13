@@ -9,6 +9,7 @@ import {
   invitations,
   members,
   organizations,
+  teams,
   sessions,
   users,
   verifications,
@@ -27,12 +28,17 @@ export const auth = betterAuth({
       account: accounts,
       verification: verifications,
       organization: organizations,
+      team: teams,
       member: members,
       invitation: invitations,
     },
   }),
   usePlural: true,
-  plugins: [admin(), organization(), reactStartCookies()],
+  plugins: [admin(), organization({
+    teams: {
+      enabled: true,
+    }
+  }), reactStartCookies()],
   emailAndPassword: {
     enabled: true,
     requireEmailVerification: true,
