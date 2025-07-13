@@ -41,7 +41,7 @@ function RouteComponent() {
         onSuccess={() => {
           router.navigate({ to: "/" })
         }}
-        config={{
+        options={{
           submitText: "Login"
         }}
       />

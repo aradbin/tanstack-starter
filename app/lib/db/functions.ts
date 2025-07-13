@@ -35,7 +35,7 @@ export const getOrderArgs = (tableSchema?: AnyType, sort?: SortType) => {
   }
 
   if (tableSchema?.createdAt) {
-    order.push(sort?.order === "desc" ? desc(tableSchema.createdAt) : tableSchema.createdAt)
+    order.push(sort?.order === "asc" ? tableSchema.createdAt : desc(tableSchema.createdAt))
   }
 
   return order
@@ -115,3 +115,17 @@ export const getDatas = async <TTable extends TableType>(
 ) => {
   return await getDatasFn(input)
 }
+
+export const postData = createServerFn({ method: "POST" })
+  .validator((data: {
+    table: TableType
+    values: Record<string, any>
+  }) => data)
+  .handler(async ({ data }) => {
+    const { table, values } = data
+    const tableSchema = schema[table] as AnyType
+
+    const result = await db.insert(tableSchema).values(values)
+
+    return result
+  })

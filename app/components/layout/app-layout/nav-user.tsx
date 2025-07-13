@@ -14,10 +14,10 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
-import { useAuth } from "@/hooks/use-auth"
+import { useAuth } from "@/lib/auth/hook"
 
 export function NavUser() {
-  const { user } = useAuth()
+  const user = useAuth()
   const navigate = useNavigate()
 
   return (

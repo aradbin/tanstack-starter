@@ -39,7 +39,7 @@ function RouteComponent() {
       <AuthProviders />
       <FormComponent fields={fields} handleSubmit={signUp} onSuccess={() => {
         router.navigate({ to: "/" })
-      }} config={{
+      }} options={{
         submitText: "Register"
       }} />
       <div className="text-center text-sm">

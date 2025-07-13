@@ -2,7 +2,7 @@ import { Input } from "@/components/ui/input"
 import { AnyType } from "@/lib/types"
 import { useNavigate } from "@tanstack/react-router"
 import debounce from 'lodash.debounce'
-import { X } from "lucide-react"
+import { Search, X } from "lucide-react"
 import { useEffect, useMemo, useState } from "react"
 
 export default function TableSearch({ search }: { search: AnyType }) {
@@ -27,6 +27,7 @@ export default function TableSearch({ search }: { search: AnyType }) {
 
   return (
     <div className="relative">
+      <Search className="absolute left-2 top-2 size-4 text-muted-foreground" />
       <Input
         placeholder="Search"
         value={term}
@@ -34,12 +35,12 @@ export default function TableSearch({ search }: { search: AnyType }) {
           setTerm(e.target.value)
           debouncedSearch(e.target.value)
         }}
-        className="h-8 w-[150px] lg:w-[250px]"
+        className="h-8 w-[150px] lg:w-[250px] pl-8"
       />
-      <X className="absolute right-2 top-2 size-4 text-muted-foreground" onClick={() => {
+      {term && <X className="absolute right-2 top-2 size-4 text-muted-foreground" onClick={() => {
         setTerm("")
         debouncedSearch("")
-      }} />
+      }} />}
     </div>
   )
 }

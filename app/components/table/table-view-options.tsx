@@ -10,6 +10,7 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
 } from "@/components/ui/dropdown-menu"
+import { capitalize } from "@/lib/utils"
 
 export function TableViewOptions<TData>({
   table,
@@ -45,7 +46,7 @@ export function TableViewOptions<TData>({
                 checked={column.getIsVisible()}
                 onCheckedChange={(value) => column.toggleVisibility(!!value)}
               >
-                {(column.columnDef.meta as { label?: string })?.label ?? column.id}
+                {(column.columnDef.meta as { label?: string })?.label ?? capitalize(column.id)}
               </DropdownMenuCheckboxItem>
             )
           })}

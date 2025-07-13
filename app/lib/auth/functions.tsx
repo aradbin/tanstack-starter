@@ -15,26 +15,27 @@ export const signUp = async (value: {
   const { data, error } =  await authClient.signUp.email(value)
 
   if(data){
-    return { data: {
+    return {
       ...data,
       message: 'Registration Successful'
-    }, error }
+    }
   }
 
-  return { data, error }
+  throw new Error(error?.message || "Something went wrong. Please try again.");
 }
 
 export const signIn = async (value: { email: string; password: string }) => {
   const { data, error } = await authClient.signIn.email(value)
 
   if(data){
-    return { data: {
+    return {
       ...data,
       message: 'Login Successful'
-    }, error }
+    }
   }
 
-  return { data, error }
+  throw new Error(error?.message || "Something went wrong. Please try again.");
+  
 }
 
 export const signInSocial = async (provider: "google") => {
@@ -80,13 +81,13 @@ export const createOrganization = async (value: { name: string; slug: string }) 
   const { data, error } =  await authClient.organization.create(value)
 
   if(data){
-    return { data: {
+    return {
       ...data,
       message: 'Organization Created Successfully'
-    }, error }
+    }
   }
 
-  return { data, error }
+  throw new Error(error?.message || "Something went wrong. Please try again.");
 }
 
 const getUserOrganizations = async () => {

@@ -14,6 +14,8 @@ import { Route as rootRoute } from './routes/__root'
 import { Route as PrivateRouteImport } from './routes/_private/route'
 import { Route as AuthRouteImport } from './routes/_auth/route'
 import { Route as PrivateIndexImport } from './routes/_private/index'
+import { Route as PrivateTeamsIndexImport } from './routes/_private/teams/index'
+import { Route as PrivateTasksIndexImport } from './routes/_private/tasks/index'
 import { Route as PrivateMembersIndexImport } from './routes/_private/members/index'
 import { Route as AuthRegisterIndexImport } from './routes/_auth/register/index'
 import { Route as AuthLoginIndexImport } from './routes/_auth/login/index'
@@ -34,6 +36,18 @@ const AuthRouteRoute = AuthRouteImport.update({
 const PrivateIndexRoute = PrivateIndexImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => PrivateRouteRoute,
+} as any)
+
+const PrivateTeamsIndexRoute = PrivateTeamsIndexImport.update({
+  id: '/teams/',
+  path: '/teams/',
+  getParentRoute: () => PrivateRouteRoute,
+} as any)
+
+const PrivateTasksIndexRoute = PrivateTasksIndexImport.update({
+  id: '/tasks/',
+  path: '/tasks/',
   getParentRoute: () => PrivateRouteRoute,
 } as any)
 
@@ -114,6 +128,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof PrivateMembersIndexImport
       parentRoute: typeof PrivateRouteImport
     }
+    '/_private/tasks/': {
+      id: '/_private/tasks/'
+      path: '/tasks'
+      fullPath: '/tasks'
+      preLoaderRoute: typeof PrivateTasksIndexImport
+      parentRoute: typeof PrivateRouteImport
+    }
+    '/_private/teams/': {
+      id: '/_private/teams/'
+      path: '/teams'
+      fullPath: '/teams'
+      preLoaderRoute: typeof PrivateTeamsIndexImport
+      parentRoute: typeof PrivateRouteImport
+    }
   }
 }
 
@@ -138,11 +166,15 @@ const AuthRouteRouteWithChildren = AuthRouteRoute._addFileChildren(
 interface PrivateRouteRouteChildren {
   PrivateIndexRoute: typeof PrivateIndexRoute
   PrivateMembersIndexRoute: typeof PrivateMembersIndexRoute
+  PrivateTasksIndexRoute: typeof PrivateTasksIndexRoute
+  PrivateTeamsIndexRoute: typeof PrivateTeamsIndexRoute
 }
 
 const PrivateRouteRouteChildren: PrivateRouteRouteChildren = {
   PrivateIndexRoute: PrivateIndexRoute,
   PrivateMembersIndexRoute: PrivateMembersIndexRoute,
+  PrivateTasksIndexRoute: PrivateTasksIndexRoute,
+  PrivateTeamsIndexRoute: PrivateTeamsIndexRoute,
 }
 
 const PrivateRouteRouteWithChildren = PrivateRouteRoute._addFileChildren(
@@ -156,6 +188,8 @@ export interface FileRoutesByFullPath {
   '/login': typeof AuthLoginIndexRoute
   '/register': typeof AuthRegisterIndexRoute
   '/members': typeof PrivateMembersIndexRoute
+  '/tasks': typeof PrivateTasksIndexRoute
+  '/teams': typeof PrivateTeamsIndexRoute
 }
 
 export interface FileRoutesByTo {
@@ -165,6 +199,8 @@ export interface FileRoutesByTo {
   '/login': typeof AuthLoginIndexRoute
   '/register': typeof AuthRegisterIndexRoute
   '/members': typeof PrivateMembersIndexRoute
+  '/tasks': typeof PrivateTasksIndexRoute
+  '/teams': typeof PrivateTeamsIndexRoute
 }
 
 export interface FileRoutesById {
@@ -176,6 +212,8 @@ export interface FileRoutesById {
   '/_auth/login/': typeof AuthLoginIndexRoute
   '/_auth/register/': typeof AuthRegisterIndexRoute
   '/_private/members/': typeof PrivateMembersIndexRoute
+  '/_private/tasks/': typeof PrivateTasksIndexRoute
+  '/_private/teams/': typeof PrivateTeamsIndexRoute
 }
 
 export interface FileRouteTypes {
@@ -187,8 +225,18 @@ export interface FileRouteTypes {
     | '/login'
     | '/register'
     | '/members'
+    | '/tasks'
+    | '/teams'
   fileRoutesByTo: FileRoutesByTo
-  to: '' | '/' | '/register/organization' | '/login' | '/register' | '/members'
+  to:
+    | ''
+    | '/'
+    | '/register/organization'
+    | '/login'
+    | '/register'
+    | '/members'
+    | '/tasks'
+    | '/teams'
   id:
     | '__root__'
     | '/_auth'
@@ -198,6 +246,8 @@ export interface FileRouteTypes {
     | '/_auth/login/'
     | '/_auth/register/'
     | '/_private/members/'
+    | '/_private/tasks/'
+    | '/_private/teams/'
   fileRoutesById: FileRoutesById
 }
 
@@ -237,7 +287,9 @@ export const routeTree = rootRoute
       "filePath": "_private/route.tsx",
       "children": [
         "/_private/",
-        "/_private/members/"
+        "/_private/members/",
+        "/_private/tasks/",
+        "/_private/teams/"
       ]
     },
     "/_private/": {
@@ -258,6 +310,14 @@ export const routeTree = rootRoute
     },
     "/_private/members/": {
       "filePath": "_private/members/index.tsx",
+      "parent": "/_private"
+    },
+    "/_private/tasks/": {
+      "filePath": "_private/tasks/index.tsx",
+      "parent": "/_private"
+    },
+    "/_private/teams/": {
+      "filePath": "_private/teams/index.tsx",
       "parent": "/_private"
     }
   }

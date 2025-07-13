@@ -1,4 +1,4 @@
-import { FormFieldType } from "@/lib/types";
+import { AnyType, FormFieldType } from "@/lib/types";
 import { validate } from "@/lib/validations"
 import { useForm } from "@tanstack/react-form"
 import RenderField from "@/components/form/render-field";
@@ -6,19 +6,22 @@ import { Button } from "@/components/ui/button";
 import { AlertCircleIcon, CheckCircle2Icon, Loader2Icon } from "lucide-react";
 import { useState } from "react";
 import { Alert, AlertTitle } from "@/components/ui/alert";
+import { useQueryClient } from "@tanstack/react-query";
 
-export default function FormComponent({ fields, handleSubmit, onSuccess, onError, onCancel, config }: {
+export default function FormComponent({ fields, handleSubmit, onSuccess, onError, onCancel, options }: {
   fields: FormFieldType[][]
   handleSubmit: any;
   onSuccess?: any;
   onError?: any;
   onCancel?: any;
-  config?: {
+  options?: {
+    queryKey?: AnyType
     submitText?: string
     cancelText?: string
     loadingText?: string
   }
 }) {
+  const queryClient = useQueryClient()
   const [messageSuccess, setMessageSuccess] = useState<string | null | undefined>(null)
   const [messageError, setMessageError] = useState<string | null | undefined>(null)
   const flatFields = fields.flat()
@@ -65,21 +68,25 @@ export default function FormComponent({ fields, handleSubmit, onSuccess, onError
     onSubmit: async ({ value }) => {
       setMessageSuccess(null)
       setMessageError(null)
-      const { data, error } = await handleSubmit(value)
-      if (error) {
+      try {
+        const response = await handleSubmit(value)
+        if(options?.queryKey) {
+          queryClient.invalidateQueries({
+            queryKey: [options.queryKey]
+          })
+        }
+        form.reset()
+        if(response.message) {
+          setMessageSuccess(response.message)
+        }
+        if(onSuccess) {
+          onSuccess(response)
+        }
+      } catch (error: AnyType) {
         if (onError) {
           onError(error)
         }
         setMessageError(error.message || "Something went wrong. Please try again.")
-      }
-      if (data) {
-        if(onSuccess) {
-          onSuccess(data)
-        }
-        if(data.message) {
-          setMessageSuccess(data.message)
-        }
-        form.reset()
       }
     },
   })
@@ -141,7 +148,7 @@ export default function FormComponent({ fields, handleSubmit, onSuccess, onError
                   Please wait
                 </>
               ) : (
-                config?.submitText || "Submit"
+                options?.submitText || "Submit"
               )}
             </Button>
           )}
@@ -153,7 +160,7 @@ export default function FormComponent({ fields, handleSubmit, onSuccess, onError
             className="w-full"
             onClick={onCancel}
           >
-            {config?.cancelText || "Cancel"}
+            {options?.cancelText || "Cancel"}
           </Button>
         )}
       </div>

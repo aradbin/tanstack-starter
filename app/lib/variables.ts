@@ -1,4 +1,4 @@
-import { LayoutGrid, Users } from "lucide-react"
+import { LayoutGrid, ListChecks, Users } from "lucide-react"
 
 import { NavigationType, NavItemType } from "@/lib/types"
 import appCss from "@/styles/globals.css?url"
@@ -49,6 +49,11 @@ export const mainNavItems: NavigationType[] = [
         href: "/members",
         icon: Users,
       },
+      {
+        title: "Teams",
+        href: "/teams",
+        icon: Users,
+      },
       // {
       //   title: "Fallback",
       //   icon: LayoutGrid,
@@ -71,6 +76,16 @@ export const mainNavItems: NavigationType[] = [
       //     },
       //   ],
       // },
+    ],
+  },
+  {
+    title: "Tasks",
+    items: [
+      {
+        title: "All Tasks",
+        href: "/tasks",
+        icon: ListChecks,
+      },
     ],
   },
 ]
