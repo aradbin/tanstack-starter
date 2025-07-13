@@ -40,7 +40,8 @@ function RouteComponent() {
       <FormComponent fields={fields} handleSubmit={signUp} onSuccess={() => {
         router.navigate({ to: "/" })
       }} options={{
-        submitText: "Register"
+        submitText: "Register",
+        btnWidth: "w-full",
       }} />
       <div className="text-center text-sm">
         Already have an account?{" "}

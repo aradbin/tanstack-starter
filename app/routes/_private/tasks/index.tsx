@@ -1,12 +1,11 @@
 import TableComponent from '@/components/table/table-component'
-import { defaultSearchParamValidation, stringRequiredValidation, validate } from '@/lib/validations'
+import { defaultSearchParamValidation, validate } from '@/lib/validations'
 import { createFileRoute } from '@tanstack/react-router'
 import { taskColumns } from './-columns'
-import { postData, QueryParamType } from '@/lib/db/functions'
+import { QueryParamType } from '@/lib/db/functions'
 import ModalComponent from '@/components/modal/modal-component'
 import FormComponent from '@/components/form/form-component'
-import { FormFieldType } from '@/lib/types'
-import { createTask } from './-functions'
+import { createTask, taskFormFields } from './-utils'
 
 export const Route = createFileRoute('/_private/tasks/')({
   component: RouteComponent,
@@ -21,7 +20,7 @@ function RouteComponent() {
   const query: QueryParamType<"tasks"> = {
     table: "tasks",
     sort: {
-      // field: params.sort,
+      field: params.sort,
       order: params.order
     },
     pagination: {
@@ -32,16 +31,6 @@ function RouteComponent() {
       term: params.search,
     }
   }
-
-  const fields: FormFieldType[][] = [
-    [
-      {
-        name: "title",
-        validationOnSubmit: stringRequiredValidation("Title"),
-        placeholder: "Enter title",
-      },
-    ]
-  ]
   
   return (
     <>
@@ -51,12 +40,14 @@ function RouteComponent() {
         }}>
           {(props) => (
             <FormComponent
-              fields={fields}
+              fields={taskFormFields}
               handleSubmit={(values: Record<string, any>) => createTask({ data: { values } })}
               onSuccess={() => {
                 props.close()
               }}
-              onCancel={() => {}}
+              onCancel={() => {
+                props.close()
+              }}
               options={{
                 queryKey: 'tasks'
               }}

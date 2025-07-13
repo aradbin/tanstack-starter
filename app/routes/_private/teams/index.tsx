@@ -19,7 +19,7 @@ function RouteComponent() {
   const query: QueryParamType<"teams"> = {
     table: "teams",
     sort: {
-      // field: params.sort,
+      field: params.sort,
       order: params.order
     },
     pagination: {
@@ -33,9 +33,7 @@ function RouteComponent() {
 
   return (
     <>
-      <TableComponent columns={teamColumns} query={query} options={{
-        hasSearch: true
-      }} toolbar={(
+      <TableComponent columns={teamColumns} query={query} toolbar={(
         <Button size="sm" variant="outline"><PlusCircle /> Create</Button>
       )} />
     </>

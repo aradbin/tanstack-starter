@@ -42,7 +42,8 @@ function RouteComponent() {
           router.navigate({ to: "/" })
         }}
         options={{
-          submitText: "Login"
+          submitText: "Login",
+          btnWidth: "w-full",
         }}
       />
       <div className="flex flex-col gap-2">

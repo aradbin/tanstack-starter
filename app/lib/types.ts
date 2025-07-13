@@ -20,6 +20,7 @@ export interface FormFieldType {
   type?: string
   label?: string
   placeholder?: string
+  options?: OptionType[]
   defaultValue?: any
   value?: any
   validationOnBlur?: any

@@ -7,6 +7,7 @@ import { AlertCircleIcon, CheckCircle2Icon, Loader2Icon } from "lucide-react";
 import { useState } from "react";
 import { Alert, AlertTitle } from "@/components/ui/alert";
 import { useQueryClient } from "@tanstack/react-query";
+import { toast } from "sonner";
 
 export default function FormComponent({ fields, handleSubmit, onSuccess, onError, onCancel, options }: {
   fields: FormFieldType[][]
@@ -19,10 +20,10 @@ export default function FormComponent({ fields, handleSubmit, onSuccess, onError
     submitText?: string
     cancelText?: string
     loadingText?: string
+    btnWidth?: string
   }
 }) {
   const queryClient = useQueryClient()
-  const [messageSuccess, setMessageSuccess] = useState<string | null | undefined>(null)
   const [messageError, setMessageError] = useState<string | null | undefined>(null)
   const flatFields = fields.flat()
 
@@ -66,7 +67,6 @@ export default function FormComponent({ fields, handleSubmit, onSuccess, onError
       } : {},
     },
     onSubmit: async ({ value }) => {
-      setMessageSuccess(null)
       setMessageError(null)
       try {
         const response = await handleSubmit(value)
@@ -77,7 +77,7 @@ export default function FormComponent({ fields, handleSubmit, onSuccess, onError
         }
         form.reset()
         if(response.message) {
-          setMessageSuccess(response.message)
+          toast.success(response.message)
         }
         if(onSuccess) {
           onSuccess(response)
@@ -100,7 +100,7 @@ export default function FormComponent({ fields, handleSubmit, onSuccess, onError
       }}
     >
       {fields?.map((fieldGroup, groupIndex) => (
-        <div key={groupIndex}>
+        <div className={`grid grid-cols-1 md:grid-cols-${fieldGroup?.length} gap-2`} key={groupIndex}>
           {fieldGroup?.map((field: FormFieldType, index) => (
             <form.Field
               key={index}
@@ -131,13 +131,13 @@ export default function FormComponent({ fields, handleSubmit, onSuccess, onError
           ))}
         </div>
       ))}
-      <div className="flex flex-wrap gap-2">
+      <div className="flex flex-row-reverse flex-wrap gap-2">
         <form.Subscribe
           selector={(state) => [state.isSubmitting]}
           children={([isSubmitting]) => (
             <Button
               type="submit"
-              className="w-full"
+              className={`${options?.btnWidth || "w-30"}`}
               disabled={isSubmitting}
               aria-busy={isSubmitting}
               aria-disabled={isSubmitting}
@@ -157,19 +157,13 @@ export default function FormComponent({ fields, handleSubmit, onSuccess, onError
           <Button
             type="button"
             variant="outline"
-            className="w-full"
+            className={`${options?.btnWidth || "w-30"}`}
             onClick={onCancel}
           >
             {options?.cancelText || "Cancel"}
           </Button>
         )}
       </div>
-      {messageSuccess && (
-        <Alert variant="default" className="border-green-800 text-green-800">
-          <CheckCircle2Icon className="size-4" />
-          <AlertTitle>{messageSuccess}</AlertTitle>
-        </Alert>
-      )}
       {messageError && (
         <Alert variant="destructive" className="border-destructive">
           <AlertCircleIcon className="size-4" />

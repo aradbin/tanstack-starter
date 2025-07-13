@@ -12,15 +12,18 @@ import {
 import { getUser } from "@/lib/auth/functions"
 import { authRoutes, head } from "@/lib/variables"
 import { QueryProvider } from "@/providers/query-provider"
+import { AnyType } from "@/lib/types";
+import { Toaster } from "@/components/ui/sonner";
 
 export const Route = createRootRoute({
   head: () => head,
   component: RootComponent,
   beforeLoad: async () => {
-    let user = await getUser()
-
-    return {
-      user,
+    try {
+      let user = await getUser()
+      return { user }
+    } catch (_) {
+      return { user: null }
     }
   },
   loader: ({ context, location }) => {
@@ -75,6 +78,7 @@ function RootDocument({ children }: Readonly<{ children: ReactNode }>) {
         <ThemeProvider defaultTheme="system" storageKey="mode">
           <QueryProvider>
             {children}
+            <Toaster richColors position="bottom-center" />
           </QueryProvider>
         </ThemeProvider>
         <Scripts />

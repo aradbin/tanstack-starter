@@ -38,6 +38,9 @@ function RouteComponent() {
           signOut()
           router.navigate({ to: "/" })
         }}
+        options={{
+          btnWidth: "w-full",
+        }}
       />
     </div>
   )

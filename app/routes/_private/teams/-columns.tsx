@@ -44,7 +44,6 @@ export const teamColumns: ColumnDef<typeof teams.$inferSelect>[] = [
     accessorKey: "createdAt",
     header: ({ column }) => <TableColumnHeader column={column} title="Created At" />,
     cell: ({ row }) => formatDate(row.original.createdAt),
-    enableHiding: true,
     enableSorting: true,
   },
   {

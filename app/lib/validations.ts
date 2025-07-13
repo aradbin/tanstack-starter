@@ -84,6 +84,7 @@ export const enamValidation = (
 export const defaultSearchParamValidation = {
   page: numberValidation('Page').catch(1),
   pageSize: numberValidation('Page Size').catch(defaultPageSize),
+  sort: enamValidation('Sort', ['createdAt']).catch(undefined),
   order: enamValidation('Order', ['asc', 'desc']).catch(undefined),
   search: unionValidation('Search', [
     stringValidation('Search'),

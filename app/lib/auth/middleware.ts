@@ -10,6 +10,10 @@ export const authMiddleware = createMiddleware().server(async ({ next }) => {
     },
   })
 
+  if (!data) {
+    throw new Error("Session Timeout. Please login again")
+  }
+  
   return await next({
     context: data,
   })

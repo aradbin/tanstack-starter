@@ -19,6 +19,7 @@ interface TableComponentProps<TData, TValue, TTable extends TableType> {
   queryFn?: AnyType
   options?: {
     hasSearch?: boolean
+    hasViewOptions?: boolean
   }
   toolbar?: ReactNode
 }
@@ -94,7 +95,8 @@ export default function TableComponent<TData, TValue, TTable extends TableType>(
       {(
         options?.hasSearch ||
         (filters && filters?.length > 0) ||
-        Object.entries(query?.where || {})?.some(([_, value]) => value?.length > 0)
+        Object.entries(query?.where || {})?.some(([_, value]) => value?.length > 0) ||
+        toolbar
       ) && (
         <div className="flex items-center justify-between">
           <div className="flex flex-1 items-center gap-2">
@@ -103,7 +105,7 @@ export default function TableComponent<TData, TValue, TTable extends TableType>(
             <TableReset hasReset={filters && filters?.length > 0 && Object.entries(query?.where || {})?.some(([_, value]) => value?.length > 0) || table.getState().sorting.length > 0 || query?.search?.term} />
           </div>
           <div className="flex items-center gap-2">
-            <TableViewOptions table={table} />
+            {options?.hasViewOptions && <TableViewOptions table={table} />}
             {toolbar}
           </div>
         </div>

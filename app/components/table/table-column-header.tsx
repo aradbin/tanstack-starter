@@ -74,11 +74,13 @@ export function TableColumnHeader<TData, TValue>({
             <ArrowDown />
             Desc
           </DropdownMenuItem>
-          <DropdownMenuSeparator />
-          <DropdownMenuItem onClick={() => column.toggleVisibility(false)}>
-            <EyeOff />
-            Hide
-          </DropdownMenuItem>
+          {column.getCanHide() && <>
+            <DropdownMenuSeparator />
+            <DropdownMenuItem onClick={() => column.toggleVisibility(false)}>
+              <EyeOff />
+              Hide
+            </DropdownMenuItem>
+          </>}
         </DropdownMenuContent>
       </DropdownMenu>
     </div>
