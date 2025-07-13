@@ -33,7 +33,12 @@ export const getInitials = (fullName: string | undefined | null): string => {
   return `${firstInitial}${lastInitial}`.toUpperCase()
 }
 
-export const formatDate = (date: Date) => {
+export const formatDateTime = (date: Date) => {
   if (!date || !isValid(date)) return ""
   return format(new Date(date), "do MMM, yyyy hh:mm a")
+}
+
+export const formatDate = (date: Date) => {
+  if (!date || !isValid(date)) return ""
+  return format(new Date(date), "do MMM, yyyy")
 }

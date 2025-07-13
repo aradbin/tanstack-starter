@@ -5,7 +5,7 @@ import { TableColumnHeader } from "@/components/table/table-column-header"
 import { TableRowActions } from "@/components/table/table-row-actions"
 
 import { teams } from "@/lib/db/schema"
-import { capitalize, formatDate } from "@/lib/utils"
+import { capitalize, formatDateTime } from "@/lib/utils"
 
 export const teamColumns: ColumnDef<typeof teams.$inferSelect>[] = [
   {
@@ -43,7 +43,7 @@ export const teamColumns: ColumnDef<typeof teams.$inferSelect>[] = [
   {
     accessorKey: "createdAt",
     header: ({ column }) => <TableColumnHeader column={column} title="Created At" />,
-    cell: ({ row }) => formatDate(row.original.createdAt),
+    cell: ({ row }) => formatDateTime(row.original.createdAt),
     enableSorting: true,
   },
   {

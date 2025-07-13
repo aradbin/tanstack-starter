@@ -18,3 +18,21 @@ export const authMiddleware = createMiddleware().server(async ({ next }) => {
     context: data,
   })
 })
+
+export const orgMiddleware = createMiddleware()
+  .middleware([authMiddleware])
+  .server(async ({ context, next }) => {
+    if (!context?.session?.activeOrganizationId) {
+      throw new Error("No active organization found. Please select an organization")
+    }
+
+    return await next({
+      context: {
+        ...context,
+        session: {
+          ...context.session,
+          activeOrganizationId: context?.session?.activeOrganizationId,
+        },
+      },
+    })
+  })

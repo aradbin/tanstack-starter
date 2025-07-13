@@ -1,4 +1,4 @@
-import { authMiddleware } from "@/lib/auth/middleware";
+import { orgMiddleware } from "@/lib/auth/middleware";
 import { db } from "@/lib/db";
 import { tasks } from "@/lib/db/schema";
 import { AnyType, FormFieldType, OptionType } from "@/lib/types";
@@ -51,35 +51,39 @@ export const taskFormFields: FormFieldType[][] = [
       validationOnSubmit: stringRequiredValidation("Priority"),
       defaultValue: "medium",
     }
+  ],
+  [
+    {
+      name: "Deadline",
+      type: "date",
+      validationOnSubmit: stringRequiredValidation("Deadline"),
+      placeholder: "Select deadline",
+    }
   ]
 ]
 
 export const createTask = createServerFn({ method: "POST" })
+  .middleware([orgMiddleware])
   .validator((data: {
     values: AnyType
   }) => data)
-  .middleware([authMiddleware])
   .handler(async ({ context, data }) => {
-    if(context?.session?.activeOrganizationId) {
-      const { values } = data
+    const { values } = data
     
-      const count = await db.$count(tasks, and(eq(tasks.organizationId, context?.session?.activeOrganizationId)))
+    const count = await db.$count(tasks, and(eq(tasks.organizationId, context?.session?.activeOrganizationId)))
 
-      try {
-        const result = await db.insert(tasks).values({
-          ...values,
-          number: count + 1,
-          organizationId: context?.session?.activeOrganizationId,
-        })
+    try {
+      const result = await db.insert(tasks).values({
+        ...values,
+        number: count + 1,
+        organizationId: context?.session?.activeOrganizationId,
+      })
 
-        return {
-          ...result,
-          message: "Task created successfully"
-        }
-      } catch (error) {
-        throw new Error("Something went wrong. Please try again")
+      return {
+        ...result,
+        message: "Task created successfully"
       }
+    } catch (error) {
+      throw new Error("Something went wrong. Please try again")
     }
-
-    throw new Error("No Active Organization");
   })

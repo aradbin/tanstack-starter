@@ -6,7 +6,7 @@ import { TableRowActions } from "@/components/table/table-row-actions"
 
 import { members, users } from "@/lib/db/schema"
 import UserAvatar from "@/components/common/user-avatar"
-import { capitalize, formatDate } from "@/lib/utils"
+import { capitalize, formatDateTime } from "@/lib/utils"
 
 export const memberColumns: ColumnDef<typeof members.$inferSelect & {
   user: typeof users.$inferSelect
@@ -47,7 +47,7 @@ export const memberColumns: ColumnDef<typeof members.$inferSelect & {
   {
     accessorKey: "createdAt",
     header: ({ column }) => <TableColumnHeader column={column} title="Joined" />,
-    cell: ({ row }) => formatDate(row.original.createdAt),
+    cell: ({ row }) => formatDateTime(row.original.createdAt),
     enableSorting: true,
   },
   {

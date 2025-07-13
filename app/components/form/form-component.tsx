@@ -8,6 +8,8 @@ import { useState } from "react";
 import { Alert, AlertTitle } from "@/components/ui/alert";
 import { useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
+import { Label } from "@/components/ui/label";
+import { capitalize } from "@/lib/utils";
 
 export default function FormComponent({ fields, handleSubmit, onSuccess, onError, onCancel, options }: {
   fields: FormFieldType[][]
@@ -105,28 +107,37 @@ export default function FormComponent({ fields, handleSubmit, onSuccess, onError
             <form.Field
               key={index}
               name={field.name}
-              children={(fieldProps) => (
-                <div className="grid gap-2">
-                  <RenderField field={{
-                    ...field,
-                    isValid: fieldProps?.state?.meta?.isTouched ? fieldProps?.state?.meta?.isValid : true,
-                    value: fieldProps?.state?.value,
-                    handleBlur: fieldProps?.handleBlur,
-                    handleChange: fieldProps?.handleChange
-                  }} />
-                  
-                  {fieldProps?.state?.meta?.isTouched &&
-                  !fieldProps?.state?.meta?.isValid &&
-                  fieldProps?.state?.meta?.errors.map((error: any, index: number) => (
-                    <p
-                      key={index}
-                      className="text-sm font-medium text-destructive"
+              children={(fieldProps) => {
+                const isValid = fieldProps?.state?.meta?.isTouched ? fieldProps?.state?.meta?.isValid : true
+                return (
+                  <div className="grid gap-2">
+                    <Label
+                      htmlFor={field?.name}
+                      className={!isValid ? "text-destructive" : ""}
                     >
-                      {error?.message}
-                    </p>
-                  ))}
-                </div>
-              )}
+                      {field?.label || capitalize(field?.name)}
+                    </Label>
+                    <RenderField field={{
+                      ...field,
+                      isValid,
+                      value: fieldProps?.state?.value,
+                      handleBlur: fieldProps?.handleBlur,
+                      handleChange: fieldProps?.handleChange
+                    }} />
+                    
+                    {fieldProps?.state?.meta?.isTouched &&
+                    !fieldProps?.state?.meta?.isValid &&
+                    fieldProps?.state?.meta?.errors.map((error: any, index: number) => (
+                      <p
+                        key={index}
+                        className="text-sm font-medium text-destructive"
+                      >
+                        {error?.message}
+                      </p>
+                    ))}
+                  </div>
+                )
+              }}
             />
           ))}
         </div>

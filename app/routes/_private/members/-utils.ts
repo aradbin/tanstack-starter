@@ -1,3 +1,4 @@
+import { orgMiddleware } from "@/lib/auth/middleware";
 import { db } from "@/lib/db";
 import { addOrder, addPagination, getWhereArgs } from "@/lib/db/functions";
 import { members, users } from "@/lib/db/schema";
@@ -6,11 +7,12 @@ import { createServerFn } from "@tanstack/react-start";
 import { and, eq, getTableColumns, ilike, or, sql } from "drizzle-orm";
 
 export const getMembers = createServerFn()
+  .middleware([orgMiddleware])
   .validator((data: { sort?: SortType, pagination?: PaginationType, where?: WhereType, search: SearchType }) => data)
-  .handler(async ({ data }) => {
+  .handler(async ({ context, data }) => {
     const { pagination, sort, where, search } = data
     const whereArgs = and(
-      ...getWhereArgs(members, where),
+      ...getWhereArgs(context?.session?.activeOrganizationId, members, where),
       ...search?.term ? [or(
         ilike(users.name, `%${search.term}%`),
         ilike(users.email, `%${search.term}%`)

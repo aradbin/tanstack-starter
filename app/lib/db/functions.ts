@@ -4,6 +4,7 @@ import * as schema from "@/lib/db/schema"
 import { and, desc, eq, inArray, isNull } from "drizzle-orm"
 import { defaultPageSize } from "../variables"
 import { AnyType, PaginationType, SearchType, SortType, WhereType } from "../types"
+import { orgMiddleware } from "../auth/middleware"
 
 export type TableType = keyof typeof db.query
 export type RelationType<TTable extends TableType> = NonNullable<Parameters<typeof db.query[TTable]['findMany']>[0]>['with']
@@ -41,10 +42,10 @@ export const getOrderArgs = (tableSchema?: AnyType, sort?: SortType) => {
   return order
 }
 
-export const getWhereArgs = (tableSchema?: AnyType, where?: WhereType) => {
+export const getWhereArgs = (activeOrganizationId: string, tableSchema: AnyType, where?: WhereType) => {
   const baseConditions = [
     isNull(tableSchema?.deletedAt),
-    // eq(tableSchema?.organizationId, context?.session?.activeOrganizationId)
+    eq(tableSchema?.organizationId, activeOrganizationId)
   ]
   const dynamicConditions = Object.entries(where ?? {}).flatMap(([key, value]) => {
     const column = tableSchema?.[key]
@@ -75,8 +76,9 @@ export const addOrder = (query: AnyType, tableSchema?: AnyType, sort?: SortType)
 }
 
 const getDatasFn = createServerFn()
+  .middleware([orgMiddleware])
   .validator((data: { table: TableType; relation?: unknown; sort?: SortType, pagination?: PaginationType, where?: WhereType }) => data)
-  .handler(async ({ data }) => {
+  .handler(async ({ context, data }) => {
     const { table, relation, sort, pagination, where } = data
     const tableSchema = schema[table] as AnyType
     const query = db.query[table]
@@ -91,7 +93,7 @@ const getDatasFn = createServerFn()
     }
 
     // where
-    const whereArg = and(...getWhereArgs(tableSchema, where))
+    const whereArg = and(...getWhereArgs(context?.session?.activeOrganizationId, tableSchema, where))
 
     // query
     const args: FindManyArgs = {
@@ -117,6 +119,7 @@ export const getDatas = async <TTable extends TableType>(
 }
 
 export const postData = createServerFn({ method: "POST" })
+  .middleware([orgMiddleware])
   .validator((data: {
     table: TableType
     values: Record<string, any>
