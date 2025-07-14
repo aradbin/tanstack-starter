@@ -18,7 +18,7 @@ export const Route = createFileRoute('/_private/tasks/')({
 function RouteComponent() {
   const params = Route.useSearch()
 
-  const query: QueryParamType<"tasks"> = {
+  const query: QueryParamType = {
     table: "tasks",
     sort: {
       field: params.sort,

@@ -8,9 +8,9 @@ import { authOrgMiddleware } from "../auth/middleware"
 
 export type TableType = keyof typeof db.query
 export type RelationType<TTable extends TableType> = NonNullable<Parameters<typeof db.query[TTable]['findMany']>[0]>['with']
-export type QueryParamType<TTable extends TableType> = {
-  table: TTable
-  relation?: RelationType<TTable>
+export type QueryParamType = {
+  table: TableType
+  relation?: RelationType<TableType>
   sort?: SortType
   pagination?: PaginationType
   where?: WhereType
@@ -112,8 +112,8 @@ const getDatasFn = createServerFn()
     }
   })
 
-export const getDatas = async <TTable extends TableType>(
-  input: { data: QueryParamType<TTable> }
+export const getDatas = async (
+  input: { data: QueryParamType }
 ) => {
   return await getDatasFn(input)
 }

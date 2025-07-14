@@ -1,8 +1,7 @@
 import { ReactNode, useMemo, useState } from 'react'
-import { ColumnDef, getCoreRowModel, useReactTable, VisibilityState,
-} from "@tanstack/react-table"
+import { ColumnDef, getCoreRowModel, useReactTable, VisibilityState } from "@tanstack/react-table"
 import { TablePagination } from "@/components/table/table-pagination"
-import { getDatas, QueryParamType, TableType } from "@/lib/db/functions"
+import { getDatas, QueryParamType } from "@/lib/db/functions"
 import { defaultPageSize } from "@/lib/variables"
 import { AnyType, TableFilterType } from "@/lib/types"
 import { useQuery } from '@tanstack/react-query'
@@ -12,9 +11,9 @@ import { TableFilter } from '@/components/table/table-filter'
 import TableReset from '@/components/table/table-reset'
 import { TableViewOptions } from '@/components/table/table-view-options'
 
-interface TableComponentProps<TData, TValue, TTable extends TableType> {
+interface TableComponentProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[]
-  query: QueryParamType<TTable>
+  query: QueryParamType
   filters?: TableFilterType[]
   queryFn?: AnyType
   options?: {
@@ -24,14 +23,14 @@ interface TableComponentProps<TData, TValue, TTable extends TableType> {
   toolbar?: ReactNode
 }
 
-export default function TableComponent<TData, TValue, TTable extends TableType>({
+export default function TableComponent<TData, TValue>({
   columns,
   filters,
   query,
   queryFn,
   options,
   toolbar
-}: TableComponentProps<TData, TValue, TTable>) {
+}: TableComponentProps<TData, TValue>) {
   const [rowSelection, setRowSelection] = useState({})
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({})
   
@@ -73,16 +72,11 @@ export default function TableComponent<TData, TValue, TTable extends TableType>(
     onColumnVisibilityChange: setColumnVisibility,
     getCoreRowModel: getCoreRowModel(),
   }), [
-    tableData?.result,
-    tableData?.count,
+    query,
     columns,
-    query?.sort?.field,
-    query?.sort?.order,
-    query?.pagination?.hasPagination,
-    query?.pagination?.page,
-    query?.pagination?.pageSize,
-    columnVisibility,
+    tableData,
     rowSelection,
+    columnVisibility,
   ])
 
   const table = useReactTable(tableOptions)
