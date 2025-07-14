@@ -20,7 +20,11 @@ export default function SelectField({
           variant="outline"
           role="combobox"
           aria-expanded={open}
-          className="w-full justify-between"
+          className={cn(
+            "w-full justify-between",
+            !field.value && "text-muted-foreground",
+            !field?.isValid && "border-destructive dark:border-destructive"
+          )}
         >
           {field?.value
             ? field?.options?.find((item) => item?.value === field?.value)?.label

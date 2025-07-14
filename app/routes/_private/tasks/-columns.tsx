@@ -5,7 +5,9 @@ import { TableColumnHeader } from "@/components/table/table-column-header"
 import { TableRowActions } from "@/components/table/table-row-actions"
 
 import { tasks } from "@/lib/db/schema"
-import { capitalize, formatDateTime } from "@/lib/utils"
+import { capitalize, formatDate, formatDateTime } from "@/lib/utils"
+import { taskPriorityOptions, taskStatusOptions } from "./-utils"
+import TableRowFromOptions from "@/components/table/table-row-from-options"
 
 export const taskColumns: ColumnDef<typeof tasks.$inferSelect>[] = [
   {
@@ -43,17 +45,19 @@ export const taskColumns: ColumnDef<typeof tasks.$inferSelect>[] = [
   {
     accessorKey: "status",
     header: ({ column }) => <TableColumnHeader column={column} title="Status" />,
-    cell: ({ row }) => capitalize(row.original.status),
+    cell: ({ row }) => <TableRowFromOptions value={row.original.status} options={taskStatusOptions} />,
+    enableSorting: true,
   },
   {
     accessorKey: "priority",
     header: ({ column }) => <TableColumnHeader column={column} title="Priority" />,
-    cell: ({ row }) => capitalize(row.original.priority),
+    cell: ({ row }) => <TableRowFromOptions value={row.original.priority} options={taskPriorityOptions} />,
+    enableSorting: true,
   },
   {
-    accessorKey: "createdAt",
-    header: ({ column }) => <TableColumnHeader column={column} title="Created At" />,
-    cell: ({ row }) => formatDateTime(row.original.createdAt),
+    accessorKey: "dueDate",
+    header: ({ column }) => <TableColumnHeader column={column} title="Due Date" />,
+    cell: ({ row }) => formatDate(row.original.dueDate),
     enableSorting: true,
   },
   {

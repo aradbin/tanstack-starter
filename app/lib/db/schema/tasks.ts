@@ -10,6 +10,7 @@ export const tasks = pgTable("tasks", {
   description: table.text(),
   status: table.text().default("todo").notNull(),
   priority: table.text().default("medium").notNull(),
+  dueDate: table.date("due_date").defaultNow().notNull(),
   organizationId: table
     .text("organization_id")
     .notNull()

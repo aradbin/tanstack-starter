@@ -1,5 +1,5 @@
 import TableComponent from '@/components/table/table-component'
-import { defaultSearchParamValidation, validate } from '@/lib/validations'
+import { defaultSearchParamValidation, enamValidation, validate } from '@/lib/validations'
 import { createFileRoute } from '@tanstack/react-router'
 import { taskColumns } from './-columns'
 import { QueryParamType } from '@/lib/db/functions'
@@ -11,6 +11,7 @@ export const Route = createFileRoute('/_private/tasks/')({
   component: RouteComponent,
   validateSearch: validate({
     ...defaultSearchParamValidation,
+    sort: enamValidation('Sort', ['dueDate', 'priority', 'status']).catch(undefined),
   })
 })
 

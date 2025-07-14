@@ -12,7 +12,6 @@ import {
 import { getUser } from "@/lib/auth/functions"
 import { authRoutes, head } from "@/lib/variables"
 import { QueryProvider } from "@/providers/query-provider"
-import { AnyType } from "@/lib/types";
 import { Toaster } from "@/components/ui/sonner";
 
 export const Route = createRootRoute({

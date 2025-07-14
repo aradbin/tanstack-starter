@@ -19,7 +19,7 @@ export const authMiddleware = createMiddleware().server(async ({ next }) => {
   })
 })
 
-export const orgMiddleware = createMiddleware()
+export const authOrgMiddleware = createMiddleware()
   .middleware([authMiddleware])
   .server(async ({ context, next }) => {
     if (!context?.session?.activeOrganizationId) {

@@ -1,4 +1,4 @@
-import { orgMiddleware } from "@/lib/auth/middleware";
+import { authOrgMiddleware } from "@/lib/auth/middleware";
 import { db } from "@/lib/db";
 import { tasks } from "@/lib/db/schema";
 import { AnyType, FormFieldType, OptionType } from "@/lib/types";
@@ -54,16 +54,17 @@ export const taskFormFields: FormFieldType[][] = [
   ],
   [
     {
-      name: "Deadline",
+      name: "dueDate",
+      label: "Due Date",
       type: "date",
-      validationOnSubmit: stringRequiredValidation("Deadline"),
-      placeholder: "Select deadline",
+      validationOnSubmit: stringRequiredValidation("Due Date"),
+      placeholder: "Select Due Date",
     }
   ]
 ]
 
 export const createTask = createServerFn({ method: "POST" })
-  .middleware([orgMiddleware])
+  .middleware([authOrgMiddleware])
   .validator((data: {
     values: AnyType
   }) => data)

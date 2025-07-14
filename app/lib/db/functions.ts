@@ -4,7 +4,7 @@ import * as schema from "@/lib/db/schema"
 import { and, desc, eq, inArray, isNull } from "drizzle-orm"
 import { defaultPageSize } from "../variables"
 import { AnyType, PaginationType, SearchType, SortType, WhereType } from "../types"
-import { orgMiddleware } from "../auth/middleware"
+import { authOrgMiddleware } from "../auth/middleware"
 
 export type TableType = keyof typeof db.query
 export type RelationType<TTable extends TableType> = NonNullable<Parameters<typeof db.query[TTable]['findMany']>[0]>['with']
@@ -76,7 +76,7 @@ export const addOrder = (query: AnyType, tableSchema?: AnyType, sort?: SortType)
 }
 
 const getDatasFn = createServerFn()
-  .middleware([orgMiddleware])
+  .middleware([authOrgMiddleware])
   .validator((data: { table: TableType; relation?: unknown; sort?: SortType, pagination?: PaginationType, where?: WhereType }) => data)
   .handler(async ({ context, data }) => {
     const { table, relation, sort, pagination, where } = data
@@ -119,7 +119,7 @@ export const getDatas = async <TTable extends TableType>(
 }
 
 export const postData = createServerFn({ method: "POST" })
-  .middleware([orgMiddleware])
+  .middleware([authOrgMiddleware])
   .validator((data: {
     table: TableType
     values: Record<string, any>

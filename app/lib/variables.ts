@@ -92,4 +92,4 @@ export const mainNavItems: NavigationType[] = [
 
 export const footerNavItems: NavItemType[] = []
 
-export const defaultPageSize = 1
+export const defaultPageSize = 10
