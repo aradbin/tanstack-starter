@@ -3,6 +3,7 @@ import { db } from "@/lib/db";
 import { createData } from "@/lib/db/functions";
 import { tasks } from "@/lib/db/schema";
 import { AnyType, FormFieldType, OptionType } from "@/lib/types";
+import { formatDateForInput } from "@/lib/utils";
 import { stringRequiredValidation, stringValidation } from "@/lib/validations";
 import { createServerFn } from "@tanstack/react-start";
 import { and, eq } from "drizzle-orm";
@@ -19,49 +20,6 @@ export const taskPriorityOptions: OptionType[] = [
   { label: "Low", value: "low", icon: ArrowDown },
   { label: "Medium", value: "medium", icon: ArrowRight },
   { label: "High", value: "high", icon: ArrowUp },
-]
-
-export const taskFormFields: FormFieldType[][] = [
-  [
-    {
-      name: "title",
-      validationOnSubmit: stringRequiredValidation("Title"),
-      placeholder: "Enter title",
-    },
-  ],
-  [
-    {
-      name: "description",
-      type: "textarea",
-      validationOnSubmit: stringValidation("Description"),
-      placeholder: "Enter description",
-    }
-  ],
-  [
-    {
-      name: "status",
-      type: "select",
-      options: taskStatusOptions,
-      validationOnSubmit: stringRequiredValidation("Status"),
-      defaultValue: "todo",
-    },
-    {
-      name: "priority",
-      type: "select",
-      options: taskPriorityOptions,
-      validationOnSubmit: stringRequiredValidation("Priority"),
-      defaultValue: "medium",
-    }
-  ],
-  [
-    {
-      name: "dueDate",
-      label: "Due Date",
-      type: "date",
-      validationOnSubmit: stringRequiredValidation("Due Date"),
-      placeholder: "Select Due Date",
-    }
-  ]
 ]
 
 export const createTask = createServerFn({ method: "POST" })

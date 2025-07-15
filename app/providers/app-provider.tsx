@@ -1,5 +1,7 @@
 import { TableType } from "@/lib/db/functions";
 import { AnyType } from "@/lib/types";
+import { getMembers, MemberWithUser } from "@/routes/_private/members/-utils";
+import { useQuery } from "@tanstack/react-query";
 import { createContext, Dispatch, ReactNode, SetStateAction, useContext, useState } from "react";
 
 type DeleteIdType = {
@@ -15,6 +17,7 @@ type AppStateType = {
   setEditId: Dispatch<SetStateAction<AnyType>>
   deleteId: DeleteIdType
   setDeleteId: Dispatch<SetStateAction<DeleteIdType>>
+  members: MemberWithUser[]
 }
 
 const initialState: AppStateType = {
@@ -23,7 +26,8 @@ const initialState: AppStateType = {
   editId: null,
   setEditId: () => {},
   deleteId: null,
-  setDeleteId: () => {}
+  setDeleteId: () => {},
+  members: [],
 }
 
 const AppContext = createContext<AppStateType>(initialState)
@@ -37,6 +41,11 @@ export function AppProvider({
   const [editId, setEditId] = useState()
   const [deleteId, setDeleteId] = useState<DeleteIdType>(null)
 
+  const { data: members } = useQuery({
+    queryKey: ['members', 'all'],
+    queryFn: () => getMembers({ data: {} })
+  })
+
   return (
     <AppContext.Provider value={{
       isTaskOpen,
@@ -44,7 +53,8 @@ export function AppProvider({
       editId,
       setEditId,
       deleteId,
-      setDeleteId
+      setDeleteId,
+      members: members?.result || []
     }}>
       {children}
     </AppContext.Provider>

@@ -34,11 +34,11 @@ export default function SelectField({
       </PopoverTrigger>
       <PopoverContent className="w-full p-0">
         <Command>
-          <CommandInput placeholder="Search framework..." />
+          <CommandInput placeholder="Search..." />
           <CommandList>
             <CommandEmpty>No option found</CommandEmpty>
             <CommandGroup>
-              {field?.options?.map((item?) => (
+              {field?.options?.map((item) => (
                 <CommandItem
                   key={item?.value}
                   value={item?.value}

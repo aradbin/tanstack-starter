@@ -1,7 +1,7 @@
 import { createServerFn } from "@tanstack/react-start"
 import { db } from "@/lib/db"
 import * as schema from "@/lib/db/schema"
-import { and, desc, eq, inArray, isNull } from "drizzle-orm"
+import { and, desc, eq, ilike, inArray, isNull } from "drizzle-orm"
 import { defaultPageSize } from "../variables"
 import { AnyType, PaginationType, SearchType, SortType, WhereType } from "../types"
 import { authOrgMiddleware } from "../auth/middleware"
@@ -42,7 +42,7 @@ export const getOrderArgs = (tableSchema?: AnyType, sort?: SortType) => {
   return order
 }
 
-export const getWhereArgs = (activeOrganizationId: string, tableSchema: AnyType, where?: WhereType) => {
+export const getWhereArgs = (activeOrganizationId: string, tableSchema: AnyType, where?: WhereType, search?: SearchType) => {
   const baseConditions = [
     isNull(tableSchema?.deletedAt),
     eq(tableSchema?.organizationId, activeOrganizationId)
@@ -53,8 +53,11 @@ export const getWhereArgs = (activeOrganizationId: string, tableSchema: AnyType,
 
     return Array.isArray(value) ? inArray(column, value) : eq(column, value)
   })
+  const searchConditions = [
+    ...(search?.term && search?.key && tableSchema?.[search?.key]) ? [ilike(tableSchema?.[search?.key], `%${search.term}%`)] : []
+  ]
   
-  return [...baseConditions, ...dynamicConditions]
+  return [...baseConditions, ...dynamicConditions, ...searchConditions]
 }
 
 export const addPagination = (query: AnyType, pagination?: PaginationType) => {
@@ -77,9 +80,9 @@ export const addOrder = (query: AnyType, tableSchema?: AnyType, sort?: SortType)
 
 const getDatasFn = createServerFn()
   .middleware([authOrgMiddleware])
-  .validator((data: { table: TableType; relation?: unknown; sort?: SortType, pagination?: PaginationType, where?: WhereType }) => data)
+  .validator((data: { table: TableType; relation?: unknown; sort?: SortType, pagination?: PaginationType, where?: WhereType, search?: SearchType }) => data)
   .handler(async ({ context, data }) => {
-    const { table, relation, sort, pagination, where } = data
+    const { table, relation, sort, pagination, where, search } = data
     const tableSchema = schema[table] as AnyType
     const query = db.query[table]
 
@@ -93,7 +96,7 @@ const getDatasFn = createServerFn()
     }
 
     // where
-    const whereArg = and(...getWhereArgs(context?.session?.activeOrganizationId, tableSchema, where))
+    const whereArg = and(...getWhereArgs(context?.session?.activeOrganizationId, tableSchema, where, search))
 
     // query
     const args: FindManyArgs = {

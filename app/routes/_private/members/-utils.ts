@@ -4,11 +4,15 @@ import { addOrder, addPagination, getWhereArgs } from "@/lib/db/functions";
 import { members, users } from "@/lib/db/schema";
 import { PaginationType, SearchType, SortType, WhereType } from "@/lib/types";
 import { createServerFn } from "@tanstack/react-start";
-import { and, eq, getTableColumns, ilike, or, sql } from "drizzle-orm";
+import { and, eq, getTableColumns, ilike, InferSelectModel, or, sql } from "drizzle-orm";
+
+export type MemberWithUser = InferSelectModel<typeof members> & {
+  user: InferSelectModel<typeof users>
+}
 
 export const getMembers = createServerFn()
   .middleware([authOrgMiddleware])
-  .validator((data: { sort?: SortType, pagination?: PaginationType, where?: WhereType, search: SearchType }) => data)
+  .validator((data: { sort?: SortType, pagination?: PaginationType, where?: WhereType, search?: SearchType }) => data)
   .handler(async ({ context, data }) => {
     const { pagination, sort, where, search } = data
     const whereArgs = and(
@@ -26,7 +30,7 @@ export const getMembers = createServerFn()
         count: sql<number>`count(*) over()`
       })
       .from(members)
-      .leftJoin(users, eq(members.userId, users.id))
+      .innerJoin(users, eq(members.userId, users.id))
       .where(whereArgs)
 
     query = addPagination(query, pagination)

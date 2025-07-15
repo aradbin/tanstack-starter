@@ -6,12 +6,16 @@ import { QueryParamType } from '@/lib/db/functions'
 import { Button } from '@/components/ui/button'
 import { PlusCircle } from 'lucide-react'
 import { useApp } from '@/providers/app-provider'
+import { TableFilterType } from '@/lib/types'
+import { taskPriorities, taskPriorityOptions, taskStatuses, taskStatusOptions } from './-utils'
 
 export const Route = createFileRoute('/_private/tasks/')({
   component: RouteComponent,
   validateSearch: validate({
     ...defaultSearchParamValidation,
     sort: enamValidation('Sort', ['dueDate', 'priority', 'status']).catch(undefined),
+    status: enamValidation('Status', taskStatuses).catch(undefined),
+    priority: enamValidation('Priority', taskPriorities).catch(undefined),
   })
 })
 
@@ -29,14 +33,30 @@ function RouteComponent() {
       page: params.page,
       pageSize: params.pageSize
     },
+    where: {
+      status: params.status,
+      priority: params.priority
+    },
     search: {
       term: params.search,
+      key: 'title'
     }
   }
+
+  const filters: TableFilterType[] = [
+    {
+      key: 'status',
+      options: taskStatusOptions
+    },
+    {
+      key: 'priority',
+      options: taskPriorityOptions
+    }
+  ]
   
   return (
     <>
-      <TableComponent columns={taskColumns} query={query} options={{ hasSearch: true }} toolbar={(
+      <TableComponent columns={taskColumns} query={query} filters={filters} options={{ hasSearch: true }} toolbar={(
         <Button size="sm" variant="outline" onClick={() => setIsTaskOpen(true)}><PlusCircle /> Create</Button>
       )} />
     </>

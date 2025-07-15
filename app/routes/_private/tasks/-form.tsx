@@ -1,18 +1,73 @@
 import FormComponent from "@/components/form/form-component"
 import ModalComponent from "@/components/modal/modal-component"
-import { createTask, taskFormFields } from "./-utils"
+import { createTask, taskPriorityOptions, taskStatusOptions } from "./-utils"
 import { useApp } from "@/providers/app-provider"
 import { useQuery } from "@tanstack/react-query"
 import { getData, updateData } from "@/lib/db/functions"
+import { FormFieldType } from "@/lib/types"
+import { stringRequiredValidation, stringValidation } from "@/lib/validations"
+import { formatDateForInput } from "@/lib/utils"
 
 export default function TaskForm() {
-  const { isTaskOpen, setIsTaskOpen, editId, setEditId } = useApp()
+  const { isTaskOpen, setIsTaskOpen, editId, setEditId, members } = useApp()
   
   const { data: task, isLoading } = useQuery({
     queryKey: ['task', editId],
     queryFn: () => getData({ data: { table: "tasks", id: editId } }),
     enabled: !!editId && isTaskOpen
   })
+
+  const taskFormFields: FormFieldType[][] = [
+    [
+      {
+        name: "title",
+        validationOnSubmit: stringRequiredValidation("Title"),
+        placeholder: "Enter title",
+      },
+    ],
+    [
+      {
+        name: "description",
+        type: "textarea",
+        validationOnSubmit: stringValidation("Description"),
+        placeholder: "Enter description",
+      }
+    ],
+    [
+      {
+        name: "status",
+        type: "select",
+        options: taskStatusOptions,
+        validationOnSubmit: stringRequiredValidation("Status"),
+        defaultValue: "todo",
+      },
+      {
+        name: "priority",
+        type: "select",
+        options: taskPriorityOptions,
+        validationOnSubmit: stringRequiredValidation("Priority"),
+        defaultValue: "medium",
+      }
+    ],
+    [
+      {
+        name: 'assignee',
+        type: 'select',
+        options: members?.map((member) => ({ label: member.user.name, value: member.id })) || [],
+        validationOnSubmit: stringRequiredValidation('Assignee'),
+      }
+    ],
+    [
+      {
+        name: "dueDate",
+        label: "Due Date",
+        type: "date",
+        validationOnSubmit: stringRequiredValidation("Due Date"),
+        placeholder: "Select Due Date",
+        defaultValue: formatDateForInput(new Date()),
+      }
+    ]
+  ]
 
   return (
     <ModalComponent options={{
