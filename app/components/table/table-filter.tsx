@@ -121,20 +121,20 @@ export function TableFilter({
                   <CommandItem
                     key={option.value}
                     onSelect={() => onSelect(option.value)}
+                    className="flex items-center justify-between"
                   >
-                    <div
-                      className={cn(
-                        "flex size-4 items-center justify-center border",
-                        filter?.multiple ? "rounded-[4px]" : "rounded-full",
-                        isSelected ? "bg-primary border-primary text-primary-foreground" : "border-input [&_svg]:invisible"
+                    <div className="flex items-center gap-3">
+                      {option.icon && (
+                        <option.icon className="text-muted-foreground size-4" />
                       )}
-                    >
-                      <Check className="text-primary-foreground size-3.5" />
+                      <span>{option.label}</span>
                     </div>
-                    {option.icon && (
-                      <option.icon className="text-muted-foreground size-4" />
-                    )}
-                    <span>{option.label}</span>
+                    <Check
+                      className={cn(
+                        "h-4 w-4",
+                        isSelected ? "opacity-100" : "opacity-0"
+                      )}
+                    />
                   </CommandItem>
                 )
               })}

@@ -10,7 +10,7 @@ export default function LoadingComponent({
   }
 
   return (
-    <div className="absolute top-0 left-0 right-0 bottom-0 z-50 flex gap-2 items-center justify-center rounded-lg bg-black/70 backdrop-blur">
+    <div className="absolute top-0 left-0 right-0 bottom-0 z-50 flex gap-2 items-center justify-center rounded-lg bg-black/30 backdrop-blur-sm">
       <Loader2 className="animate-spin" /> Please Wait
     </div>
   )

@@ -6,10 +6,10 @@ import { useQuery } from "@tanstack/react-query"
 import { getData, updateData } from "@/lib/db/functions"
 import { FormFieldType } from "@/lib/types"
 import { stringRequiredValidation, stringValidation } from "@/lib/validations"
-import { formatDateForInput } from "@/lib/utils"
+import { formatDateForInput, getUserOptions } from "@/lib/utils"
 
 export default function TaskForm() {
-  const { isTaskOpen, setIsTaskOpen, editId, setEditId, members } = useApp()
+  const { isTaskOpen, setIsTaskOpen, editId, setEditId, users } = useApp()
   
   const { data: task, isLoading } = useQuery({
     queryKey: ['task', editId],
@@ -51,14 +51,6 @@ export default function TaskForm() {
     ],
     [
       {
-        name: 'assignee',
-        type: 'select',
-        options: members?.map((member) => ({ label: member.user.name, value: member.id })) || [],
-        validationOnSubmit: stringRequiredValidation('Assignee'),
-      }
-    ],
-    [
-      {
         name: "dueDate",
         label: "Due Date",
         type: "date",
@@ -66,7 +58,15 @@ export default function TaskForm() {
         placeholder: "Select Due Date",
         defaultValue: formatDateForInput(new Date()),
       }
-    ]
+    ],
+    [
+      {
+        name: 'assignee',
+        type: 'user',
+        options: getUserOptions(users),
+        validationOnSubmit: stringRequiredValidation('Assignee'),
+      }
+    ],
   ]
 
   return (

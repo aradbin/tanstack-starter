@@ -15,6 +15,14 @@ export interface NavigationType {
   items?: NavItemType[]
 }
 
+export interface OptionType {
+  label: string
+  value: string
+  description?: string
+  icon?: React.ComponentType<{ className?: string }>
+  image?: string
+}
+
 export interface FormFieldType {
   name: string
   type?: string
@@ -29,12 +37,6 @@ export interface FormFieldType {
   handleBlur?: any
   handleChange?: any
   isValid?: boolean
-}
-
-export interface OptionType {
-  label: string
-  value: string
-  icon?: React.ComponentType<{ className?: string }>
 }
 
 export interface TableFilterType {

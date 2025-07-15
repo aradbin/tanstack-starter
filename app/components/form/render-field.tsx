@@ -6,6 +6,7 @@ import DateField from "./date-field"
 export default function RenderField({ field }: { field: FormFieldType }) {
   switch (field.type) {
     case "select":
+    case "user":
       return <SelectField field={field} />
     case "date":
       return <DateField field={field} />

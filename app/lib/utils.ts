@@ -1,7 +1,8 @@
 import { clsx, type ClassValue } from "clsx"
 import { twMerge } from "tailwind-merge"
 import { format, isValid } from "date-fns"
-import { AnyType } from "./types"
+import { AnyType, OptionType } from "./types"
+import { users } from "./db/schema"
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
@@ -32,6 +33,15 @@ export const getInitials = (fullName: string | undefined | null): string => {
   const lastInitial = names[names.length - 1].charAt(0)
 
   return `${firstInitial}${lastInitial}`.toUpperCase()
+}
+
+export const getUserOptions = (items: typeof users.$inferSelect[]): OptionType[] => {
+  return items?.map((item) => ({
+    label: item.name,
+    value: item.id,
+    description: item.email,
+    image: item.image || '',
+  })) || []
 }
 
 export const formatDateTime = (date: AnyType) => {

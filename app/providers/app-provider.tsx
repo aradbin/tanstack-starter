@@ -1,6 +1,7 @@
 import { TableType } from "@/lib/db/functions";
+import { users } from "@/lib/db/schema";
 import { AnyType } from "@/lib/types";
-import { getMembers, MemberWithUser } from "@/routes/_private/members/-utils";
+import { getMembers } from "@/routes/_private/members/-utils";
 import { useQuery } from "@tanstack/react-query";
 import { createContext, Dispatch, ReactNode, SetStateAction, useContext, useState } from "react";
 
@@ -17,7 +18,7 @@ type AppStateType = {
   setEditId: Dispatch<SetStateAction<AnyType>>
   deleteId: DeleteIdType
   setDeleteId: Dispatch<SetStateAction<DeleteIdType>>
-  members: MemberWithUser[]
+  users: typeof users.$inferSelect[]
 }
 
 const initialState: AppStateType = {
@@ -27,7 +28,7 @@ const initialState: AppStateType = {
   setEditId: () => {},
   deleteId: null,
   setDeleteId: () => {},
-  members: [],
+  users: [],
 }
 
 const AppContext = createContext<AppStateType>(initialState)
@@ -41,9 +42,12 @@ export function AppProvider({
   const [editId, setEditId] = useState()
   const [deleteId, setDeleteId] = useState<DeleteIdType>(null)
 
-  const { data: members } = useQuery({
-    queryKey: ['members', 'all'],
-    queryFn: () => getMembers({ data: {} })
+  const { data: users } = useQuery({
+    queryKey: ['members', 'users', 'all'],
+    queryFn: async () => {
+      const members = await getMembers({ data: {} })
+      return members?.result?.map((member) => (member.user)) || []
+    }
   })
 
   return (
@@ -54,7 +58,7 @@ export function AppProvider({
       setEditId,
       deleteId,
       setDeleteId,
-      members: members?.result || []
+      users: users || []
     }}>
       {children}
     </AppContext.Provider>

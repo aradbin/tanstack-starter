@@ -6,7 +6,7 @@ import { PaginationType, SearchType, SortType, WhereType } from "@/lib/types";
 import { createServerFn } from "@tanstack/react-start";
 import { and, eq, getTableColumns, ilike, InferSelectModel, or, sql } from "drizzle-orm";
 
-export type MemberWithUser = InferSelectModel<typeof members> & {
+export type MemberWithUserType = InferSelectModel<typeof members> & {
   user: InferSelectModel<typeof users>
 }
 
