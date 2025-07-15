@@ -1,4 +1,4 @@
-import { union, z, ZodObject, ZodRawShape, ZodType } from "zod/v4"
+import { z, ZodObject, ZodRawShape, ZodType } from "zod/v4"
 import { defaultPageSize } from "./variables"
 
 const maxLength = 35
@@ -22,11 +22,30 @@ export const stringValidation = (
   return z.string({ error: `${key} has to be string` }).max(max, { error: `${key} is too long` }).optional()
 }
 
-export const unionValidation = (
+export const stringRequiredValidation = (
   key: string,
-  array: ZodType[]
+  max: number = maxLength
 ) => {
-  return z.union(array, { error: `${key} has invalid value` }).optional()
+  return z
+    .string()
+    .min(1, { error: `${key} is required` })
+    .max(max, { error: `${key} is too long` })
+}
+
+export const booleanValidation = (
+  key: string
+) => {
+  return z.boolean({ error: `${key} has to be true or false` }).optional()
+}
+
+export const stringNumberValidation = (
+  key: string,
+  max: number = maxLength
+) => {
+  return unionValidation(key, [
+    stringValidation(key, max),
+    numberValidation(key),
+  ])
 }
 
 export const stringNumberArrayValidation = (
@@ -43,16 +62,6 @@ export const stringNumberArrayValidation = (
     ], { error: `${key} has to be string, number or array of strings or numbers` })
     .transform((val) => (val ? Array.isArray(val) ? val : [val] : []))
     .optional()
-}
-
-export const stringRequiredValidation = (
-  key: string,
-  max: number = maxLength
-) => {
-  return z
-    .string()
-    .min(1, { error: `${key} is required` })
-    .max(max, { error: `${key} is too long` })
 }
 
 export const emailRequiredValidation = (
@@ -74,6 +83,13 @@ export const passwordRequiredValidation = (
     .max(max, { error: `${key} is too long` })
 }
 
+export const unionValidation = (
+  key: string,
+  array: ZodType[]
+) => {
+  return z.union(array, { error: `${key} has invalid value` }).optional()
+}
+
 export const enamValidation = (
   key: string,
   options: string[]
@@ -86,8 +102,5 @@ export const defaultSearchParamValidation = {
   pageSize: numberValidation('Page Size').catch(defaultPageSize),
   sort: enamValidation('Sort', ['createdAt']).catch(undefined),
   order: enamValidation('Order', ['asc', 'desc']).catch(undefined),
-  search: unionValidation('Search', [
-    stringValidation('Search'),
-    numberValidation('Search'),
-  ]).catch(undefined),
+  search: stringNumberValidation('Search').catch(undefined),
 }

@@ -5,7 +5,7 @@ import { TableColumnHeader } from "@/components/table/table-column-header"
 import { TableRowActions } from "@/components/table/table-row-actions"
 
 import { tasks } from "@/lib/db/schema"
-import { capitalize, formatDate, formatDateTime } from "@/lib/utils"
+import { formatDate } from "@/lib/utils"
 import { taskPriorityOptions, taskStatusOptions } from "./-utils"
 import TableRowFromOptions from "@/components/table/table-row-from-options"
 
@@ -35,12 +35,10 @@ export const taskColumns: ColumnDef<typeof tasks.$inferSelect>[] = [
   {
     accessorKey: "number",
     header: ({ column }) => <TableColumnHeader column={column} title="#" />,
-    cell: ({ row }) => row.original.number,
   },
   {
     accessorKey: "title",
     header: ({ column }) => <TableColumnHeader column={column} title="Title" />,
-    cell: ({ row }) => capitalize(row.original.title),
   },
   {
     accessorKey: "status",

@@ -3,9 +3,9 @@ import { defaultSearchParamValidation, enamValidation, validate } from '@/lib/va
 import { createFileRoute } from '@tanstack/react-router'
 import { taskColumns } from './-columns'
 import { QueryParamType } from '@/lib/db/functions'
-import ModalComponent from '@/components/modal/modal-component'
-import FormComponent from '@/components/form/form-component'
-import { createTask, taskFormFields } from './-utils'
+import { Button } from '@/components/ui/button'
+import { PlusCircle } from 'lucide-react'
+import { useApp } from '@/providers/app-provider'
 
 export const Route = createFileRoute('/_private/tasks/')({
   component: RouteComponent,
@@ -17,6 +17,7 @@ export const Route = createFileRoute('/_private/tasks/')({
 
 function RouteComponent() {
   const params = Route.useSearch()
+  const { setIsTaskOpen } = useApp()
 
   const query: QueryParamType = {
     table: "tasks",
@@ -36,25 +37,7 @@ function RouteComponent() {
   return (
     <>
       <TableComponent columns={taskColumns} query={query} options={{ hasSearch: true }} toolbar={(
-        <ModalComponent options={{
-          header: 'Create Task'
-        }}>
-          {(props) => (
-            <FormComponent
-              fields={taskFormFields}
-              handleSubmit={(values: Record<string, any>) => createTask({ data: { values } })}
-              onSuccess={() => {
-                props.close()
-              }}
-              onCancel={() => {
-                props.close()
-              }}
-              options={{
-                queryKey: 'tasks'
-              }}
-            />
-          )}
-        </ModalComponent>
+        <Button size="sm" variant="outline" onClick={() => setIsTaskOpen(true)}><PlusCircle /> Create</Button>
       )} />
     </>
   )

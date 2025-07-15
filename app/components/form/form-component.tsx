@@ -3,35 +3,39 @@ import { validate } from "@/lib/validations"
 import { useForm } from "@tanstack/react-form"
 import RenderField from "@/components/form/render-field";
 import { Button } from "@/components/ui/button";
-import { AlertCircleIcon, CheckCircle2Icon, Loader2Icon } from "lucide-react";
-import { useState } from "react";
+import { AlertCircle, Loader2 } from "lucide-react";
+import { useEffect, useState } from "react";
 import { Alert, AlertTitle } from "@/components/ui/alert";
 import { useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { Label } from "@/components/ui/label";
 import { capitalize } from "@/lib/utils";
+import LoadingComponent from "../common/loading-component";
 
-export default function FormComponent({ fields, handleSubmit, onSuccess, onError, onCancel, options }: {
+export default function FormComponent({ fields, handleSubmit, values ={}, onSuccess, onError, onCancel, options }: {
   fields: FormFieldType[][]
   handleSubmit: any;
+  values?: Record<string, any>
   onSuccess?: any;
   onError?: any;
   onCancel?: any;
   options?: {
-    queryKey?: AnyType
+    isLoading?: boolean
+    queryKey?: string | string[]
     submitText?: string
     cancelText?: string
     loadingText?: string
     btnWidth?: string
+    submitVariant?: "default" | "destructive"
   }
 }) {
   const queryClient = useQueryClient()
   const [messageError, setMessageError] = useState<string | null | undefined>(null)
   const flatFields = fields.flat()
 
-  const defaultValues = flatFields.reduce((values, field) => {
-    values[field.name] = field.defaultValue || ""
-    return values
+  const defaultValues = flatFields.reduce((flatDefaultValues, field) => {
+    flatDefaultValues[field.name] = field.defaultValue || ""
+    return flatDefaultValues
   }, {} as Record<string, any>)
 
   const schemaOnBlur = flatFields.reduce((shape, field) => {
@@ -74,12 +78,12 @@ export default function FormComponent({ fields, handleSubmit, onSuccess, onError
         const response = await handleSubmit(value)
         if(options?.queryKey) {
           queryClient.invalidateQueries({
-            queryKey: [options.queryKey]
+            queryKey: typeof options.queryKey === 'string' ? [options.queryKey] : options.queryKey
           })
         }
         form.reset()
         if(response.message) {
-          toast.success(response.message)
+          options?.submitVariant === "destructive" ? toast.error(response.message) : toast.success(response.message)
         }
         if(onSuccess) {
           onSuccess(response)
@@ -92,6 +96,17 @@ export default function FormComponent({ fields, handleSubmit, onSuccess, onError
       }
     },
   })
+
+  useEffect(() => {
+    if(Object.keys(values)?.length){
+      Object.keys(values)?.forEach((item) => {
+        const field = flatFields.find((field) => field.name === item)
+        if(field){
+          form.setFieldValue(item, values[item])
+        }
+      });
+    }
+  },[values])
 
   return (
     <form
@@ -109,34 +124,38 @@ export default function FormComponent({ fields, handleSubmit, onSuccess, onError
               name={field.name}
               children={(fieldProps) => {
                 const isValid = fieldProps?.state?.meta?.isTouched ? fieldProps?.state?.meta?.isValid : true
-                return (
-                  <div className="grid gap-2">
-                    <Label
-                      htmlFor={field?.name}
-                      className={!isValid ? "text-destructive" : ""}
-                    >
-                      {field?.label || capitalize(field?.name)}
-                    </Label>
-                    <RenderField field={{
-                      ...field,
-                      isValid,
-                      value: fieldProps?.state?.value,
-                      handleBlur: fieldProps?.handleBlur,
-                      handleChange: fieldProps?.handleChange
-                    }} />
-                    
-                    {fieldProps?.state?.meta?.isTouched &&
-                    !fieldProps?.state?.meta?.isValid &&
-                    fieldProps?.state?.meta?.errors.map((error: any, index: number) => (
-                      <p
-                        key={index}
-                        className="text-sm font-medium text-destructive"
+                if(field.type !== 'hidden'){
+                  return (
+                    <div className="grid gap-2">
+                      <Label
+                        htmlFor={field?.name}
+                        className={!isValid ? "text-destructive" : ""}
                       >
-                        {error?.message}
-                      </p>
-                    ))}
-                  </div>
-                )
+                        {field?.label || capitalize(field?.name)}
+                      </Label>
+                      <RenderField field={{
+                        ...field,
+                        isValid,
+                        value: fieldProps?.state?.value,
+                        handleBlur: fieldProps?.handleBlur,
+                        handleChange: fieldProps?.handleChange
+                      }} />
+                      
+                      {fieldProps?.state?.meta?.isTouched &&
+                      !fieldProps?.state?.meta?.isValid &&
+                      fieldProps?.state?.meta?.errors.map((error: any, index: number) => (
+                        <p
+                          key={index}
+                          className="text-sm font-medium text-destructive"
+                        >
+                          {error?.message}
+                        </p>
+                      ))}
+                    </div>
+                  )
+                }
+
+                return null
               }}
             />
           ))}
@@ -147,16 +166,16 @@ export default function FormComponent({ fields, handleSubmit, onSuccess, onError
           selector={(state) => [state.isSubmitting]}
           children={([isSubmitting]) => (
             <Button
+              variant={options?.submitVariant || "default"}
               type="submit"
               className={`${options?.btnWidth || "w-30"}`}
-              disabled={isSubmitting}
-              aria-busy={isSubmitting}
-              aria-disabled={isSubmitting}
+              disabled={isSubmitting || options?.isLoading}
+              aria-busy={isSubmitting || options?.isLoading}
+              aria-disabled={isSubmitting || options?.isLoading}
             >
-              {isSubmitting ? (
+              {(isSubmitting || options?.isLoading) ? (
                 <>
-                  <Loader2Icon className="animate-spin" />
-                  Please wait
+                  <Loader2 className="animate-spin" /> Please wait
                 </>
               ) : (
                 options?.submitText || "Submit"
@@ -169,7 +188,10 @@ export default function FormComponent({ fields, handleSubmit, onSuccess, onError
             type="button"
             variant="outline"
             className={`${options?.btnWidth || "w-30"}`}
-            onClick={onCancel}
+            onClick={() => {
+              form.reset()
+              onCancel()
+            }}
           >
             {options?.cancelText || "Cancel"}
           </Button>
@@ -177,10 +199,11 @@ export default function FormComponent({ fields, handleSubmit, onSuccess, onError
       </div>
       {messageError && (
         <Alert variant="destructive" className="border-destructive">
-          <AlertCircleIcon className="size-4" />
+          <AlertCircle className="size-4" />
           <AlertTitle>{messageError}</AlertTitle>
         </Alert>
       )}
+      <LoadingComponent isLoading={options?.isLoading} />
     </form>
   )
 }

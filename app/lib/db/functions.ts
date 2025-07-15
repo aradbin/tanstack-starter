@@ -49,7 +49,7 @@ export const getWhereArgs = (activeOrganizationId: string, tableSchema: AnyType,
   ]
   const dynamicConditions = Object.entries(where ?? {}).flatMap(([key, value]) => {
     const column = tableSchema?.[key]
-    if (!column || !value || !value.length) return []
+    if (!column || value === undefined || value === null) return []
 
     return Array.isArray(value) ? inArray(column, value) : eq(column, value)
   })
@@ -118,17 +118,88 @@ export const getDatas = async (
   return await getDatasFn(input)
 }
 
-export const postData = createServerFn({ method: "POST" })
+export const getData = createServerFn()
+  .middleware([authOrgMiddleware])
+  .validator((data: { table: TableType; id: AnyType }) => data)
+  .handler(async ({ context, data }) => {
+    const { table, id } = data
+    const tableSchema = schema[table] as AnyType
+    return await db.query.tasks.findFirst({
+      where: and(...getWhereArgs(context?.session?.activeOrganizationId, tableSchema, { id }))
+    })
+  })
+
+export const createData = createServerFn({ method: "POST" })
   .middleware([authOrgMiddleware])
   .validator((data: {
     table: TableType
     values: Record<string, any>
+    title?: string
   }) => data)
-  .handler(async ({ data }) => {
-    const { table, values } = data
+  .handler(async ({ context, data }) => {
+    const { table, values, title } = data
     const tableSchema = schema[table] as AnyType
 
-    const result = await db.insert(tableSchema).values(values)
+    try {
+      const result = await db.insert(tableSchema).values({
+        ...values,
+        organizationId: context?.session?.activeOrganizationId,
+      })
 
-    return result
+      return {
+        ...result,
+        message: `${title ? title+" " : ""}Created Successfully`
+      }
+    } catch {
+      throw new Error("Something went wrong. Please try again")
+    }
+  })
+
+export const updateData = createServerFn({ method: "POST" })
+  .middleware([authOrgMiddleware])
+  .validator((data: {
+    table: TableType
+    values: Record<string, any>
+    id: AnyType
+    title?: string
+  }) => data)
+  .handler(async ({ data }) => {
+    const { table, values, id, title } = data
+    const tableSchema = schema[table] as AnyType
+
+    try {
+      const result = await db.update(tableSchema).set(values).where(eq(tableSchema.id, id))
+
+      return {
+        ...result,
+        message: `${title ? title+" " : ""}Updated Successfully`
+      }
+    } catch {
+      throw new Error("Something went wrong. Please try again")
+    }
+  })
+
+export const deleteData = createServerFn({ method: "POST" })
+  .middleware([authOrgMiddleware])
+  .validator((data: {
+    table: TableType
+    id: AnyType
+    title?: string
+  }) => data)
+  .handler(async ({ data }) => {
+    const { table, id, title } = data
+    const tableSchema = schema[table] as AnyType
+
+    try {
+      const result = await db.update(tableSchema).set({
+        deletedAt: new Date()
+      }).where(eq(tableSchema.id, id))
+
+      return {
+        ...result,
+        message: `${title ? title+" " : ""}Deleted Successfully`
+      }
+    } catch {
+      throw new Error("Something went wrong. Please try again")
+    }
   })

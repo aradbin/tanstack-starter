@@ -1,44 +1,43 @@
 import { ReactNode, useState } from "react"
-import { Dialog, DialogClose, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
-import { Button } from "@/components/ui/button"
-import { PlusCircle } from "lucide-react"
-import { Separator } from "@/components/ui/separator"
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
 
 export default function ModalComponent ({
   children,
+  trigger,
   variant = "default",
   options,
 }: {
   children: ReactNode | ((props: { close: () => void }) => ReactNode)
+  trigger?: ReactNode
   variant?: "default" | "responsive" | "sheet"
   options?: {
     header?: string
     description?: string
-    confirmOnClose?: boolean
-    preventClose?: boolean
+    isOpen?: boolean
+    onClose?: () => void
   }
 }) {
   const [open, setOpen] = useState(false)
 
   const renderContent =
     typeof children === "function"
-      ? children({ close: () => setOpen(false) })
+      ? children({ close: () => {
+        setOpen(false)
+        options?.onClose?.()
+      } })
       : children
 
   return (
-    <Dialog open={open} onOpenChange={setOpen}>
+    <Dialog open={options?.isOpen ?? open} onOpenChange={(state) => {
+      setOpen(state)
+      if(!state && options?.onClose) {
+        options?.onClose?.()
+      }
+    }}>
       <DialogTrigger asChild>
-        <Button size="sm" variant="outline"><PlusCircle /> Create</Button>
+        {trigger}
       </DialogTrigger>
-      <DialogContent showCloseButton={false} onInteractOutside={(e) => {
-        if (options?.preventClose) {
-          e.preventDefault()
-        }
-      }} onEscapeKeyDown={(e) => {
-        if (options?.preventClose) {
-          e.preventDefault()
-        }
-      }}>
+      <DialogContent showCloseButton={false}>
         {(options?.header || options?.description) && (
           <DialogHeader>
             {options?.header && <DialogTitle>{options?.header}</DialogTitle>}

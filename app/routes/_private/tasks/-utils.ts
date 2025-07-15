@@ -1,5 +1,6 @@
 import { authOrgMiddleware } from "@/lib/auth/middleware";
 import { db } from "@/lib/db";
+import { createData } from "@/lib/db/functions";
 import { tasks } from "@/lib/db/schema";
 import { AnyType, FormFieldType, OptionType } from "@/lib/types";
 import { stringRequiredValidation, stringValidation } from "@/lib/validations";
@@ -70,21 +71,21 @@ export const createTask = createServerFn({ method: "POST" })
   }) => data)
   .handler(async ({ context, data }) => {
     const { values } = data
-    
-    const count = await db.$count(tasks, and(eq(tasks.organizationId, context?.session?.activeOrganizationId)))
 
     try {
-      const result = await db.insert(tasks).values({
-        ...values,
-        number: count + 1,
-        organizationId: context?.session?.activeOrganizationId,
+      const count = await db.$count(tasks, and(eq(tasks.organizationId, context?.session?.activeOrganizationId)))
+      
+      return await createData({
+        data: {
+          table: "tasks",
+          values: {
+            ...values,
+            number: count + 1,
+          },
+          title: "Task"
+        }
       })
-
-      return {
-        ...result,
-        message: "Task created successfully"
-      }
-    } catch (error) {
+    } catch {
       throw new Error("Something went wrong. Please try again")
     }
   })
