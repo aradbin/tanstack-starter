@@ -2,9 +2,7 @@ import { authOrgMiddleware } from "@/lib/auth/middleware";
 import { db } from "@/lib/db";
 import { createData } from "@/lib/db/functions";
 import { tasks } from "@/lib/db/schema";
-import { AnyType, FormFieldType, OptionType } from "@/lib/types";
-import { formatDateForInput } from "@/lib/utils";
-import { stringRequiredValidation, stringValidation } from "@/lib/validations";
+import { AnyType, OptionType } from "@/lib/types";
 import { createServerFn } from "@tanstack/react-start";
 import { and, eq } from "drizzle-orm";
 import { ArrowDown, ArrowRight, ArrowUp, Circle, CircleCheckBig, Timer } from "lucide-react";
@@ -12,14 +10,14 @@ import { ArrowDown, ArrowRight, ArrowUp, Circle, CircleCheckBig, Timer } from "l
 export const taskStatuses = ['todo', 'inprogress', 'done']
 export const taskPriorities = ['low', 'medium', 'high']
 export const taskStatusOptions: OptionType[] = [
-  { label: "To Do", value: "todo", icon: Circle },
-  { label: "In Progress", value: "inprogress", icon: Timer },
-  { label: "Done", value: "done", icon: CircleCheckBig },
+  { name: "To Do", id: "todo", icon: Circle },
+  { name: "In Progress", id: "inprogress", icon: Timer },
+  { name: "Done", id: "done", icon: CircleCheckBig },
 ]
 export const taskPriorityOptions: OptionType[] = [
-  { label: "Low", value: "low", icon: ArrowDown },
-  { label: "Medium", value: "medium", icon: ArrowRight },
-  { label: "High", value: "high", icon: ArrowUp },
+  { name: "Low", id: "low", icon: ArrowDown },
+  { name: "Medium", id: "medium", icon: ArrowRight },
+  { name: "High", id: "high", icon: ArrowUp },
 ]
 
 export const createTask = createServerFn({ method: "POST" })

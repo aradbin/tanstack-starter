@@ -1,4 +1,5 @@
 import { LucideIcon } from "lucide-react"
+import { ComponentType } from "react"
 
 export type AnyType = any
 
@@ -16,11 +17,11 @@ export interface NavigationType {
 }
 
 export interface OptionType {
-  label: string
-  value: string
-  description?: string
-  icon?: React.ComponentType<{ className?: string }>
-  image?: string
+  id: string | number
+  name: string
+  email?: string
+  icon?: ComponentType<{ className?: string }>
+  image?: string | null
 }
 
 export interface FormFieldType {

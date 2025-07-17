@@ -6,6 +6,8 @@ import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, Command
 import { useRef, useState } from "react"
 import { cn, getInitials } from "@/lib/utils"
 import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar"
+import OptionComponent from "../common/option-component"
+import AvatarComponent from "../common/avatar-component"
 
 export default function SelectField({
   field,
@@ -15,27 +17,23 @@ export default function SelectField({
   const [open, setOpen] = useState(false)
   const triggerRef = useRef<HTMLButtonElement>(null)
 
-  const avatarOption = (item: OptionType | undefined) => {
-    if(!item) return null
-    
-    return (
-      <div className="flex items-center gap-2">
-        <Avatar className="rounded-sm">
-          <AvatarImage src={item?.image || ""} alt={item?.label} />
-          <AvatarFallback className="bg-transparent rounded-sm">
-            {getInitials(item?.label)}
-          </AvatarFallback>
-        </Avatar>
-        <div className="flex flex-col items-start overflow-hidden">
-          <p className="text-sm font-medium truncate">{item?.label}</p>
-          {item?.description && (
-            <p className="text-xs text-muted-foreground font-semibold truncate">
-              {item?.description}
-            </p>
-          )}
-        </div>
-      </div>
-    )
+  const renderOption = (option: OptionType) => {
+    if(field?.type === 'user') {
+      return <AvatarComponent user={option} />
+    } else {
+      return <OptionComponent option={option} />
+    }
+  }
+
+  const renderValue = () => {
+    if(field?.value){
+      const selected = field?.options?.find((item) => item?.id === field?.value)
+      if(selected) {
+        return renderOption(selected)
+      }
+    }
+
+    return "Select"
   }
 
   return (
@@ -48,16 +46,13 @@ export default function SelectField({
           aria-expanded={open}
           className={cn(
             "w-full justify-between",
-            field?.type === 'select' ? "h-9" : "h-13",
             !field.value && "text-muted-foreground",
             !field?.isValid && "border-destructive dark:border-destructive"
           )}
         >
-          {field?.value
-            ? field?.type === 'select'
-              ? field?.options?.find((item) => item?.value === field?.value)?.label
-              : avatarOption(field?.options?.find((item) => item?.value === field?.value))
-            : "Select"}
+          <div className="flex items-center justify-start">
+            {renderValue()}
+          </div>
           <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
         </Button>
       </PopoverTrigger>
@@ -69,29 +64,20 @@ export default function SelectField({
             <CommandGroup>
               {field?.options?.map((item) => (
                 <CommandItem
-                  key={item?.value}
-                  value={`${item?.label} ${item?.value} ${item?.description || ""}`}
+                  key={item?.id}
+                  value={`${item?.name} ${item?.email}`}
                   onSelect={() => {
-                    field?.handleChange(item?.value)
+                    field?.handleChange(item?.id)
                     field.handleBlur?.()
                     setOpen(false)
                   }}
                   className="flex items-center justify-between"
                 >
-                  {field?.type === 'select' ? (
-                    <div className="flex gap-3 items-center w-full">
-                      {item?.icon && (
-                        <item.icon className="text-muted-foreground size-4" />
-                      )}
-                      {item?.label}
-                    </div>
-                  ) : (
-                    avatarOption(item)
-                  )}
+                  {renderOption(item)}
                   <CheckIcon
                     className={cn(
                       "h-4 w-4",
-                      field?.value === item?.value ? "opacity-100" : "opacity-0"
+                      field?.value === item?.id ? "opacity-100" : "opacity-0"
                     )}
                   />
                 </CommandItem>

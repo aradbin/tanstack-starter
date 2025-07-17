@@ -1,11 +1,8 @@
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { OptionType } from "@/lib/types";
 import { getInitials } from "@/lib/utils";
 
-export default function UserAvatar({ user }: { user: {
-  name: string;
-  email?: string;
-  image?: string | null | undefined;
-} }) {
+export default function AvatarComponent({ user }: { user: OptionType }) {
   return (
     <div className="flex gap-2">
       <Avatar>
@@ -14,11 +11,9 @@ export default function UserAvatar({ user }: { user: {
           {getInitials(user?.name)}
         </AvatarFallback>
       </Avatar>
-      <div className="flex flex-col overflow-hidden">
+      <div className="flex flex-col text-left overflow-hidden">
         <p className="text-sm font-medium truncate">{user?.name}</p>
-        <p className="text-xs text-muted-foreground font-semibold truncate">
-          {user?.email}
-        </p>
+        <p className="text-xs text-muted-foreground font-semibold truncate">{user?.email}</p>
       </div>
     </div>
   )

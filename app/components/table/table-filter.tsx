@@ -20,6 +20,7 @@ import {
 import { Separator } from "@/components/ui/separator"
 import { AnyType, TableFilterType } from "@/lib/types"
 import { useNavigate } from "@tanstack/react-router"
+import OptionComponent from "../common/option-component"
 
 export function TableFilter({
   filter,
@@ -94,13 +95,13 @@ export function TableFilter({
                     {selected?.length} selected
                   </Badge>
                 ) : (
-                  options?.filter((option) => selected?.includes(option.value)).map((option) => (
+                  options?.filter((option) => selected?.includes(option.id)).map((option) => (
                     <Badge
                       variant="secondary"
-                      key={option.value}
+                      key={option.id}
                       className="rounded-sm px-1 font-normal"
                     >
-                      {option.label}
+                      {option.name}
                     </Badge>
                   ))
                 )}
@@ -116,19 +117,14 @@ export function TableFilter({
             <CommandEmpty>No results found.</CommandEmpty>
             <CommandGroup>
               {options?.map((option) => {
-                const isSelected = selected?.includes(option.value)
+                const isSelected = selected?.includes(option.id)
                 return (
                   <CommandItem
-                    key={option.value}
-                    onSelect={() => onSelect(option.value)}
+                    key={option.id}
+                    onSelect={() => onSelect(option.id)}
                     className="flex items-center justify-between"
                   >
-                    <div className="flex items-center gap-3">
-                      {option.icon && (
-                        <option.icon className="text-muted-foreground size-4" />
-                      )}
-                      <span>{option.label}</span>
-                    </div>
+                    <OptionComponent option={option} />
                     <Check
                       className={cn(
                         "h-4 w-4",

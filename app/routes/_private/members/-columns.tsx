@@ -5,7 +5,7 @@ import { TableColumnHeader } from "@/components/table/table-column-header"
 import { TableRowActions } from "@/components/table/table-row-actions"
 
 import { members, users } from "@/lib/db/schema"
-import UserAvatar from "@/components/common/user-avatar"
+import AvatarComponent from "@/components/common/avatar-component"
 import { capitalize, formatDateTime } from "@/lib/utils"
 
 export const memberColumns: ColumnDef<typeof members.$inferSelect & {
@@ -36,7 +36,7 @@ export const memberColumns: ColumnDef<typeof members.$inferSelect & {
   {
     id: "member",
     header: ({ column }) => <TableColumnHeader column={column} title="Member" />,
-    cell: ({ row }) => <UserAvatar user={row.original.user} />,
+    cell: ({ row }) => <AvatarComponent user={row.original.user} />,
   },
   {
     accessorKey: "role",

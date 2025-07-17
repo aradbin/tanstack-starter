@@ -35,15 +35,6 @@ export const getInitials = (fullName: string | undefined | null): string => {
   return `${firstInitial}${lastInitial}`.toUpperCase()
 }
 
-export const getUserOptions = (items: typeof users.$inferSelect[]): OptionType[] => {
-  return items?.map((item) => ({
-    label: item.name,
-    value: item.id,
-    description: item.email,
-    image: item.image || '',
-  })) || []
-}
-
 export const formatDateTime = (date: AnyType) => {
   if (!date || !isValid(new Date(date))) return ""
   return format(new Date(date), "do MMM, yyyy hh:mm a")

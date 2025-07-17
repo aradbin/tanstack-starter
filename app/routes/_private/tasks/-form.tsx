@@ -6,7 +6,7 @@ import { useQuery } from "@tanstack/react-query"
 import { getData, updateData } from "@/lib/db/functions"
 import { FormFieldType } from "@/lib/types"
 import { stringRequiredValidation, stringValidation } from "@/lib/validations"
-import { formatDateForInput, getUserOptions } from "@/lib/utils"
+import { formatDateForInput } from "@/lib/utils"
 
 export default function TaskForm() {
   const { isTaskOpen, setIsTaskOpen, editId, setEditId, users } = useApp()
@@ -63,7 +63,7 @@ export default function TaskForm() {
       {
         name: 'assignee',
         type: 'user',
-        options: getUserOptions(users),
+        options: users,
         validationOnSubmit: stringRequiredValidation('Assignee'),
       }
     ],
