@@ -7,7 +7,7 @@ import { Button } from '@/components/ui/button'
 import { PlusCircle } from 'lucide-react'
 import { useApp } from '@/providers/app-provider'
 import { TableFilterType } from '@/lib/types'
-import { taskPriorities, taskPriorityOptions, taskStatuses, taskStatusOptions } from './-utils'
+import { getTasks, taskPriorities, taskPriorityOptions, taskStatuses, taskStatusOptions } from './-utils'
 
 export const Route = createFileRoute('/_private/tasks/')({
   component: RouteComponent,
@@ -38,8 +38,7 @@ function RouteComponent() {
       priority: params.priority
     },
     search: {
-      term: params.search,
-      key: 'title'
+      term: params.search
     }
   }
 
@@ -56,7 +55,7 @@ function RouteComponent() {
   
   return (
     <>
-      <TableComponent columns={taskColumns} query={query} filters={filters} options={{ hasSearch: true }} toolbar={(
+      <TableComponent columns={taskColumns} query={query} queryFn={getTasks} filters={filters} options={{ hasSearch: true }} toolbar={(
         <Button size="sm" variant="outline" onClick={() => setIsTaskOpen(true)}><PlusCircle /> Create</Button>
       )} />
     </>

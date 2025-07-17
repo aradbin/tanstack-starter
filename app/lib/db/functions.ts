@@ -147,6 +147,7 @@ export const createData = createServerFn({ method: "POST" })
       const result = await db.insert(tableSchema).values({
         ...values,
         organizationId: context?.session?.activeOrganizationId,
+        createdBy: context?.user?.id,
       })
 
       return {
@@ -166,12 +167,15 @@ export const updateData = createServerFn({ method: "POST" })
     id: AnyType
     title?: string
   }) => data)
-  .handler(async ({ data }) => {
+  .handler(async ({ context, data }) => {
     const { table, values, id, title } = data
     const tableSchema = schema[table] as AnyType
 
     try {
-      const result = await db.update(tableSchema).set(values).where(eq(tableSchema.id, id))
+      const result = await db.update(tableSchema).set({
+        ...values,
+      updatedBy: context?.user?.id
+    }).where(eq(tableSchema.id, id))
 
       return {
         ...result,
@@ -189,13 +193,14 @@ export const deleteData = createServerFn({ method: "POST" })
     id: AnyType
     title?: string
   }) => data)
-  .handler(async ({ data }) => {
+  .handler(async ({ context, data }) => {
     const { table, id, title } = data
     const tableSchema = schema[table] as AnyType
 
     try {
       const result = await db.update(tableSchema).set({
-        deletedAt: new Date()
+        deletedAt: new Date(),
+        deletedBy: context?.user?.id
       }).where(eq(tableSchema.id, id))
 
       return {

@@ -76,14 +76,15 @@ export default function FormComponent({ fields, handleSubmit, values ={}, onSucc
       setMessageError(null)
       try {
         const response = await handleSubmit(value)
+        console.log('form response', response)
         if(options?.queryKey) {
           queryClient.invalidateQueries({
             queryKey: typeof options.queryKey === 'string' ? [options.queryKey] : options.queryKey
           })
         }
         form.reset()
-        if(response.message) {
-          options?.submitVariant === "destructive" ? toast.error(response.message) : toast.success(response.message)
+        if(response?.message) {
+          options?.submitVariant === "destructive" ? toast.error(response?.message) : toast.success(response?.message)
         }
         if(onSuccess) {
           onSuccess(response)
