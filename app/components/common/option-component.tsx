@@ -1,7 +1,6 @@
 import { AnyType, OptionType } from "@/lib/types"
 
 export default function OptionComponent({ option }: { option: OptionType }) {
-  console.log(option)
   return (
     <div className="flex gap-2 items-center">
       {option?.icon && (
