@@ -43,7 +43,9 @@ export default function TableComponent<TData, TValue>({
     }],
     queryFn: () => queryFn?.({ data: query }) ?? getDatas({ data: query }),
   })
-
+  
+  console.log('tableData',tableData)
+  
   const tableOptions: AnyType = useMemo(() => ({
     data: tableData?.result || [],
     rowCount: tableData?.count || tableData?.result?.length || 0,

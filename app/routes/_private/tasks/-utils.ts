@@ -33,10 +33,14 @@ export const getTasks = createServerFn()
     let query = db
       .select({
         ...getTableColumns(tasks),
+        taskUsers: {
+          ...getTableColumns(taskUsers)
+        },
         count: sql<number>`count(*) over()`
       })
       .from(tasks)
       .leftJoin(taskUsers, eq(tasks.id, taskUsers.taskId))
+      .leftJoin(users, eq(taskUsers.userId, users.id))
       .where(whereArgs)
 
     query = addPagination(query, pagination)
