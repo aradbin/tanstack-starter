@@ -8,8 +8,16 @@ import { tasks } from "@/lib/db/schema"
 import { formatDate } from "@/lib/utils"
 import { taskPriorityOptions, taskStatusOptions } from "./-utils"
 import TableRowFromOptions from "@/components/table/table-row-from-options"
+import { AnyType } from "@/lib/types"
 
-export const taskColumns: ColumnDef<typeof tasks.$inferSelect>[] = [
+export const taskColumns = ({
+  actions
+}: {
+  actions?: {
+    edit?: (id: AnyType) => void
+    delete?: (id: AnyType) => void
+  }
+}): ColumnDef<typeof tasks.$inferSelect>[] => ([
   {
     id: "select",
     header: ({ table }) => (
@@ -61,6 +69,6 @@ export const taskColumns: ColumnDef<typeof tasks.$inferSelect>[] = [
   {
     id: "actions",
     header: ({ column }) => <TableColumnHeader column={column} title="Actions" className="text-right" />,
-    cell: ({ row }) => <TableRowActions row={row} />,
+    cell: ({ row }) => <TableRowActions row={row} actions={actions} />,
   },
-]
+])
