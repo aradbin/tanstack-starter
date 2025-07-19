@@ -2,9 +2,21 @@ import { authOrgMiddleware } from "@/lib/auth/middleware";
 import { db } from "@/lib/db";
 import { addOrder, addPagination, getWhereArgs } from "@/lib/db/functions";
 import { members, users } from "@/lib/db/schema";
-import { PaginationType, SearchType, SortType, WhereType } from "@/lib/types";
+import { OptionType, PaginationType, SearchType, SortType, WhereType } from "@/lib/types";
 import { createServerFn } from "@tanstack/react-start";
 import { and, eq, getTableColumns, ilike, InferSelectModel, or, sql } from "drizzle-orm";
+
+export const roles = ['owner', 'member']
+export const roleOptions: OptionType[] = [
+  {
+    name: 'Owner',
+    id: 'owner'
+  },
+  {
+    name: 'Member',
+    id: 'member'
+  }
+]
 
 export type MemberWithUserType = InferSelectModel<typeof members> & {
   user: InferSelectModel<typeof users>

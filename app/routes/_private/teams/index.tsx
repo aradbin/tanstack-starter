@@ -34,7 +34,7 @@ function RouteComponent() {
   return (
     <>
       <TableComponent columns={teamColumns} query={query} toolbar={(
-        <Button size="sm" variant="outline"><PlusCircle /> Create</Button>
+        <Button size="sm" variant="outline" onClick={() => console.log('Create')}><PlusCircle /> Create</Button>
       )} />
     </>
   )

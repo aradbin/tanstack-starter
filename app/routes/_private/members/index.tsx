@@ -2,7 +2,7 @@ import TableComponent from '@/components/table/table-component'
 import { defaultSearchParamValidation, enamValidation, validate } from '@/lib/validations'
 import { createFileRoute } from '@tanstack/react-router'
 import { memberColumns } from './-columns'
-import { getMembers } from './-utils'
+import { getMembers, roleOptions, roles } from './-utils'
 import { QueryParamType } from '@/lib/db/functions'
 import { TableFilterType } from '@/lib/types'
 import { Button } from '@/components/ui/button'
@@ -13,7 +13,7 @@ export const Route = createFileRoute('/_private/members/')({
   validateSearch: validate({
     ...defaultSearchParamValidation,
     sort: enamValidation('Sort', ['role', 'createdAt']).catch(undefined),
-    role: enamValidation('Role', ['owner', 'member']).catch(undefined),
+    role: enamValidation('Role', roles).catch(undefined),
   }),
 })
 
@@ -41,16 +41,7 @@ function RouteComponent() {
   const filters: TableFilterType[] = [
     {
       key: 'role',
-      options: [
-        {
-          label: 'Owner',
-          value: 'owner'
-        },
-        {
-          label: 'Member',
-          value: 'member'
-        }
-      ]
+      options: roleOptions
     }
   ]
   
