@@ -1,20 +1,23 @@
 import { createServerFn } from "@tanstack/react-start"
 import { db } from "@/lib/db"
 import * as schema from "@/lib/db/schema"
-import { and, desc, eq, ilike, inArray, isNull } from "drizzle-orm"
+import { and, desc, eq, ilike, inArray, isNull, or } from "drizzle-orm"
 import { defaultPageSize } from "../variables"
 import { AnyType, PaginationType, SearchType, SortType, WhereType } from "../types"
 import { authOrgMiddleware } from "../auth/middleware"
 
 export type TableType = keyof typeof db.query
 export type RelationType<TTable extends TableType> = NonNullable<Parameters<typeof db.query[TTable]['findMany']>[0]>['with']
-export type QueryParamType = {
+export interface QueryParamBaseType {
   table: TableType
-  relation?: RelationType<TableType>
+  relation?: AnyType
   sort?: SortType
   pagination?: PaginationType
   where?: WhereType
   search?: SearchType
+}
+export interface QueryParamType extends QueryParamBaseType {
+  relation?: RelationType<TableType>
 }
 
 export const getPaginationArgs = (pagination?: PaginationType): { limit?: number; offset?: number } => {
@@ -53,9 +56,9 @@ export const getWhereArgs = (activeOrganizationId: string, tableSchema: AnyType,
 
     return Array.isArray(value) ? inArray(column, value) : eq(column, value)
   })
-  const searchConditions = [
-    ...(search?.term && search?.key && tableSchema?.[search?.key]) ? [ilike(tableSchema?.[search?.key], `%${search.term}%`)] : []
-  ]
+  const searchConditions = search?.term && search?.key && Array.isArray(search?.key)
+    ? [or(...search.key?.filter((key) => tableSchema?.[key])?.map((key) => ilike(tableSchema[key], `%${search.term}%`)))]
+    : []
   
   return [...baseConditions, ...dynamicConditions, ...searchConditions]
 }
@@ -80,7 +83,7 @@ export const addOrder = (query: AnyType, tableSchema?: AnyType, sort?: SortType)
 
 const getDatasFn = createServerFn()
   .middleware([authOrgMiddleware])
-  .validator((data: { table: TableType; relation?: unknown; sort?: SortType, pagination?: PaginationType, where?: WhereType, search?: SearchType }) => data)
+  .validator((data: QueryParamBaseType) => data)
   .handler(async ({ context, data }) => {
     const { table, relation, sort, pagination, where, search } = data
     const tableSchema = schema[table] as AnyType
@@ -121,16 +124,40 @@ export const getDatas = async (
   return await getDatasFn(input)
 }
 
-export const getData = createServerFn()
+export const getDataFn = createServerFn()
   .middleware([authOrgMiddleware])
-  .validator((data: { table: TableType; id: AnyType }) => data)
+  .validator((data: QueryParamBaseType & { id: AnyType }) => data)
   .handler(async ({ context, data }) => {
-    const { table, id } = data
+    const { table, id, relation } = data
     const tableSchema = schema[table] as AnyType
-    return await db.query.tasks.findFirst({
-      where: and(...getWhereArgs(context?.session?.activeOrganizationId, tableSchema, { id }))
-    })
+    const query = db.query[table]
+
+    type TTable = typeof table
+    type Relation = RelationType<TTable>
+    type FindFirstArgs = Parameters<typeof db.query[TTable]['findFirst']>[0]
+
+    // relation
+    const relationArgs = {
+      ...(relation ? { with: relation as Relation } : {}),
+    }
+
+    // where
+    const whereArg = and(...getWhereArgs(context?.session?.activeOrganizationId, tableSchema, { id }))
+
+    // query
+    const args: FindFirstArgs = {
+      ...relationArgs,
+      where: whereArg
+    }
+
+    return await (query.findFirst as (args?: FindFirstArgs) => Promise<any>)(args)
   })
+
+export const getData = async (
+  input: { data: QueryParamType & { id: AnyType } }
+) => {
+  return await getDataFn(input)
+}
 
 export const createData = createServerFn({ method: "POST" })
   .middleware([authOrgMiddleware])

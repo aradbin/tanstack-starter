@@ -7,7 +7,7 @@ import { Button } from '@/components/ui/button'
 import { PlusCircle } from 'lucide-react'
 import { useApp } from '@/providers/app-provider'
 import { TableFilterType } from '@/lib/types'
-import { getTasks, taskPriorities, taskPriorityOptions, taskStatuses, taskStatusOptions } from './-utils'
+import { taskPriorities, taskPriorityOptions, taskStatuses, taskStatusOptions } from './-utils'
 
 export const Route = createFileRoute('/_private/tasks/')({
   component: RouteComponent,
@@ -25,6 +25,13 @@ function RouteComponent() {
 
   const query: QueryParamType = {
     table: "tasks",
+    relation: {
+      taskUsers: {
+        with: {
+          user: true
+        }
+      }
+    },
     sort: {
       field: params.sort,
       order: params.order
@@ -38,7 +45,8 @@ function RouteComponent() {
       priority: params.priority
     },
     search: {
-      term: params.search
+      term: params.search,
+      key: ["title"]
     }
   }
 
@@ -69,7 +77,7 @@ function RouteComponent() {
             })
           }
         }
-      })} query={query} queryFn={getTasks} filters={filters} toolbar={(
+      })} query={query} filters={filters} toolbar={(
         <Button size="sm" variant="outline" onClick={() => setIsTaskOpen(true)}><PlusCircle /> Create</Button>
       )} options={{ hasSearch: true }} />
     </>

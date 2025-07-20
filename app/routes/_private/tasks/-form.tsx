@@ -4,7 +4,7 @@ import { createTask, taskPriorityOptions, taskStatusOptions } from "./-utils"
 import { useApp } from "@/providers/app-provider"
 import { useQuery } from "@tanstack/react-query"
 import { getData, updateData } from "@/lib/db/functions"
-import { FormFieldType } from "@/lib/types"
+import { AnyType, FormFieldType } from "@/lib/types"
 import { stringRequiredValidation, stringValidation } from "@/lib/validations"
 import { formatDateForInput } from "@/lib/utils"
 
@@ -13,7 +13,28 @@ export default function TaskForm() {
   
   const { data: task, isLoading } = useQuery({
     queryKey: ['task', editId],
-    queryFn: () => getData({ data: { table: "tasks", id: editId } }),
+    queryFn: async () => {
+      const result = await getData({ data: {
+        table: "tasks",
+        relation: {
+          taskUsers: {
+            with: {
+              user: true
+            }
+          }
+        },
+        id: editId
+      }})
+      
+      if(result){
+        return {
+          ...result,
+          assignee: result.taskUsers?.find((taskUser: AnyType) => taskUser?.role === 'assignee')?.user?.id
+        }
+      }
+
+      return result
+    },
     enabled: !!editId && isTaskOpen
   })
 

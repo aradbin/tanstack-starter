@@ -48,12 +48,7 @@ export const mainNavItems: NavigationType[] = [
         title: "Members",
         href: "/members",
         icon: Users,
-      },
-      {
-        title: "Teams",
-        href: "/teams",
-        icon: Users,
-      },
+      }
       // {
       //   title: "Fallback",
       //   icon: LayoutGrid,

@@ -1,37 +1,21 @@
 import { ColumnDef } from "@tanstack/react-table"
 
-import { Checkbox } from "@/components/ui/checkbox"
 import { TableColumnHeader } from "@/components/table/table-column-header"
 import { TableRowActions } from "@/components/table/table-row-actions"
 
 import { members, users } from "@/lib/db/schema"
 import AvatarComponent from "@/components/common/avatar-component"
 import { capitalize, formatDateTime } from "@/lib/utils"
+import TableCheckboxHeader from "@/components/table/table-checkbox-header"
+import TableCheckboxRow from "@/components/table/table-checkbox-row"
 
 export const memberColumns: ColumnDef<typeof members.$inferSelect & {
   user: typeof users.$inferSelect
 }>[] = [
   {
     id: "select",
-    header: ({ table }) => (
-      <Checkbox
-        checked={
-          table.getIsAllPageRowsSelected() ||
-          (table.getIsSomePageRowsSelected() && "indeterminate")
-        }
-        onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
-        aria-label="Select all"
-        className="translate-y-[2px]"
-      />
-    ),
-    cell: ({ row }) => (
-      <Checkbox
-        checked={row.getIsSelected()}
-        onCheckedChange={(value) => row.toggleSelected(!!value)}
-        aria-label="Select row"
-        className="translate-y-[2px]"
-      />
-    ),
+    header: ({ table }) => <TableCheckboxHeader table={table} />,
+    cell: ({ row }) => <TableCheckboxRow row={row} />,
   },
   {
     id: "member",

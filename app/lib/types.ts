@@ -60,7 +60,7 @@ export interface PaginationType {
 
 export interface SearchType {
   term: AnyType
-  key?: AnyType
+  key?: string[]
 }
 
 export type WhereType = Record<string, AnyType>

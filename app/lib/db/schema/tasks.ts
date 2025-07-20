@@ -2,6 +2,7 @@ import { pgTable } from "drizzle-orm/pg-core"
 import * as table from "drizzle-orm/pg-core"
 import { timestamps } from "./columns.helpers"
 import { organizations, users } from "./users"
+import { relations } from "drizzle-orm"
 
 export const tasks = pgTable("tasks", {
   id: table.serial().primaryKey(),
@@ -31,3 +32,22 @@ export const taskUsers = pgTable("task_users", {
   role: table.text().default("assignee").notNull(),
   ...timestamps
 })
+
+export const taskRelations = relations(tasks, ({ many, one }) => ({
+  taskUsers: many(taskUsers),
+  organization: one(organizations, {
+    fields: [tasks.organizationId],
+    references: [organizations.id]
+  })
+}))
+
+export const taskUserRelations = relations(taskUsers, ({ one }) => ({
+  task: one(tasks, {
+    fields: [taskUsers.taskId],
+    references: [tasks.id]
+  }),
+  user: one(users, {
+    fields: [taskUsers.userId], 
+    references: [users.id]
+  })
+}))

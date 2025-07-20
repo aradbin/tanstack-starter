@@ -1,14 +1,16 @@
 import { ColumnDef } from "@tanstack/react-table"
 
-import { Checkbox } from "@/components/ui/checkbox"
 import { TableColumnHeader } from "@/components/table/table-column-header"
 import { TableRowActions } from "@/components/table/table-row-actions"
 
-import { tasks } from "@/lib/db/schema"
+import { tasks, taskUsers, users } from "@/lib/db/schema"
 import { formatDate } from "@/lib/utils"
 import { taskPriorityOptions, taskStatusOptions } from "./-utils"
 import TableRowFromOptions from "@/components/table/table-row-from-options"
 import { AnyType } from "@/lib/types"
+import AvatarComponent from "@/components/common/avatar-component"
+import TableCheckboxHeader from "@/components/table/table-checkbox-header"
+import TableCheckboxRow from "@/components/table/table-checkbox-row"
 
 export const taskColumns = ({
   actions
@@ -17,36 +19,27 @@ export const taskColumns = ({
     edit?: (id: AnyType) => void
     delete?: (id: AnyType) => void
   }
-}): ColumnDef<typeof tasks.$inferSelect>[] => ([
+}): ColumnDef<typeof tasks.$inferSelect & {
+  taskUsers: Array<typeof taskUsers.$inferSelect & {
+    user: typeof users.$inferSelect
+  }>
+}>[] => ([
   {
     id: "select",
-    header: ({ table }) => (
-      <Checkbox
-        checked={
-          table.getIsAllPageRowsSelected() ||
-          (table.getIsSomePageRowsSelected() && "indeterminate")
-        }
-        onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
-        aria-label="Select all"
-        className="translate-y-[2px]"
-      />
-    ),
-    cell: ({ row }) => (
-      <Checkbox
-        checked={row.getIsSelected()}
-        onCheckedChange={(value) => row.toggleSelected(!!value)}
-        aria-label="Select row"
-        className="translate-y-[2px]"
-      />
-    ),
-  },
-  {
-    accessorKey: "number",
-    header: ({ column }) => <TableColumnHeader column={column} title="#" />,
+    header: ({ table }) => <TableCheckboxHeader table={table} />,
+    cell: ({ row }) => <TableCheckboxRow row={row} />,
   },
   {
     accessorKey: "title",
     header: ({ column }) => <TableColumnHeader column={column} title="Title" />,
+    cell: ({ row }) => `#${row.original.number} - ${row.original.title}`,
+  },
+  {
+    accessorKey: "assignee",
+    header: ({ column }) => <TableColumnHeader column={column} title="Assignee" />,
+    cell: ({ row }) => row.original.taskUsers?.filter((taskUser) => taskUser?.role === 'assignee')?.map((taskUser) => (
+      <AvatarComponent key={taskUser.id} user={taskUser.user} options={{ hideDescription: true }} />
+    ))
   },
   {
     accessorKey: "status",
