@@ -45,6 +45,7 @@ export interface TableFilterType {
   title?: string
   multiple?: boolean
   options?: OptionType[],
+  type?: string
 }
 
 export interface SortType {

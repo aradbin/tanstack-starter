@@ -1,5 +1,5 @@
 import TableComponent from '@/components/table/table-component'
-import { defaultSearchParamValidation, enamValidation, validate } from '@/lib/validations'
+import { defaultSearchParamValidation, enamValidation, stringValidation, validate } from '@/lib/validations'
 import { createFileRoute } from '@tanstack/react-router'
 import { taskColumns } from './-columns'
 import { QueryParamType } from '@/lib/db/functions'
@@ -7,7 +7,7 @@ import { Button } from '@/components/ui/button'
 import { PlusCircle } from 'lucide-react'
 import { useApp } from '@/providers/app-provider'
 import { TableFilterType } from '@/lib/types'
-import { taskPriorities, taskPriorityOptions, taskStatuses, taskStatusOptions } from './-utils'
+import { getTasks, taskPriorities, taskPriorityOptions, taskStatuses, taskStatusOptions } from './-utils'
 
 export const Route = createFileRoute('/_private/tasks/')({
   component: RouteComponent,
@@ -16,22 +16,17 @@ export const Route = createFileRoute('/_private/tasks/')({
     sort: enamValidation('Sort', ['dueDate', 'priority', 'status']).catch(undefined),
     status: enamValidation('Status', taskStatuses).catch(undefined),
     priority: enamValidation('Priority', taskPriorities).catch(undefined),
+    assignee: stringValidation('Assignee').catch(undefined),
+    reporter: stringValidation('Reporter').catch(undefined)
   })
 })
 
 function RouteComponent() {
   const params = Route.useSearch()
-  const { setIsTaskOpen, setEditId, setDeleteId } = useApp()
+  const { setIsTaskOpen, setEditId, setDeleteId, users } = useApp()
 
   const query: QueryParamType = {
     table: "tasks",
-    relation: {
-      taskUsers: {
-        with: {
-          user: true
-        }
-      }
-    },
     sort: {
       field: params.sort,
       order: params.order
@@ -42,7 +37,9 @@ function RouteComponent() {
     },
     where: {
       status: params.status,
-      priority: params.priority
+      priority: params.priority,
+      assignee: params.assignee,
+      reporter: params.reporter
     },
     search: {
       term: params.search,
@@ -58,6 +55,16 @@ function RouteComponent() {
     {
       key: 'priority',
       options: taskPriorityOptions
+    },
+    {
+      key: 'assignee',
+      options: users,
+      type: 'avatar'
+    },
+    {
+      key: 'reporter',
+      options: users,
+      type: 'avatar'
     }
   ]
   
@@ -77,7 +84,7 @@ function RouteComponent() {
             })
           }
         }
-      })} query={query} filters={filters} toolbar={(
+      })} query={query} queryFn={getTasks} filters={filters} toolbar={(
         <Button size="sm" variant="outline" onClick={() => setIsTaskOpen(true)}><PlusCircle /> Create</Button>
       )} options={{ hasSearch: true }} />
     </>

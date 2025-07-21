@@ -81,6 +81,10 @@ export const addOrder = (query: AnyType, tableSchema?: AnyType, sort?: SortType)
   return query.orderBy(...getOrderArgs(tableSchema, sort))
 }
 
+export const addWhere = (query: AnyType, activeOrganizationId: string, tableSchema: AnyType, where?: WhereType, search?: SearchType) => {
+  return query.where(and(...getWhereArgs(activeOrganizationId, tableSchema, where, search)))
+}
+
 const getDatasFn = createServerFn()
   .middleware([authOrgMiddleware])
   .validator((data: QueryParamBaseType) => data)
@@ -90,7 +94,6 @@ const getDatasFn = createServerFn()
     const query = db.query[table]
 
     type TTable = typeof table
-    type Relation = RelationType<TTable>
     type FindManyArgs = Parameters<typeof db.query[TTable]['findMany']>[0]
 
     // relation

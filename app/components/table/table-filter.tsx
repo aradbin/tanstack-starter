@@ -21,6 +21,7 @@ import { Separator } from "@/components/ui/separator"
 import { AnyType, TableFilterType } from "@/lib/types"
 import { useNavigate } from "@tanstack/react-router"
 import OptionComponent from "../common/option-component"
+import AvatarComponent from "../common/avatar-component"
 
 export function TableFilter({
   filter,
@@ -110,7 +111,7 @@ export function TableFilter({
           )}
         </Button>
       </PopoverTrigger>
-      <PopoverContent className="w-[200px] p-0" align="start">
+      <PopoverContent className="w-full p-0" align="start">
         <Command>
           <CommandInput placeholder={capitalize(title || key)} />
           <CommandList>
@@ -124,7 +125,11 @@ export function TableFilter({
                     onSelect={() => onSelect(option.id)}
                     className="flex items-center justify-between"
                   >
-                    <OptionComponent option={option} />
+                    {filter?.type === 'avatar' ? (
+                      <AvatarComponent user={option} />
+                    ) : (
+                      <OptionComponent option={option} />
+                    )}
                     <Check
                       className={cn(
                         "h-4 w-4",

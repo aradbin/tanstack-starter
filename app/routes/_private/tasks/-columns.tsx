@@ -3,7 +3,7 @@ import { ColumnDef } from "@tanstack/react-table"
 import { TableColumnHeader } from "@/components/table/table-column-header"
 import { TableRowActions } from "@/components/table/table-row-actions"
 
-import { tasks, taskUsers, users } from "@/lib/db/schema"
+import { tasks, users } from "@/lib/db/schema"
 import { formatDate } from "@/lib/utils"
 import { taskPriorityOptions, taskStatusOptions } from "./-utils"
 import TableRowFromOptions from "@/components/table/table-row-from-options"
@@ -20,9 +20,8 @@ export const taskColumns = ({
     delete?: (id: AnyType) => void
   }
 }): ColumnDef<typeof tasks.$inferSelect & {
-  taskUsers: Array<typeof taskUsers.$inferSelect & {
-    user: typeof users.$inferSelect
-  }>
+  assignee?: typeof users.$inferSelect
+  reporter?: typeof users.$inferSelect
 }>[] => ([
   {
     id: "select",
@@ -37,9 +36,12 @@ export const taskColumns = ({
   {
     accessorKey: "assignee",
     header: ({ column }) => <TableColumnHeader column={column} title="Assignee" />,
-    cell: ({ row }) => row.original.taskUsers?.filter((taskUser) => taskUser?.role === 'assignee')?.map((taskUser) => (
-      <AvatarComponent key={taskUser.id} user={taskUser.user} options={{ hideDescription: true }} />
-    ))
+    cell: ({ row }) => row?.original?.assignee ? <AvatarComponent user={row.original.assignee} options={{ hideDescription: false }} /> : "",
+  },
+  {
+    accessorKey: "reporter",
+    header: ({ column }) => <TableColumnHeader column={column} title="Reporter" />,
+    cell: ({ row }) => row?.original?.reporter ? <AvatarComponent user={row.original.reporter} options={{ hideDescription: false }} /> : "",
   },
   {
     accessorKey: "status",

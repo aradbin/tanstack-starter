@@ -1,9 +1,9 @@
 import FormComponent from "@/components/form/form-component"
 import ModalComponent from "@/components/modal/modal-component"
-import { createTask, taskPriorityOptions, taskStatusOptions } from "./-utils"
+import { createTask, taskPriorityOptions, taskStatusOptions, updateTask } from "./-utils"
 import { useApp } from "@/providers/app-provider"
 import { useQuery } from "@tanstack/react-query"
-import { getData, updateData } from "@/lib/db/functions"
+import { getData } from "@/lib/db/functions"
 import { AnyType, FormFieldType } from "@/lib/types"
 import { stringRequiredValidation, stringValidation } from "@/lib/validations"
 import { formatDateForInput } from "@/lib/utils"
@@ -29,7 +29,8 @@ export default function TaskForm() {
       if(result){
         return {
           ...result,
-          assignee: result.taskUsers?.find((taskUser: AnyType) => taskUser?.role === 'assignee')?.user?.id
+          assignee: result.taskUsers?.find((taskUser: AnyType) => taskUser?.role === 'assignee')?.user?.id,
+          reporter: result.taskUsers?.find((taskUser: AnyType) => taskUser?.role === 'reporter')?.user?.id
         }
       }
 
@@ -85,7 +86,15 @@ export default function TaskForm() {
         name: 'assignee',
         type: 'user',
         options: users,
-        validationOnSubmit: stringRequiredValidation('Assignee'),
+        validationOnSubmit: stringValidation('Assignee'),
+      }
+    ],
+    [
+      {
+        name: 'reporter',
+        type: 'user',
+        options: users,
+        validationOnSubmit: stringValidation('Reporter'),
       }
     ],
   ]
@@ -103,7 +112,7 @@ export default function TaskForm() {
         <FormComponent
           fields={taskFormFields}
           handleSubmit={(values: Record<string, any>) => editId ?
-            updateData({ data: { table: "tasks", id: editId, values, title: "Task" } }) :
+            updateTask({ data: { id: editId, values, } }) :
             createTask({ data: { values } })}
           values={isTaskOpen && editId && task ? task : {}}
           onSuccess={() => {
