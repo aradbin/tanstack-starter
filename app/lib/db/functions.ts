@@ -94,9 +94,7 @@ const getDatasFn = createServerFn()
     type FindManyArgs = Parameters<typeof db.query[TTable]['findMany']>[0]
 
     // relation
-    const relationArgs = {
-      ...(relation ? { with: relation as Relation } : {}),
-    }
+    const relationArgs = relation ? { with: relation } : {};
 
     // where
     const whereArg = and(...getWhereArgs(context?.session?.activeOrganizationId, tableSchema, where, search))
@@ -137,9 +135,7 @@ export const getDataFn = createServerFn()
     type FindFirstArgs = Parameters<typeof db.query[TTable]['findFirst']>[0]
 
     // relation
-    const relationArgs = {
-      ...(relation ? { with: relation as Relation } : {}),
-    }
+    const relationArgs = relation ? { with: relation } : {};
 
     // where
     const whereArg = and(...getWhereArgs(context?.session?.activeOrganizationId, tableSchema, { id }))

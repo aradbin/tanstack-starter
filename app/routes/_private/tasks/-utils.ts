@@ -1,6 +1,5 @@
 import { authOrgMiddleware } from "@/lib/auth/middleware";
 import { db } from "@/lib/db";
-import { getDatas, QueryParamBaseType } from "@/lib/db/functions";
 import { tasks, taskUsers } from "@/lib/db/schema";
 import { AnyType, OptionType } from "@/lib/types";
 import { createServerFn } from "@tanstack/react-start";
@@ -42,20 +41,22 @@ export const createTask = createServerFn({ method: "POST" })
           throw new Error("Something went wrong. Please try again")
         }
 
-        await tx.insert(taskUsers).values([
-          ...values?.assignee ? [{
-            taskId: result?.id,
-            userId: values?.assignee,
-            role: "assignee",
-            createdBy: context?.user?.id
-          }] : [],
-          ...values?.reporter ? [{
-            taskId: result?.id,
-            userId: values?.reporter,
-            role: "reporter",
-            createdBy: context?.user?.id
-          }] : []
-        ])
+        if(values?.assignee || values?.reporter){
+          await tx.insert(taskUsers).values([
+            ...values?.assignee ? [{
+              taskId: result?.id,
+              userId: values?.assignee,
+              role: "assignee",
+              createdBy: context?.user?.id
+            }] : [],
+            ...values?.reporter ? [{
+              taskId: result?.id,
+              userId: values?.reporter,
+              role: "reporter",
+              createdBy: context?.user?.id
+            }] : []
+          ])
+        }
 
         return {
           ...result,
