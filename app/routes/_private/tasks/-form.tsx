@@ -10,6 +10,8 @@ import { formatDateForInput } from "@/lib/utils"
 
 export default function TaskForm() {
   const { isTaskOpen, setIsTaskOpen, editId, setEditId, users } = useApp()
+
+  console.count('TaskForm')
   
   const { data: task, isLoading } = useQuery({
     queryKey: ['task', editId],

@@ -45,6 +45,7 @@ export default function TableComponent<TData, TValue>({
   })
   
   console.log('tableData',tableData)
+  console.count('TableComponent')
   
   const tableOptions: AnyType = useMemo(() => ({
     data: tableData?.result || [],
@@ -82,8 +83,6 @@ export default function TableComponent<TData, TValue>({
   ])
 
   const table = useReactTable(tableOptions)
-
-  console.count('TableComponent')
 
   return (
     <div className="flex flex-col gap-4">
