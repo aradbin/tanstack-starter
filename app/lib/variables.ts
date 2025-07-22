@@ -83,6 +83,16 @@ export const mainNavItems: NavigationType[] = [
       },
     ],
   },
+  {
+    title: "CRM",
+    items: [
+      {
+        title: "Contacts",
+        href: "/contacts",
+        icon: Users,
+      },
+    ],
+  },
 ]
 
 export const footerNavItems: NavItemType[] = []

@@ -71,7 +71,7 @@ export const organizations = pgTable("organizations", {
 })
 
 export const teams = pgTable("teams", {
-  id: table.text('id').primaryKey(),
+  id: table.text().primaryKey(),
   name: table.text('name').notNull(),
   organizationId: table
     .text("organization_id")

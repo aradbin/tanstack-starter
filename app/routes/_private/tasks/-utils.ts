@@ -4,6 +4,7 @@ import { addOrder, addPagination, addWhere, QueryParamBaseType } from "@/lib/db/
 import { tasks, taskUsers, users } from "@/lib/db/schema";
 import { AnyType, OptionType } from "@/lib/types";
 import { createServerFn } from "@tanstack/react-start";
+import { generateId } from "better-auth";
 import { and, eq, getTableColumns, sql } from "drizzle-orm";
 import { alias } from "drizzle-orm/pg-core";
 import { ArrowDown, ArrowRight, ArrowUp, Circle, CircleCheckBig, Timer } from "lucide-react";
@@ -94,6 +95,7 @@ export const createTask = createServerFn({ method: "POST" })
       return await db.transaction(async (tx) => {
         const count = await tx.$count(tasks, and(eq(tasks.organizationId, context?.session?.activeOrganizationId)))
         const [result] = await tx.insert(tasks).values({
+          id: generateId(),
           ...values,
           number: count + 1,
           organizationId: context?.session?.activeOrganizationId,
@@ -103,12 +105,14 @@ export const createTask = createServerFn({ method: "POST" })
         if(values?.assignee || values?.reporter){
           await tx.insert(taskUsers).values([
             ...values?.assignee ? [{
+              id: generateId(),
               taskId: result?.id,
               userId: values?.assignee,
               role: "assignee",
               createdBy: context?.user?.id
             }] : [],
             ...values?.reporter ? [{
+              id: generateId(),
               taskId: result?.id,
               userId: values?.reporter,
               role: "reporter",
@@ -152,6 +156,7 @@ export const updateTask = createServerFn({ method: "POST" })
 
         if(!assignee && values?.assignee){
           await tx.insert(taskUsers).values({
+            id: generateId(),
             taskId: id,
             userId: values?.assignee,
             role: "assignee",
@@ -170,6 +175,7 @@ export const updateTask = createServerFn({ method: "POST" })
 
         if(!reporter && values?.reporter){
           await tx.insert(taskUsers).values({
+            id: generateId(),
             taskId: id,
             userId: values?.reporter,
             role: "reporter",

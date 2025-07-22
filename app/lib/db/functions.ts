@@ -180,7 +180,7 @@ export const createData = createServerFn({ method: "POST" })
         ...result,
         message: `${title ? title+" " : ""}Created Successfully`
       }
-    } catch {
+    } catch(error) {
       throw new Error("Something went wrong. Please try again")
     }
   })

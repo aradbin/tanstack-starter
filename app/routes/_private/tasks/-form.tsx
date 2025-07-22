@@ -13,7 +13,7 @@ export default function TaskForm() {
 
   console.count('TaskForm')
   
-  const { data: task, isLoading } = useQuery({
+  const { data, isLoading } = useQuery({
     queryKey: ['task', editId],
     queryFn: async () => {
       const result = await getData({ data: {
@@ -41,7 +41,7 @@ export default function TaskForm() {
     enabled: !!editId && isTaskOpen
   })
 
-  const taskFormFields: FormFieldType[][] = [
+  const formFields: FormFieldType[][] = [
     [
       {
         name: "title",
@@ -112,11 +112,11 @@ export default function TaskForm() {
     }}>
       {(props) => (
         <FormComponent
-          fields={taskFormFields}
+          fields={formFields}
           handleSubmit={(values: Record<string, any>) => editId ?
             updateTask({ data: { id: editId, values, } }) :
             createTask({ data: { values } })}
-          values={isTaskOpen && editId && task ? task : {}}
+          values={isTaskOpen && editId && data ? data : {}}
           onSuccess={() => {
             props.close()
           }}

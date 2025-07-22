@@ -5,7 +5,7 @@ import { organizations, users } from "./users"
 import { relations } from "drizzle-orm"
 
 export const tasks = pgTable("tasks", {
-  id: table.serial().primaryKey(),
+  id: table.text().primaryKey(),
   number: table.integer().notNull(),
   title: table.text().notNull(),
   description: table.text(),
@@ -20,9 +20,9 @@ export const tasks = pgTable("tasks", {
 })
 
 export const taskUsers = pgTable("task_users", {
-  id: table.serial().primaryKey(),
+  id: table.text().primaryKey(),
   taskId: table
-    .integer("task_id")
+    .text("task_id")
     .notNull()
     .references(() => tasks.id, { onDelete: "cascade" }),
   userId: table
