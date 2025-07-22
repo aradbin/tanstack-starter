@@ -6,9 +6,9 @@ import { organizations } from "./users"
 export const contacts = pgTable("contacts", {
   id: table.text().primaryKey(),
   name: table.text().notNull(),
-  email: table.text().notNull().unique(),
-  address: table.text(),
+  email: table.text(),
   phone: table.text(),
+  address: table.text(),
   image: table.text(),
   organizationId: table
     .text("organization_id")
@@ -20,11 +20,11 @@ export const contacts = pgTable("contacts", {
 export const customers = pgTable("customers", {
   id: table.text().primaryKey(),
   name: table.text().notNull(),
-  email: table.text().notNull().unique(),
-  businessType: table.text("business_type").notNull(), // individual, company
-  address: table.text(),
+  email: table.text(),
   phone: table.text(),
+  address: table.text(),
   image: table.text(),
+  businessType: table.text("business_type").notNull(), // individual, company
   organizationId: table
     .text("organization_id")
     .notNull()
@@ -34,6 +34,9 @@ export const customers = pgTable("customers", {
 
 export const customerContacts = pgTable("customer_contacts", {
   id: table.text().primaryKey(),
+  email: table.text(),
+  phone: table.text(),
+  address: table.text(),
   customerId: table
     .text("customer_id")
     .notNull()

@@ -19,7 +19,7 @@ export interface NavigationType {
 export interface OptionType {
   id: string | number
   name: string
-  email?: string
+  email?: string | undefined | null
   icon?: ComponentType<{ className?: string }>
   image?: string | null
 }
