@@ -9,8 +9,8 @@ export const tasks = pgTable("tasks", {
   number: table.integer().notNull(),
   title: table.text().notNull(),
   description: table.text(),
-  status: table.text().default("todo").notNull(),
-  priority: table.text().default("medium").notNull(),
+  status: table.text().default("todo").notNull(), // todo, inprogress, done
+  priority: table.text().default("medium").notNull(), // low, medium, high
   dueDate: table.date("due_date").defaultNow().notNull(),
   organizationId: table
     .text("organization_id")
@@ -29,7 +29,7 @@ export const taskUsers = pgTable("task_users", {
     .text("user_id")
     .notNull()
     .references(() => users.id, { onDelete: "cascade" }),
-  role: table.text().default("assignee").notNull(),
+  role: table.text().default("assignee").notNull(), // assignee, owner
   ...timestamps
 })
 

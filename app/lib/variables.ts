@@ -91,6 +91,11 @@ export const mainNavItems: NavigationType[] = [
         href: "/contacts",
         icon: Users,
       },
+      {
+        title: "Customers",
+        href: "/customers",
+        icon: Users,
+      },
     ],
   },
 ]

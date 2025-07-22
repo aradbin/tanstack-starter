@@ -31,7 +31,7 @@ export function TableFilter({
   selected: AnyType
 }) {
   const navigate: AnyType = useNavigate()
-  const { key, title, options } = filter
+  const { key, label, options } = filter
 
   const onSelect = (value: AnyType) => {
     navigate({
@@ -77,7 +77,7 @@ export function TableFilter({
       <PopoverTrigger asChild>
         <Button variant="outline" size="sm" className="h-8 border-dashed">
           <PlusCircle />
-          {capitalize(title || key)}
+          {capitalize(label || key)}
           {selected?.length > 0 && (
             <>
               <Separator orientation="vertical" className="mx-2 h-4" />
@@ -113,7 +113,7 @@ export function TableFilter({
       </PopoverTrigger>
       <PopoverContent className="w-full p-0" align="start">
         <Command>
-          <CommandInput placeholder={capitalize(title || key)} />
+          <CommandInput placeholder={capitalize(label || key)} />
           <CommandList>
             <CommandEmpty>No results found.</CommandEmpty>
             <CommandGroup>

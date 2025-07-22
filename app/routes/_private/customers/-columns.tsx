@@ -7,26 +7,30 @@ import AvatarComponent from "@/components/common/avatar-component"
 import { formatDateTime } from "@/lib/utils"
 import TableCheckboxHeader from "@/components/table/table-checkbox-header"
 import TableCheckboxRow from "@/components/table/table-checkbox-row"
-import { contacts } from "@/lib/db/schema/customers"
+import { customers } from "@/lib/db/schema/customers"
 import { AnyType } from "@/lib/types"
 
-export const contactColumns = ({
+export const customerColumns = ({
   actions
 }: {
   actions?: {
     edit?: (id: AnyType) => void
     delete?: (id: AnyType) => void
   }
-}): ColumnDef<typeof contacts.$inferSelect>[] => [
+}): ColumnDef<typeof customers.$inferSelect>[] => [
   {
     id: "select",
     header: ({ table }) => <TableCheckboxHeader table={table} />,
     cell: ({ row }) => <TableCheckboxRow row={row} />,
   },
   {
-    id: "contact",
-    header: ({ column }) => <TableColumnHeader column={column} title="Contact" />,
+    id: "customer",
+    header: ({ column }) => <TableColumnHeader column={column} title="Customer" />,
     cell: ({ row }) => <AvatarComponent user={row.original} />,
+  },
+  {
+    accessorKey: "businessType",
+    header: ({ column }) => <TableColumnHeader column={column} title="Business Type" />,
   },
   {
     accessorKey: "phone",

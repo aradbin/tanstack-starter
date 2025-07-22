@@ -30,13 +30,13 @@ export const getTasks = createServerFn()
 
     const assigneeTaskUser = alias(taskUsers, 'assignee_task_users')
     const assigneeUser = alias(users, 'assignee_users')
-    const reporterTaskUser = alias(taskUsers, 'reporter_task_users')
-    const reporterUser = alias(users, 'reporter_users')
+    const ownerTaskUser = alias(taskUsers, 'owner_task_users')
+    const ownerUser = alias(users, 'owner_users')
     
     let query = db.select({
       ...getTableColumns(tasks),
         assignee: getTableColumns(assigneeUser),
-        reporter: getTableColumns(reporterUser),
+        owner: getTableColumns(ownerUser),
         count: sql<number>`count(*) over()`
     }).from(tasks)
 
@@ -53,21 +53,21 @@ export const getTasks = createServerFn()
       )
     }
 
-    if(where?.reporter){
-      query.innerJoin(reporterTaskUser, and(
-        eq(tasks.id, reporterTaskUser.taskId),
-        eq(reporterTaskUser.userId, where?.reporter),
-        eq(reporterTaskUser.role, 'reporter'))
+    if(where?.owner){
+      query.innerJoin(ownerTaskUser, and(
+        eq(tasks.id, ownerTaskUser.taskId),
+        eq(ownerTaskUser.userId, where?.owner),
+        eq(ownerTaskUser.role, 'owner'))
       )
     }else{
-      query.leftJoin(reporterTaskUser, and(
-        eq(tasks.id, reporterTaskUser.taskId),
-        eq(reporterTaskUser.role, 'reporter'))
+      query.leftJoin(ownerTaskUser, and(
+        eq(tasks.id, ownerTaskUser.taskId),
+        eq(ownerTaskUser.role, 'owner'))
       )
     }
 
     query.leftJoin(assigneeUser, eq(assigneeTaskUser?.userId, assigneeUser?.id))
-    query.leftJoin(reporterUser, eq(reporterTaskUser?.userId, reporterUser?.id))
+    query.leftJoin(ownerUser, eq(ownerTaskUser?.userId, ownerUser?.id))
 
     query = addWhere(query, context?.session?.activeOrganizationId, tasks, where, search)
     query = addOrder(query, tasks, sort)
@@ -102,7 +102,7 @@ export const createTask = createServerFn({ method: "POST" })
           createdBy: context?.user?.id,
         }).returning()
 
-        if(values?.assignee || values?.reporter){
+        if(values?.assignee || values?.owner){
           await tx.insert(taskUsers).values([
             ...values?.assignee ? [{
               id: generateId(),
@@ -111,11 +111,11 @@ export const createTask = createServerFn({ method: "POST" })
               role: "assignee",
               createdBy: context?.user?.id
             }] : [],
-            ...values?.reporter ? [{
+            ...values?.owner ? [{
               id: generateId(),
               taskId: result?.id,
-              userId: values?.reporter,
-              role: "reporter",
+              userId: values?.owner,
+              role: "owner",
               createdBy: context?.user?.id
             }] : []
           ])
@@ -139,7 +139,6 @@ export const updateTask = createServerFn({ method: "POST" })
   }) => data)
   .handler(async ({ context, data }) => {
     const { values, id } = data
-    console.log('values', values, id)
     try {
       return await db.transaction(async (tx) => {
         const [result] = await tx.update(tasks).set({
@@ -152,7 +151,7 @@ export const updateTask = createServerFn({ method: "POST" })
         })
 
         const assignee = existing?.find((taskUser) => taskUser?.role === 'assignee')
-        const reporter = existing?.find((taskUser) => taskUser?.role === 'reporter')
+        const owner = existing?.find((taskUser) => taskUser?.role === 'owner')
 
         if(!assignee && values?.assignee){
           await tx.insert(taskUsers).values({
@@ -173,23 +172,23 @@ export const updateTask = createServerFn({ method: "POST" })
           await tx.delete(taskUsers).where(eq(taskUsers.id, assignee?.id))
         }
 
-        if(!reporter && values?.reporter){
+        if(!owner && values?.owner){
           await tx.insert(taskUsers).values({
             id: generateId(),
             taskId: id,
-            userId: values?.reporter,
-            role: "reporter",
+            userId: values?.owner,
+            role: "owner",
             createdBy: context?.user?.id
           })
         }
-        if(reporter && values?.reporter && reporter?.userId !== values?.reporter){
+        if(owner && values?.owner && owner?.userId !== values?.owner){
           await tx.update(taskUsers).set({
-            userId: values?.reporter,
+            userId: values?.owner,
             updatedBy: context?.user?.id,
-          }).where(eq(taskUsers.id, reporter?.id))
+          }).where(eq(taskUsers.id, owner?.id))
         }
-        if(reporter && !values?.reporter){
-          await tx.delete(taskUsers).where(eq(taskUsers.id, reporter?.id))
+        if(owner && !values?.owner){
+          await tx.delete(taskUsers).where(eq(taskUsers.id, owner?.id))
         }
 
         return {

@@ -42,7 +42,7 @@ export interface FormFieldType {
 
 export interface TableFilterType {
   key: string
-  title?: string
+  label?: string
   multiple?: boolean
   options?: OptionType[],
   type?: string

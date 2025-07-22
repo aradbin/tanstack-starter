@@ -5,8 +5,9 @@ import { createData, getData, updateData } from "@/lib/db/functions"
 import { AnyType, FormFieldType } from "@/lib/types"
 import { emailRequiredValidation, stringRequiredValidation, stringValidation } from "@/lib/validations"
 import { generateId } from "better-auth"
+import { businessTypeOptions } from "./-utils"
 
-export default function ContactForm({
+export default function CustomerForm({
   isOpen,
   setIsOpen,
   editId,
@@ -18,9 +19,9 @@ export default function ContactForm({
   setEditId?: (id: AnyType) => void
 }) {  
   const { data, isLoading } = useQuery({
-    queryKey: ['contact', editId],
+    queryKey: ['customer', editId],
     queryFn: async () => getData({ data: {
-      table: "contacts",
+      table: "customers",
       id: editId
     }}),
     enabled: !!editId && isOpen
@@ -43,6 +44,15 @@ export default function ContactForm({
     ],
     [
       {
+        name: "businessType",
+        type: "select",
+        label: "Business Type",
+        validationOnSubmit: stringRequiredValidation("Business Type"),
+        options: businessTypeOptions
+      },
+    ],
+    [
+      {
         name: "address",
         validationOnSubmit: stringValidation("Address"),
         placeholder: "Enter address",
@@ -59,7 +69,7 @@ export default function ContactForm({
 
   return (
     <ModalComponent options={{
-      header: editId ? 'Edit Contact' : 'Create Contact',
+      header: editId ? 'Edit Customer' : 'Create Customer',
       isOpen: isOpen,
       onClose: () => {
         setIsOpen(false)
@@ -70,11 +80,11 @@ export default function ContactForm({
         <FormComponent
           fields={formFields}
           handleSubmit={(values: Record<string, any>) => editId ?
-            updateData({ data: { table: "contacts", id: editId, values, title: "Contact" } }) :
-            createData({ data: { table: "contacts", values: {
+            updateData({ data: { table: "customers", id: editId, values, title: "Customer" } }) :
+            createData({ data: { table: "customers", values: {
               id: generateId(),
               ...values,
-            }, title: "Contact" } })}
+            }, title: "Customer" } })}
           values={isOpen && editId && data ? data : {}}
           onSuccess={() => {
             props.close()
@@ -84,7 +94,7 @@ export default function ContactForm({
           }}
           options={{
             isLoading,
-            queryKey: 'contacts'
+            queryKey: 'customers'
           }}
         />
       )}

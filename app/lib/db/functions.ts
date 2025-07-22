@@ -181,6 +181,7 @@ export const createData = createServerFn({ method: "POST" })
         message: `${title ? title+" " : ""}Created Successfully`
       }
     } catch(error) {
+      console.error(error)
       throw new Error("Something went wrong. Please try again")
     }
   })
@@ -207,7 +208,8 @@ export const updateData = createServerFn({ method: "POST" })
         ...result,
         message: `${title ? title+" " : ""}Updated Successfully`
       }
-    } catch {
+    } catch(error) {
+      console.error(error)
       throw new Error("Something went wrong. Please try again")
     }
   })
@@ -233,7 +235,8 @@ export const deleteData = createServerFn({ method: "POST" })
         ...result,
         message: `${title ? title+" " : ""}Deleted Successfully`
       }
-    } catch {
+    } catch(error) {
+      console.error(error)
       throw new Error("Something went wrong. Please try again")
     }
   })

@@ -16,6 +16,7 @@ import { Route as AuthRouteImport } from './routes/_auth/route'
 import { Route as PrivateIndexImport } from './routes/_private/index'
 import { Route as PrivateTasksIndexImport } from './routes/_private/tasks/index'
 import { Route as PrivateMembersIndexImport } from './routes/_private/members/index'
+import { Route as PrivateCustomersIndexImport } from './routes/_private/customers/index'
 import { Route as PrivateContactsIndexImport } from './routes/_private/contacts/index'
 import { Route as AuthRegisterIndexImport } from './routes/_auth/register/index'
 import { Route as AuthLoginIndexImport } from './routes/_auth/login/index'
@@ -48,6 +49,12 @@ const PrivateTasksIndexRoute = PrivateTasksIndexImport.update({
 const PrivateMembersIndexRoute = PrivateMembersIndexImport.update({
   id: '/members/',
   path: '/members/',
+  getParentRoute: () => PrivateRouteRoute,
+} as any)
+
+const PrivateCustomersIndexRoute = PrivateCustomersIndexImport.update({
+  id: '/customers/',
+  path: '/customers/',
   getParentRoute: () => PrivateRouteRoute,
 } as any)
 
@@ -128,6 +135,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof PrivateContactsIndexImport
       parentRoute: typeof PrivateRouteImport
     }
+    '/_private/customers/': {
+      id: '/_private/customers/'
+      path: '/customers'
+      fullPath: '/customers'
+      preLoaderRoute: typeof PrivateCustomersIndexImport
+      parentRoute: typeof PrivateRouteImport
+    }
     '/_private/members/': {
       id: '/_private/members/'
       path: '/members'
@@ -166,6 +180,7 @@ const AuthRouteRouteWithChildren = AuthRouteRoute._addFileChildren(
 interface PrivateRouteRouteChildren {
   PrivateIndexRoute: typeof PrivateIndexRoute
   PrivateContactsIndexRoute: typeof PrivateContactsIndexRoute
+  PrivateCustomersIndexRoute: typeof PrivateCustomersIndexRoute
   PrivateMembersIndexRoute: typeof PrivateMembersIndexRoute
   PrivateTasksIndexRoute: typeof PrivateTasksIndexRoute
 }
@@ -173,6 +188,7 @@ interface PrivateRouteRouteChildren {
 const PrivateRouteRouteChildren: PrivateRouteRouteChildren = {
   PrivateIndexRoute: PrivateIndexRoute,
   PrivateContactsIndexRoute: PrivateContactsIndexRoute,
+  PrivateCustomersIndexRoute: PrivateCustomersIndexRoute,
   PrivateMembersIndexRoute: PrivateMembersIndexRoute,
   PrivateTasksIndexRoute: PrivateTasksIndexRoute,
 }
@@ -188,6 +204,7 @@ export interface FileRoutesByFullPath {
   '/login': typeof AuthLoginIndexRoute
   '/register': typeof AuthRegisterIndexRoute
   '/contacts': typeof PrivateContactsIndexRoute
+  '/customers': typeof PrivateCustomersIndexRoute
   '/members': typeof PrivateMembersIndexRoute
   '/tasks': typeof PrivateTasksIndexRoute
 }
@@ -199,6 +216,7 @@ export interface FileRoutesByTo {
   '/login': typeof AuthLoginIndexRoute
   '/register': typeof AuthRegisterIndexRoute
   '/contacts': typeof PrivateContactsIndexRoute
+  '/customers': typeof PrivateCustomersIndexRoute
   '/members': typeof PrivateMembersIndexRoute
   '/tasks': typeof PrivateTasksIndexRoute
 }
@@ -212,6 +230,7 @@ export interface FileRoutesById {
   '/_auth/login/': typeof AuthLoginIndexRoute
   '/_auth/register/': typeof AuthRegisterIndexRoute
   '/_private/contacts/': typeof PrivateContactsIndexRoute
+  '/_private/customers/': typeof PrivateCustomersIndexRoute
   '/_private/members/': typeof PrivateMembersIndexRoute
   '/_private/tasks/': typeof PrivateTasksIndexRoute
 }
@@ -225,6 +244,7 @@ export interface FileRouteTypes {
     | '/login'
     | '/register'
     | '/contacts'
+    | '/customers'
     | '/members'
     | '/tasks'
   fileRoutesByTo: FileRoutesByTo
@@ -235,6 +255,7 @@ export interface FileRouteTypes {
     | '/login'
     | '/register'
     | '/contacts'
+    | '/customers'
     | '/members'
     | '/tasks'
   id:
@@ -246,6 +267,7 @@ export interface FileRouteTypes {
     | '/_auth/login/'
     | '/_auth/register/'
     | '/_private/contacts/'
+    | '/_private/customers/'
     | '/_private/members/'
     | '/_private/tasks/'
   fileRoutesById: FileRoutesById
@@ -288,6 +310,7 @@ export const routeTree = rootRoute
       "children": [
         "/_private/",
         "/_private/contacts/",
+        "/_private/customers/",
         "/_private/members/",
         "/_private/tasks/"
       ]
@@ -310,6 +333,10 @@ export const routeTree = rootRoute
     },
     "/_private/contacts/": {
       "filePath": "_private/contacts/index.tsx",
+      "parent": "/_private"
+    },
+    "/_private/customers/": {
+      "filePath": "_private/customers/index.tsx",
       "parent": "/_private"
     },
     "/_private/members/": {

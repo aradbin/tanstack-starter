@@ -32,7 +32,7 @@ export default function TaskForm() {
         return {
           ...result,
           assignee: result.taskUsers?.find((taskUser: AnyType) => taskUser?.role === 'assignee')?.user?.id,
-          reporter: result.taskUsers?.find((taskUser: AnyType) => taskUser?.role === 'reporter')?.user?.id
+          owner: result.taskUsers?.find((taskUser: AnyType) => taskUser?.role === 'owner')?.user?.id
         }
       }
 
@@ -93,10 +93,10 @@ export default function TaskForm() {
     ],
     [
       {
-        name: 'reporter',
+        name: 'owner',
         type: 'user',
         options: users,
-        validationOnSubmit: stringValidation('Reporter'),
+        validationOnSubmit: stringValidation('Owner'),
       }
     ],
   ]

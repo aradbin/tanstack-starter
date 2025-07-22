@@ -1,3 +1,3 @@
 export * from "./users"
 export * from "./tasks"
-export * from "./contacts"
+export * from "./customers"
