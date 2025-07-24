@@ -2,7 +2,7 @@ import { FormFieldType, OptionType } from "@/lib/types"
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
 import { Button } from "@/components/ui/button"
 import { CheckIcon, ChevronsUpDown } from "lucide-react"
-import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "@/components/ui/command"
+import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList, CommandSeparator } from "@/components/ui/command"
 import { useRef, useState } from "react"
 import { cn } from "@/lib/utils"
 import OptionComponent from "../common/option-component"
@@ -32,7 +32,7 @@ export default function SelectField({
       }
     }
 
-    return "Select"
+    return field?.placeholder || "Select"
   }
 
   return (
@@ -66,7 +66,7 @@ export default function SelectField({
                   key={item?.id}
                   value={`${item?.name} ${item?.email}`}
                   onSelect={() => {
-                    field?.handleChange(item?.id)
+                    field?.handleChange?.(item?.id)
                     field.handleBlur?.()
                     setOpen(false)
                   }}
@@ -82,6 +82,16 @@ export default function SelectField({
                 </CommandItem>
               ))}
             </CommandGroup>
+            {!field?.isRequired && (
+              <>
+                <CommandSeparator />
+                <CommandGroup>
+                  <CommandItem onSelect={() => field?.handleChange?.("")} className="justify-center text-center">
+                    Clear Selection
+                  </CommandItem>
+                </CommandGroup>
+              </>
+            )}
           </CommandList>
         </Command>
       </PopoverContent>

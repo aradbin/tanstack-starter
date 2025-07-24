@@ -36,7 +36,7 @@ export const customerContacts = pgTable("customer_contacts", {
   id: table.text().primaryKey(),
   email: table.text(),
   phone: table.text(),
-  address: table.text(),
+  designation: table.text(),
   customerId: table
     .text("customer_id")
     .notNull()

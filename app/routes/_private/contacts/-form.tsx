@@ -2,28 +2,20 @@ import FormComponent from "@/components/form/form-component"
 import ModalComponent from "@/components/modal/modal-component"
 import { useQuery } from "@tanstack/react-query"
 import { createData, getData, updateData } from "@/lib/db/functions"
-import { AnyType, FormFieldType } from "@/lib/types"
+import { FormFieldType } from "@/lib/types"
 import { emailRequiredValidation, stringRequiredValidation, stringValidation } from "@/lib/validations"
 import { generateId } from "better-auth"
+import { useApp } from "@/providers/app-provider"
 
-export default function ContactForm({
-  isOpen,
-  setIsOpen,
-  editId,
-  setEditId
-}: {
-  isOpen: boolean
-  setIsOpen: (isOpen: boolean) => void
-  editId?: AnyType
-  setEditId?: (id: AnyType) => void
-}) {  
+export default function ContactForm() {
+  const { isContactOpen, setIsContactOpen, editId, setEditId } = useApp()
   const { data, isLoading } = useQuery({
     queryKey: ['contact', editId],
     queryFn: async () => getData({ data: {
       table: "contacts",
       id: editId
     }}),
-    enabled: !!editId && isOpen
+    enabled: !!editId && isContactOpen
   })
 
   const formFields: FormFieldType[][] = [
@@ -60,9 +52,9 @@ export default function ContactForm({
   return (
     <ModalComponent variant="sheet" options={{
       header: editId ? 'Edit Contact' : 'Create Contact',
-      isOpen: isOpen,
+      isOpen: isContactOpen,
       onClose: () => {
-        setIsOpen(false)
+        setIsContactOpen(false)
         setEditId?.(null)
       }
     }}>
@@ -75,7 +67,7 @@ export default function ContactForm({
               id: generateId(),
               ...values,
             }, title: "Contact" } })}
-          values={isOpen && editId && data ? data : {}}
+          values={isContactOpen && editId && data ? data : {}}
           onSuccess={() => {
             props.close()
           }}

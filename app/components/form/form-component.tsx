@@ -4,7 +4,7 @@ import { useForm } from "@tanstack/react-form"
 import RenderField from "@/components/form/render-field";
 import { Button } from "@/components/ui/button";
 import { AlertCircle, Loader2 } from "lucide-react";
-import { useEffect, useState } from "react";
+import { ReactNode, useEffect, useState } from "react";
 import { Alert, AlertTitle } from "@/components/ui/alert";
 import { useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
@@ -12,13 +12,14 @@ import { Label } from "@/components/ui/label";
 import { capitalize } from "@/lib/utils";
 import LoadingComponent from "../common/loading-component";
 
-export default function FormComponent({ fields, handleSubmit, values ={}, onSuccess, onError, onCancel, options }: {
+export default function FormComponent({ fields, handleSubmit, children, values ={}, onSuccess, onError, onCancel, options }: {
   fields: FormFieldType[][]
-  handleSubmit: any;
+  handleSubmit: any
+  children?: ReactNode
   values?: Record<string, any>
-  onSuccess?: any;
-  onError?: any;
-  onCancel?: any;
+  onSuccess?: any
+  onError?: any
+  onCancel?: any
   options?: {
     isLoading?: boolean
     queryKey?: string | string[]
@@ -162,6 +163,7 @@ export default function FormComponent({ fields, handleSubmit, values ={}, onSucc
           ))}
         </div>
       ))}
+      {children}
       <div className="flex flex-row-reverse flex-wrap gap-2">
         <form.Subscribe
           selector={(state) => [state.isSubmitting]}

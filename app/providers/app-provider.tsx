@@ -1,5 +1,5 @@
-import { TableType } from "@/lib/db/functions";
-import { users } from "@/lib/db/schema";
+import { getDatas, TableType } from "@/lib/db/functions";
+import { contacts, users } from "@/lib/db/schema";
 import { AnyType } from "@/lib/types";
 import { getMembers } from "@/routes/_private/members/-utils";
 import { useQuery } from "@tanstack/react-query";
@@ -14,21 +14,27 @@ type DeleteIdType = {
 type AppStateType = {
   isTaskOpen: boolean
   setIsTaskOpen: Dispatch<SetStateAction<boolean>>
+  isContactOpen: boolean
+  setIsContactOpen: Dispatch<SetStateAction<boolean>>
   editId: AnyType
   setEditId: Dispatch<SetStateAction<AnyType>>
   deleteId: DeleteIdType
   setDeleteId: Dispatch<SetStateAction<DeleteIdType>>
   users: typeof users.$inferSelect[]
+  contacts: typeof contacts.$inferSelect[]
 }
 
 const initialState: AppStateType = {
   isTaskOpen: false,
   setIsTaskOpen: () => {},
+  isContactOpen: false,
+  setIsContactOpen: () => {},
   editId: null,
   setEditId: () => {},
   deleteId: null,
   setDeleteId: () => {},
   users: [],
+  contacts: [],
 }
 
 const AppContext = createContext<AppStateType>(initialState)
@@ -39,6 +45,7 @@ export function AppProvider({
   children: ReactNode
 }) {
   const [isTaskOpen, setIsTaskOpen] = useState<boolean>(false)
+  const [isContactOpen, setIsContactOpen] = useState<boolean>(false)
   const [editId, setEditId] = useState()
   const [deleteId, setDeleteId] = useState<DeleteIdType>(null)
 
@@ -50,15 +57,29 @@ export function AppProvider({
     }
   })
 
+  const { data: contacts } = useQuery({
+    queryKey: ['contacts', 'all'],
+    queryFn: async () => {
+      const response = await getDatas({ data: {
+        table: "contacts"
+      }})
+
+      return response?.result || []
+    }
+  })
+
   return (
     <AppContext.Provider value={{
       isTaskOpen,
       setIsTaskOpen,
+      isContactOpen,
+      setIsContactOpen,
       editId,
       setEditId,
       deleteId,
       setDeleteId,
-      users: users || []
+      users: users || [],
+      contacts: contacts || [],
     }}>
       {children}
     </AppContext.Provider>

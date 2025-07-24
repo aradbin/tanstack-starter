@@ -5,9 +5,6 @@ import { QueryParamType } from '@/lib/db/functions'
 import { defaultSearchParamValidation, validate } from '@/lib/validations'
 import { Button } from '@/components/ui/button'
 import { PlusCircle } from 'lucide-react'
-import { useState } from 'react'
-import ContactForm from './-form'
-import { AnyType } from '@/lib/types'
 import { useApp } from '@/providers/app-provider'
 
 export const Route = createFileRoute('/_private/contacts/')({
@@ -19,9 +16,7 @@ export const Route = createFileRoute('/_private/contacts/')({
 
 function RouteComponent() {
   const params = Route.useSearch()
-  const { setDeleteId } = useApp()
-  const [isOpen, setIsOpen] = useState(false)
-  const [editId, setEditId] = useState<AnyType>(null)
+  const { setIsContactOpen, setEditId, setDeleteId } = useApp()
 
   const query: QueryParamType = {
     table: "contacts",
@@ -40,27 +35,24 @@ function RouteComponent() {
   }
 
   return (
-    <>
-      <TableComponent columns={contactColumns({
-        actions: {
-          edit: (id) => {
-            setIsOpen(true)
-            setEditId(id)
-          },
-          delete: (id) => {
-            setDeleteId({
-              id,
-              title: "Contact",
-              table: "contacts"
-            })
-          }
+    <TableComponent columns={contactColumns({
+      actions: {
+        edit: (id) => {
+          setIsContactOpen(true)
+          setEditId(id)
+        },
+        delete: (id) => {
+          setDeleteId({
+            id,
+            title: "Contact",
+            table: "contacts"
+          })
         }
-      })} filters={[]} query={query} options={{
-        hasSearch: true
-      }} toolbar={(
-        <Button size="sm" variant="outline" onClick={() => setIsOpen(true)}><PlusCircle /> Create</Button>
-      )} />
-      <ContactForm isOpen={isOpen} setIsOpen={setIsOpen} editId={editId} setEditId={setEditId} />
-    </>
+      }
+    })} filters={[]} query={query} options={{
+      hasSearch: true
+    }} toolbar={(
+      <Button size="sm" variant="outline" onClick={() => setIsContactOpen(true)}><PlusCircle /> Create</Button>
+    )} />
   )
 }

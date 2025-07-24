@@ -38,6 +38,7 @@ export interface FormFieldType {
   handleBlur?: any
   handleChange?: any
   isValid?: boolean
+  isRequired?: boolean
 }
 
 export interface TableFilterType {
