@@ -102,7 +102,7 @@ export default function TaskForm() {
   ]
 
   return (
-    <ModalComponent options={{
+    <ModalComponent variant="sheet" options={{
       header: editId ? 'Edit Task' : 'Create Task',
       isOpen: isTaskOpen,
       onClose: () => {

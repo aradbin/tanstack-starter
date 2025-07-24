@@ -68,7 +68,7 @@ export default function CustomerForm({
   ]
 
   return (
-    <ModalComponent options={{
+    <ModalComponent variant="sheet" options={{
       header: editId ? 'Edit Customer' : 'Create Customer',
       isOpen: isOpen,
       onClose: () => {

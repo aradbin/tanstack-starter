@@ -58,7 +58,7 @@ export default function ContactForm({
   ]
 
   return (
-    <ModalComponent options={{
+    <ModalComponent variant="sheet" options={{
       header: editId ? 'Edit Contact' : 'Create Contact',
       isOpen: isOpen,
       onClose: () => {
