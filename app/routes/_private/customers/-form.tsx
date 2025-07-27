@@ -23,7 +23,11 @@ export default function CustomerForm() {
       const response = await getData({ data: {
         table: "customers",
         relation: {
-          customerContacts: true
+          customerContacts: {
+            with: {
+              contact: true
+            }
+          }
         },
         id: editId
       }})

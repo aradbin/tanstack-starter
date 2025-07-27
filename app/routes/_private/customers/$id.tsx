@@ -28,7 +28,6 @@ function RouteComponent() {
   } = useQuery({
     queryKey: ['customers', params?.id],
     queryFn: () => getData({ data: {
-      id: params?.id,
       table: "customers",
       relation: {
         customerContacts: {
@@ -36,7 +35,8 @@ function RouteComponent() {
             contact: true
           }
         }
-      }
+      },
+      id: params?.id,
     }})
   })
 
@@ -49,7 +49,7 @@ function RouteComponent() {
       <div className='grid grid-cols-1 md:grid-cols-3 gap-4'>
         <Card className="w-full">
           <CardHeader className="text-center">
-            <AvatarComponent user={data} options={{ hideBody: true }} classNames='size-24 mx-auto' />
+            <AvatarComponent user={data} options={{ hideBody: true, avatarFallbackClassNames: 'text-2xl' }} classNames='size-24 mx-auto' />
             <p className="text-2xl font-bold">{data?.name}</p>
           </CardHeader>
           <CardContent className="space-y-6">
@@ -82,7 +82,10 @@ function RouteComponent() {
               </div>
             </div>
             <div className="flex flex-col md:flex-row gap-2">
-              <Button className="flex-1" onClick={() => { setIsCustomerOpen(true); setEditId(data?.id) }}>
+              <Button className="flex-1" onClick={() => {
+                setIsCustomerOpen(true)
+                setEditId(data?.id)
+              }}>
                 <Edit className="w-4 h-4 mr-2" />
                 Edit
               </Button>
@@ -90,53 +93,48 @@ function RouteComponent() {
           </CardContent>
         </Card>
         <Tabs defaultValue="contacts" className='col-span-2'>
-          <TabsList>
+          <TabsList className='w-full'>
             <TabsTrigger value="contacts">Contacts</TabsTrigger>
+            <TabsTrigger value="email">Email</TabsTrigger>
           </TabsList>
           <TabsContent value="contacts">
-            <Card className='w-full'>
-              <CardHeader>
-                <CardTitle className='flex items-center justify-between'>
-                  Contacts <ModalComponent trigger={(
-                    <Button variant="outline"><PlusCircle /> Add Contact</Button>
-                  )} options={{
-                    header: `Add Contact To ${data?.name}`,
-                  }} variant='sheet'>
-                    <>Add Contact Form</>
-                  </ModalComponent>
-                </CardTitle>
-              </CardHeader>
-              <CardContent className='grid grid-cols-1 md:grid-cols-3 gap-4'>
-                {data?.customerContacts?.map((customerContact, index) => (
-                  <Card key={index}>
-                    <CardHeader className="text-center">
-                      <AvatarComponent user={customerContact?.contact} options={{ hideBody: true }} classNames='size-12 mx-auto' />
-                      <p className="font-bold">{customerContact?.contact?.name}</p>
-                    </CardHeader>
-                    <CardContent className="space-y-6">
-                      <div className='flex flex-col gap-2 text-sm text-muted-foreground'>
-                        <div className="flex items-center">
-                          <BriefcaseBusiness className="size-4 mr-2" />{customerContact?.designation}
-                        </div>
-                        <div className="flex items-center">
-                          <Mail className="size-4 mr-2" />{customerContact?.email || customerContact?.contact?.email}
-                        </div>
-                        <div className="flex items-center">
-                          <Phone className="size-4 mr-2" />{customerContact?.phone || customerContact?.contact?.phone}
-                        </div>
-                        <div className="flex items-center">
-                          <MapPin className="size-4 mr-2" />{customerContact?.contact?.address}
-                        </div>
+            <div className='grid grid-cols-1 md:grid-cols-3 gap-4'>
+              {data?.customerContacts?.map((customerContact, index) => (
+                <Card key={index}>
+                  <CardHeader className="text-center">
+                    <AvatarComponent user={customerContact?.contact} options={{ hideBody: true }} classNames='size-12 mx-auto' />
+                    <p className="font-bold">{customerContact?.contact?.name}</p>
+                  </CardHeader>
+                  <CardContent className="space-y-6">
+                    <div className='flex flex-col gap-2 text-sm text-muted-foreground'>
+                      <div className="flex items-center">
+                        <BriefcaseBusiness className="size-4 mr-2" />{customerContact?.designation}
                       </div>
-                    </CardContent>
-                  </Card>
-                ))}
-              </CardContent>
-            </Card>
+                      <div className="flex items-center">
+                        <Mail className="size-4 mr-2" />{customerContact?.email || customerContact?.contact?.email}
+                      </div>
+                      <div className="flex items-center">
+                        <Phone className="size-4 mr-2" />{customerContact?.phone || customerContact?.contact?.phone}
+                      </div>
+                      <div className="flex items-center">
+                        <MapPin className="size-4 mr-2" />{customerContact?.contact?.address}
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          </TabsContent>
+          <TabsContent value="email">
+
           </TabsContent>
         </Tabs>
       </div>
     )
+  }
+
+  if(!isLoading && !data) {
+    throw new Error('Customer data not found')
   }
 
   return null

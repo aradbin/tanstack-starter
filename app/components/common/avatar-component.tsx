@@ -8,13 +8,14 @@ export default function AvatarComponent({ user, classNames, options }: {
   options?: {
     hideBody?: boolean
     hideDescription?: boolean
+    avatarFallbackClassNames?: string
   }
 }) {
   return (
     <div className="flex items-center gap-2">
       <Avatar className={`border-1 border-background hover:z-10 ${classNames}`}>
         <AvatarImage src={user?.image || ""} alt={user?.name} />
-        <AvatarFallback>
+        <AvatarFallback className={options?.avatarFallbackClassNames}>
           {getInitials(user?.name)}
         </AvatarFallback>
       </Avatar>
