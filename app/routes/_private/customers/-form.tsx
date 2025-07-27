@@ -5,12 +5,12 @@ import { createData, getData, updateData } from "@/lib/db/functions"
 import { AnyType, FormFieldType } from "@/lib/types"
 import { emailRequiredValidation, stringRequiredValidation, stringValidation } from "@/lib/validations"
 import { generateId } from "better-auth"
-import { businessTypeOptions } from "./-utils"
+import { businessTypeOptions, createCustomer, updateCustomer } from "./-utils"
 import { useApp } from "@/providers/app-provider"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import SelectField from "@/components/form/select-field"
 import { Button } from "@/components/ui/button"
-import { Plus, Trash } from "lucide-react"
+import { Minus, Plus, PlusCircle, Trash } from "lucide-react"
 import { useState } from "react"
 import { Separator } from "@/components/ui/separator"
 import { Label } from "@/components/ui/label"
@@ -28,14 +28,30 @@ export default function CustomerForm({
   editId?: AnyType
   setEditId?: (id: AnyType) => void
 }) {
-  const [selected, setSelected] = useState<AnyType[]>([])
+  const [selected, setSelected] = useState<AnyType[]>([{}])
   const { contacts, setIsContactOpen } = useApp()
   const { data, isLoading } = useQuery({
     queryKey: ['customer', editId],
-    queryFn: async () => getData({ data: {
-      table: "customers",
-      id: editId
-    }}),
+    queryFn: async () => {
+      const response = await getData({ data: {
+        table: "customers",
+        relation: {
+          customerContacts: true
+        },
+        id: editId
+      }})
+
+      if(response?.customerContacts?.length){
+        setSelected(response.customerContacts.map((customerContact: AnyType) => ({
+          id: customerContact.contactId,
+          email: customerContact.email,
+          phone: customerContact.phone,
+          designation: customerContact.designation
+        })))
+      }
+
+      return response
+    },
     enabled: !!editId && isOpen
   })
 
@@ -79,6 +95,105 @@ export default function CustomerForm({
     ],
   ]
 
+  const renderContactForm = (index: number) => {
+    return (
+      <Card className="py-4" key={index}>
+        <CardContent className="px-4 space-y-4">
+          <div className="flex gap-2">
+            <div className="grow">
+              <SelectField field={{
+                name: "contact_id",
+                type: "user",
+                value: selected[index]?.id,
+                placeholder: "Select Existing",
+                isValid: true,
+                options: contacts,
+                handleChange: (value: AnyType) => {
+                  if(value){
+                    const find = contacts.find((contact) => contact.id === value)
+                    if(find){
+                      setSelected((prev) => {
+                        const newSelected = [...prev]
+                        newSelected[index] = {
+                          ...find,
+                          designation: "",
+                        }
+                        return newSelected
+                      })
+                    }
+                  }else{
+                    setSelected((prev) => {
+                      const newSelected = [...prev]
+                      newSelected[index] = {}
+                      return newSelected
+                    })
+                  }
+                }
+              }} />
+            </div>
+            <Button type="button" size="icon" variant="outline" onClick={() => setIsContactOpen(true)}><Plus /></Button>
+            <Button type="button" size="icon" variant="destructive" onClick={() => setSelected((prev) => prev.filter((_, i) => i !== index))}><Minus /></Button>
+          </div>
+          {selected[index]?.id && (
+            <div className="flex flex-col gap-4">
+              <div className="flex flex-col gap-2">
+                <Label htmlFor={`email-${index}`}>Email</Label>
+                <InputField field={{
+                  name: `email-${index}`,
+                  value: selected[index]?.email,
+                  isValid: true,
+                  placeholder: "Enter email",
+                  handleChange: (value: string) => {
+                    const newSelected = [...selected]
+                    newSelected[index] = {
+                      ...newSelected[index],
+                      email: value
+                    }
+                    setSelected(newSelected)
+                  }
+                }} />
+              </div>
+              <div className="flex flex-col gap-2">
+                <Label htmlFor={`phone-${index}`}>Phone</Label>
+                <InputField field={{
+                  name: `phone-${index}`,
+                  value: selected[index]?.phone,
+                  isValid: true,
+                  placeholder: "Enter phone number",
+                  handleChange: (value: string) => {
+                    const newSelected = [...selected]
+                    newSelected[index] = {
+                      ...newSelected[index],
+                      phone: value
+                    }
+                    setSelected(newSelected)
+                  }
+                }} />
+              </div>
+              <div className="flex flex-col gap-2">
+                <Label htmlFor={`designation-${index}`}>Designation</Label>
+                <InputField field={{
+                  name: `designation-${index}`,
+                  value: selected[index]?.designation,
+                  isValid: true,
+                  placeholder: "Enter designation",
+                  handleChange: (value: string) => {
+                    const newSelected = [...selected]
+                    newSelected[index] = {
+                      ...newSelected[index],
+                      designation: value
+                    }
+                    setSelected(newSelected)
+                  }
+                }} />
+              </div>
+            </div>
+          )}
+        </CardContent>
+      </Card>
+    )
+  }
+
   return (
     <ModalComponent variant="sheet" options={{
       header: editId ? 'Edit Customer' : 'Create Customer',
@@ -86,18 +201,18 @@ export default function CustomerForm({
       onClose: () => {
         setIsOpen(false)
         setEditId?.(null)
-        setSelected([])
+        setSelected([{}])
       }
     }}>
       {(props) => (
         <FormComponent
           fields={formFields}
           handleSubmit={(values: Record<string, any>) => editId ?
-            updateData({ data: { table: "customers", id: editId, values, title: "Customer" } }) :
-            createData({ data: { table: "customers", values: {
-              id: generateId(),
+            updateCustomer({ data: { values, id: editId } }) :
+            createCustomer({ data: { values: {
               ...values,
-            }, title: "Customer" } })}
+              contacts: selected
+            }}})}
           values={isOpen && editId && data ? data : {}}
           onSuccess={() => {
             props.close()
@@ -110,62 +225,10 @@ export default function CustomerForm({
             queryKey: 'customers'
           }}
           children={(
-            <Card className="py-4">
-              <CardHeader className="px-4">
-                <CardTitle>Contacts</CardTitle>
-                <CardDescription>Add existing contacts or create new ones</CardDescription>
-              </CardHeader>
-              <CardContent className="px-4 space-y-4">
-                <div className="flex gap-2">
-                  <div className="grow">
-                    <SelectField field={{
-                      name: "",
-                      type: "user",
-                      value: selected[0],
-                      placeholder: "Select Existing",
-                      isValid: true,
-                      options: contacts,
-                      handleChange: (id: AnyType) => {
-                        if(id){
-                          setSelected([id])
-                        }else{
-                          setSelected([])
-                        }
-                      }
-                    }} />
-                  </div>
-                  <Button type="button" size="icon" variant="outline" onClick={() => setIsContactOpen(true)}><Plus /></Button>
-                </div>
-                {selected.length > 0 && (
-                  <div className="flex flex-col gap-4">
-                    <Label>Selected Contacts</Label>
-                    <Card className="py-4">
-                      <CardContent className="flex flex-col gap-4 px-4">
-                        {contacts?.find((contact) => contact.id === selected[0]) && (
-                          <div className="flex w-full">
-                            <div className="grow">
-                              <AvatarComponent user={contacts?.find((contact) => contact.id === selected[0]) || { id: "", name: "" }} />
-                            </div>
-                            <Button type="button" size="icon" variant="destructive" onClick={() => setSelected([])}><Trash /></Button>
-                          </div>
-                        )}
-                        <InputField field={{
-                          name: "email",
-                          isValid: true,
-                        }} />
-                        <InputField field={{
-                          name: "phone",
-                          isValid: true,
-                        }} />
-                        <InputField field={{
-                          name: "designation",
-                          isValid: true,
-                        }} />
-                      </CardContent>
-                    </Card>
-                  </div>
-                )}
-              </CardContent>
+            <Card className="flex flex-col gap-4 p-4">
+              <Label>Contacts</Label>
+              {selected?.map((_, index) => renderContactForm(index))}
+              <Button type="button" variant="outline" onClick={() => setSelected((prev) => [...prev, {}])}><PlusCircle /> Add Another</Button>
             </Card>
           )}
         />

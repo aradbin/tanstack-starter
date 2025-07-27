@@ -81,7 +81,7 @@ export default function ModalComponent ({
       }
     }}>
       <SheetTrigger asChild>{trigger}</SheetTrigger>
-      <SheetContent className="overflow-scroll">
+      <SheetContent className="overflow-y-auto">
         {(options?.header || options?.description) && (
           <SheetHeader>
             {options?.header && <SheetTitle>{options?.header}</SheetTitle>}

@@ -2,6 +2,7 @@ import { pgTable } from "drizzle-orm/pg-core"
 import * as table from "drizzle-orm/pg-core"
 import { timestamps } from "./columns.helpers"
 import { organizations } from "./users"
+import { relations } from "drizzle-orm"
 
 export const contacts = pgTable("contacts", {
   id: table.text().primaryKey(),
@@ -47,3 +48,22 @@ export const customerContacts = pgTable("customer_contacts", {
     .references(() => contacts.id, { onDelete: "cascade" }),
   ...timestamps,
 })
+
+export const customerRelations = relations(customers, ({ many, one }) => ({
+  customerContacts: many(customerContacts),
+  organization: one(organizations, {
+    fields: [customers.organizationId],
+    references: [organizations.id]
+  })
+}))
+
+export const customerContactRelations = relations(customerContacts, ({ one }) => ({
+  customer: one(customers, {
+    fields: [customerContacts.customerId],
+    references: [customers.id]
+  }),
+  contact: one(contacts, {
+    fields: [customerContacts.contactId],
+    references: [contacts.id]
+  })
+}))
