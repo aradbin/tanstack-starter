@@ -7,8 +7,9 @@ import AvatarComponent from "@/components/common/avatar-component"
 import { formatDateTime } from "@/lib/utils"
 import TableCheckboxHeader from "@/components/table/table-checkbox-header"
 import TableCheckboxRow from "@/components/table/table-checkbox-row"
-import { customers } from "@/lib/db/schema/customers"
+import { contacts, customerContacts, customers } from "@/lib/db/schema/customers"
 import { AnyType } from "@/lib/types"
+import AvatarGroupComponent from "@/components/common/avatar-group-component"
 
 export const customerColumns = ({
   actions
@@ -17,7 +18,11 @@ export const customerColumns = ({
     edit?: (id: AnyType) => void
     delete?: (id: AnyType) => void
   }
-}): ColumnDef<typeof customers.$inferSelect>[] => [
+}): ColumnDef<typeof customers.$inferSelect & {
+  customerContacts: typeof customerContacts.$inferSelect & {
+    contact: typeof contacts.$inferSelect
+  }[]
+}>[] => [
   {
     id: "select",
     header: ({ table }) => <TableCheckboxHeader table={table} />,
@@ -35,6 +40,11 @@ export const customerColumns = ({
   {
     accessorKey: "phone",
     header: ({ column }) => <TableColumnHeader column={column} title="Phone" />,
+  },
+  {
+    accessorKey: "contacts",
+    header: ({ column }) => <TableColumnHeader column={column} title="Contacts" />,
+    cell: ({ row }) => <AvatarGroupComponent users={row?.original?.customerContacts?.map((customerContact) => customerContact.contact)} />,
   },
   {
     accessorKey: "createdAt",

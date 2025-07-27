@@ -5,21 +5,22 @@ import { getInitials } from "@/lib/utils";
 export default function AvatarComponent({ user, options }: {
   user: OptionType,
   options?: {
+    hideBody?: boolean
     hideDescription?: boolean
   }
 }) {
   return (
     <div className="flex items-center gap-2">
-      <Avatar>
+      <Avatar className="border-2 border-background hover:z-10">
         <AvatarImage src={user?.image || ""} alt={user?.name} />
         <AvatarFallback>
           {getInitials(user?.name)}
         </AvatarFallback>
       </Avatar>
-      <div className="flex flex-col text-left overflow-hidden">
+      {options?.hideBody && <div className="flex flex-col text-left overflow-hidden">
         <p className="text-sm font-medium truncate">{user?.name}</p>
         {!options?.hideDescription && user?.email && <p className="text-xs text-muted-foreground font-semibold truncate">{user?.email}</p>}
-      </div>
+      </div>}
     </div>
   )
 }

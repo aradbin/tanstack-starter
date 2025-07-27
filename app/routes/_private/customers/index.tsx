@@ -27,6 +27,13 @@ function RouteComponent() {
 
   const query: QueryParamType = {
     table: "customers",
+    relation: {
+      customerContacts: {
+        with: {
+          contact: true
+        }
+      }
+    },
     sort: {
       field: params.sort,
       order: params.order

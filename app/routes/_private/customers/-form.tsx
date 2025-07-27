@@ -208,7 +208,10 @@ export default function CustomerForm({
         <FormComponent
           fields={formFields}
           handleSubmit={(values: Record<string, any>) => editId ?
-            updateCustomer({ data: { values, id: editId } }) :
+            updateCustomer({ data: { values: {
+              ...values,
+              contacts: selected
+            }, id: editId } }) :
             createCustomer({ data: { values: {
               ...values,
               contacts: selected
