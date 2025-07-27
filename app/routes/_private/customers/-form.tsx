@@ -1,37 +1,24 @@
 import FormComponent from "@/components/form/form-component"
 import ModalComponent from "@/components/modal/modal-component"
 import { useQuery } from "@tanstack/react-query"
-import { createData, getData, updateData } from "@/lib/db/functions"
+import { getData } from "@/lib/db/functions"
 import { AnyType, FormFieldType } from "@/lib/types"
 import { emailRequiredValidation, stringRequiredValidation, stringValidation } from "@/lib/validations"
-import { generateId } from "better-auth"
 import { businessTypeOptions, createCustomer, updateCustomer } from "./-utils"
 import { useApp } from "@/providers/app-provider"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { Card, CardContent } from "@/components/ui/card"
 import SelectField from "@/components/form/select-field"
 import { Button } from "@/components/ui/button"
-import { Minus, Plus, PlusCircle, Trash } from "lucide-react"
+import { Minus, Plus, PlusCircle } from "lucide-react"
 import { useState } from "react"
-import { Separator } from "@/components/ui/separator"
 import { Label } from "@/components/ui/label"
-import AvatarComponent from "@/components/common/avatar-component"
 import InputField from "@/components/form/input-field"
 
-export default function CustomerForm({
-  isOpen,
-  setIsOpen,
-  editId,
-  setEditId
-}: {
-  isOpen: boolean
-  setIsOpen: (isOpen: boolean) => void
-  editId?: AnyType
-  setEditId?: (id: AnyType) => void
-}) {
+export default function CustomerForm() {
+  const { contacts, isCustomerOpen, setIsCustomerOpen, setIsContactOpen, editId, setEditId } = useApp()
   const [selected, setSelected] = useState<AnyType[]>([{}])
-  const { contacts, setIsContactOpen } = useApp()
   const { data, isLoading } = useQuery({
-    queryKey: ['customer', editId],
+    queryKey: ['customers', editId],
     queryFn: async () => {
       const response = await getData({ data: {
         table: "customers",
@@ -52,7 +39,7 @@ export default function CustomerForm({
 
       return response
     },
-    enabled: !!editId && isOpen
+    enabled: !!editId && isCustomerOpen
   })
 
   const formFields: FormFieldType[][] = [
@@ -107,7 +94,7 @@ export default function CustomerForm({
                 value: selected[index]?.id,
                 placeholder: "Select Existing",
                 isValid: true,
-                options: contacts,
+                options: contacts ?? [],
                 handleChange: (value: AnyType) => {
                   if(value){
                     const find = contacts.find((contact) => contact.id === value)
@@ -197,10 +184,10 @@ export default function CustomerForm({
   return (
     <ModalComponent variant="sheet" options={{
       header: editId ? 'Edit Customer' : 'Create Customer',
-      isOpen: isOpen,
+      isOpen: isCustomerOpen,
       onClose: () => {
-        setIsOpen(false)
-        setEditId?.(null)
+        setIsCustomerOpen(false)
+        setEditId(null)
         setSelected([{}])
       }
     }}>
@@ -216,7 +203,7 @@ export default function CustomerForm({
               ...values,
               contacts: selected
             }}})}
-          values={isOpen && editId && data ? data : {}}
+          values={isCustomerOpen && editId && data ? data : {}}
           onSuccess={() => {
             props.close()
           }}

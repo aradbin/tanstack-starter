@@ -4,11 +4,9 @@ import { QueryParamType } from '@/lib/db/functions'
 import { defaultSearchParamValidation, enamValidation, validate } from '@/lib/validations'
 import { Button } from '@/components/ui/button'
 import { PlusCircle } from 'lucide-react'
-import { useState } from 'react'
-import { AnyType, TableFilterType } from '@/lib/types'
+import { TableFilterType } from '@/lib/types'
 import { useApp } from '@/providers/app-provider'
 import { customerColumns } from './-columns'
-import CustomerForm from './-form'
 import { businessTypeOptions, businessTypes } from './-utils'
 
 export const Route = createFileRoute('/_private/customers/')({
@@ -22,9 +20,7 @@ export const Route = createFileRoute('/_private/customers/')({
 function RouteComponent() {
   const params = Route.useSearch()
   const navigate = Route.useNavigate()
-  const { setDeleteId } = useApp()
-  const [isOpen, setIsOpen] = useState(false)
-  const [editId, setEditId] = useState<AnyType>(null)
+  const { setIsCustomerOpen, setEditId, setDeleteId } = useApp()
 
   const query: QueryParamType = {
     table: "customers",
@@ -70,7 +66,7 @@ function RouteComponent() {
             })
           },
           edit: (id) => {
-            setIsOpen(true)
+            setIsCustomerOpen(true)
             setEditId(id)
           },
           delete: (id) => {
@@ -84,9 +80,8 @@ function RouteComponent() {
       })} filters={filters} query={query} options={{
         hasSearch: true
       }} toolbar={(
-        <Button size="sm" variant="outline" onClick={() => setIsOpen(true)}><PlusCircle /> Create</Button>
+        <Button size="sm" variant="outline" onClick={() => setIsCustomerOpen(true)}><PlusCircle /> Create</Button>
       )} />
-      <CustomerForm isOpen={isOpen} setIsOpen={setIsOpen} editId={editId} setEditId={setEditId} />
     </>
   )
 }

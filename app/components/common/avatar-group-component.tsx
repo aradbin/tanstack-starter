@@ -10,7 +10,7 @@ export default function AvatarGroupComponent({
 }) {
   return (
     <div className="flex items-center -space-x-2 *:ring-3 *:ring-background">
-      {users.slice(0, 1).map((user, index) => (
+      {users.slice(0, 4).map((user, index) => (
         <Tooltip key={index}>
           <TooltipTrigger>
             <AvatarComponent user={user} options={{ hideBody: true }} />
@@ -20,10 +20,10 @@ export default function AvatarGroupComponent({
           </TooltipContent>
         </Tooltip>
       ))}
-      {users.length > 1 && (
+      {users.length > 4 && (
         <AvatarComponent user={{
           id: "",
-          name: `+ ${users.length - 1}`
+          name: `+ ${users.length - 4}`
         }} options={{ hideBody: true }} classNames="z-5 text-sm font-medium text-muted-foreground" />
       )}
     </div>

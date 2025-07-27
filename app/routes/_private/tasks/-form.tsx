@@ -14,7 +14,7 @@ export default function TaskForm() {
   console.count('TaskForm')
   
   const { data, isLoading } = useQuery({
-    queryKey: ['task', editId],
+    queryKey: ['tasks', editId],
     queryFn: async () => {
       const result = await getData({ data: {
         table: "tasks",

@@ -1,12 +1,15 @@
 import AvatarComponent from '@/components/common/avatar-component'
+import LoadingComponent from '@/components/common/loading-component'
+import ModalComponent from '@/components/modal/modal-component'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { getData } from '@/lib/db/functions'
 import { contacts, customerContacts } from '@/lib/db/schema'
+import { useApp } from '@/providers/app-provider'
 import { useQuery } from '@tanstack/react-query'
 import { createFileRoute } from '@tanstack/react-router'
-import { BriefcaseBusiness, Edit, Mail, MapPin, MessageCircle, Phone } from 'lucide-react'
+import { BriefcaseBusiness, Edit, Mail, MapPin, MessageCircle, Phone, PlusCircle } from 'lucide-react'
 
 export const Route = createFileRoute('/_private/customers/$id')({
   component: RouteComponent,
@@ -14,9 +17,9 @@ export const Route = createFileRoute('/_private/customers/$id')({
 
 function RouteComponent() {
   const params = Route.useParams()
-  
+  const { setIsCustomerOpen, setEditId } = useApp()
   const { data, isLoading } = useQuery({
-    queryKey: ['customer', params?.id],
+    queryKey: ['customers', params?.id],
     queryFn: () => getData({ data: {
       id: params?.id,
       table: "customers",
@@ -29,9 +32,9 @@ function RouteComponent() {
       }
     }})
   })
-  console.log('data',data)
+
   if(isLoading){
-    return 'Loading'
+    return <LoadingComponent isLoading={isLoading} />
   }
   
   if(data){
@@ -72,7 +75,7 @@ function RouteComponent() {
               </div>
             </div>
             <div className="flex flex-col md:flex-row gap-2">
-              <Button className="flex-1">
+              <Button className="flex-1" onClick={() => { setIsCustomerOpen(true); setEditId(data?.id) }}>
                 <Edit className="w-4 h-4 mr-2" />
                 Edit
               </Button>
@@ -93,7 +96,15 @@ function RouteComponent() {
           <TabsContent value="contacts">
             <Card className='w-full'>
               <CardHeader>
-                <CardTitle>Contacts</CardTitle>
+                <CardTitle className='flex items-center justify-between'>
+                  Contacts <ModalComponent trigger={(
+                    <Button variant="outline"><PlusCircle /> Add Contact</Button>
+                  )} options={{
+                    header: `Add Contact To ${data?.name}`,
+                  }} variant='sheet'>
+                    <>Add Contact Form</>
+                  </ModalComponent>
+                </CardTitle>
               </CardHeader>
               <CardContent className='grid grid-cols-1 md:grid-cols-3 gap-4'>
                 {data?.customerContacts?.map((customerContact: typeof customerContacts.$inferSelect & {
@@ -110,10 +121,10 @@ function RouteComponent() {
                           <BriefcaseBusiness className="size-4 mr-2" />{customerContact?.designation}
                         </div>
                         <div className="flex items-center">
-                          <Mail className="size-4 mr-2" />{customerContact?.email}
+                          <Mail className="size-4 mr-2" />{customerContact?.email || customerContact?.contact?.email}
                         </div>
                         <div className="flex items-center">
-                          <Phone className="size-4 mr-2" />{customerContact?.phone}
+                          <Phone className="size-4 mr-2" />{customerContact?.phone || customerContact?.contact?.phone}
                         </div>
                         <div className="flex items-center">
                           <MapPin className="size-4 mr-2" />{customerContact?.contact?.address}

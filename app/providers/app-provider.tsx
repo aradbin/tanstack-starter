@@ -16,6 +16,8 @@ type AppStateType = {
   setIsTaskOpen: Dispatch<SetStateAction<boolean>>
   isContactOpen: boolean
   setIsContactOpen: Dispatch<SetStateAction<boolean>>
+  isCustomerOpen: boolean
+  setIsCustomerOpen: Dispatch<SetStateAction<boolean>>
   editId: AnyType
   setEditId: Dispatch<SetStateAction<AnyType>>
   deleteId: DeleteIdType
@@ -29,6 +31,8 @@ const initialState: AppStateType = {
   setIsTaskOpen: () => {},
   isContactOpen: false,
   setIsContactOpen: () => {},
+  isCustomerOpen: false,
+  setIsCustomerOpen: () => {},
   editId: null,
   setEditId: () => {},
   deleteId: null,
@@ -46,6 +50,7 @@ export function AppProvider({
 }) {
   const [isTaskOpen, setIsTaskOpen] = useState<boolean>(false)
   const [isContactOpen, setIsContactOpen] = useState<boolean>(false)
+  const [isCustomerOpen, setIsCustomerOpen] = useState<boolean>(false)
   const [editId, setEditId] = useState()
   const [deleteId, setDeleteId] = useState<DeleteIdType>(null)
 
@@ -74,6 +79,8 @@ export function AppProvider({
       setIsTaskOpen,
       isContactOpen,
       setIsContactOpen,
+      isCustomerOpen,
+      setIsCustomerOpen,
       editId,
       setEditId,
       deleteId,

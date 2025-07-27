@@ -79,7 +79,7 @@ export const updateCustomer = createServerFn({ method: "POST" })
         const existing = await tx.query.customerContacts.findMany({
           where: eq(customerContacts.customerId, id)
         })
-        const incomingIds = values?.contacts?.filter((c: AnyType) => c.id)
+        const incomingIds = values?.contacts?.map((c: AnyType) => c.id)?.filter(Boolean)
 
         const toDelete = existing.filter(c => !incomingIds.includes(c.contactId))
         if (toDelete.length > 0) {

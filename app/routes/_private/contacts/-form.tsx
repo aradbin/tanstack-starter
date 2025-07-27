@@ -10,7 +10,7 @@ import { useApp } from "@/providers/app-provider"
 export default function ContactForm() {
   const { isContactOpen, setIsContactOpen, editId, setEditId } = useApp()
   const { data, isLoading } = useQuery({
-    queryKey: ['contact', editId],
+    queryKey: ['contacts', editId],
     queryFn: async () => getData({ data: {
       table: "contacts",
       id: editId
