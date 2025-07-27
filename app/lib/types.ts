@@ -49,6 +49,12 @@ export interface TableFilterType {
   type?: string
 }
 
+export interface TableActionType {
+  view?: (id: AnyType) => void
+  edit?: (id: AnyType) => void
+  delete?: (id: AnyType) => void
+}
+
 export interface SortType {
   field?: string
   order?: string

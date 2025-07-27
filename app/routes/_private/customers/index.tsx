@@ -21,6 +21,7 @@ export const Route = createFileRoute('/_private/customers/')({
 
 function RouteComponent() {
   const params = Route.useSearch()
+  const navigate = Route.useNavigate()
   const { setDeleteId } = useApp()
   const [isOpen, setIsOpen] = useState(false)
   const [editId, setEditId] = useState<AnyType>(null)
@@ -63,6 +64,11 @@ function RouteComponent() {
     <>
       <TableComponent columns={customerColumns({
         actions: {
+          view: (id) => {
+            navigate({
+              to: `/customers/${id}`
+            })
+          },
           edit: (id) => {
             setIsOpen(true)
             setEditId(id)

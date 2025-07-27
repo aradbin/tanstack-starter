@@ -8,16 +8,13 @@ import { formatDateTime } from "@/lib/utils"
 import TableCheckboxHeader from "@/components/table/table-checkbox-header"
 import TableCheckboxRow from "@/components/table/table-checkbox-row"
 import { contacts, customerContacts, customers } from "@/lib/db/schema/customers"
-import { AnyType } from "@/lib/types"
+import { TableActionType } from "@/lib/types"
 import AvatarGroupComponent from "@/components/common/avatar-group-component"
 
 export const customerColumns = ({
   actions
 }: {
-  actions?: {
-    edit?: (id: AnyType) => void
-    delete?: (id: AnyType) => void
-  }
+  actions?: TableActionType
 }): ColumnDef<typeof customers.$inferSelect & {
   customerContacts: typeof customerContacts.$inferSelect & {
     contact: typeof contacts.$inferSelect

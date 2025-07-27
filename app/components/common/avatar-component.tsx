@@ -2,8 +2,9 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { OptionType } from "@/lib/types";
 import { getInitials } from "@/lib/utils";
 
-export default function AvatarComponent({ user, options }: {
+export default function AvatarComponent({ user, classNames, options }: {
   user: OptionType,
+  classNames?: string
   options?: {
     hideBody?: boolean
     hideDescription?: boolean
@@ -11,16 +12,20 @@ export default function AvatarComponent({ user, options }: {
 }) {
   return (
     <div className="flex items-center gap-2">
-      <Avatar className="border-2 border-background hover:z-10">
+      <Avatar className={`border-1 border-background hover:z-10 ${classNames}`}>
         <AvatarImage src={user?.image || ""} alt={user?.name} />
         <AvatarFallback>
           {getInitials(user?.name)}
         </AvatarFallback>
       </Avatar>
-      {options?.hideBody && <div className="flex flex-col text-left overflow-hidden">
-        <p className="text-sm font-medium truncate">{user?.name}</p>
-        {!options?.hideDescription && user?.email && <p className="text-xs text-muted-foreground font-semibold truncate">{user?.email}</p>}
-      </div>}
+      {!options?.hideBody && (
+        <div className="flex flex-col text-left overflow-hidden">
+          <p className="text-sm font-medium truncate">{user?.name}</p>
+          {!options?.hideDescription && user?.email && (
+            <p className="text-xs text-muted-foreground font-semibold truncate">{user?.email}</p>
+          )}
+        </div>
+      )}
     </div>
   )
 }

@@ -1,15 +1,12 @@
 import { Row } from "@tanstack/react-table"
-import { Edit, Trash2 } from "lucide-react"
+import { Edit, Eye, Trash2 } from "lucide-react"
 import { Button } from "@/components/ui/button"
-import { AnyType } from "@/lib/types"
+import { AnyType, TableActionType } from "@/lib/types"
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip"
 
 interface TableRowActionsProps {
   row: Row<AnyType>
-  actions?: {
-    edit?: (id: AnyType) => void
-    delete?: (id: AnyType) => void
-  }
+  actions?: TableActionType
 }
 
 export function TableRowActions({
@@ -18,6 +15,14 @@ export function TableRowActions({
 }: TableRowActionsProps) {
   return (
     <div className="flex justify-end gap-1">
+      {actions?.view && (
+        <Tooltip>
+          <TooltipTrigger>
+            <Button variant="outline" size="icon" onClick={() => actions?.view?.(row.original.id)}><Eye /></Button>
+          </TooltipTrigger>
+          <TooltipContent>View</TooltipContent>
+        </Tooltip>
+      )}
       {actions?.edit && (
         <Tooltip>
           <TooltipTrigger>
