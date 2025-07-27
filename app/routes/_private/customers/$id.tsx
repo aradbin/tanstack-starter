@@ -1,6 +1,5 @@
 import AvatarComponent from '@/components/common/avatar-component'
 import LoadingComponent from '@/components/common/loading-component'
-import ModalComponent from '@/components/modal/modal-component'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
