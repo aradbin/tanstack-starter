@@ -79,19 +79,12 @@ function RouteComponent() {
                 <Edit className="w-4 h-4 mr-2" />
                 Edit
               </Button>
-              <Button variant="outline" className="flex-1">
-                <MessageCircle className="w-4 h-4 mr-2" />
-                Message
-              </Button>
             </div>
           </CardContent>
         </Card>
         <Tabs defaultValue="contacts" className='col-span-2'>
           <TabsList>
             <TabsTrigger value="contacts">Contacts</TabsTrigger>
-            <TabsTrigger value="services">Services</TabsTrigger>
-            <TabsTrigger value="email">Email</TabsTrigger>
-            <TabsTrigger value="whatsapp">WhatsApp</TabsTrigger>
           </TabsList>
           <TabsContent value="contacts">
             <Card className='w-full'>
@@ -134,27 +127,6 @@ function RouteComponent() {
                   </Card>
                 ))}
               </CardContent>
-            </Card>
-          </TabsContent>
-          <TabsContent value="services">
-            <Card className='w-full'>
-              <CardHeader>
-                <CardTitle>Services</CardTitle>
-              </CardHeader>
-            </Card>
-          </TabsContent>
-          <TabsContent value="email">
-            <Card className='w-full'>
-              <CardHeader>
-                <CardTitle>Email</CardTitle>
-              </CardHeader>
-            </Card>
-          </TabsContent>
-          <TabsContent value="whatsapp">
-            <Card className='w-full'>
-              <CardHeader>
-                <CardTitle>WhatsApp</CardTitle>
-              </CardHeader>
             </Card>
           </TabsContent>
         </Tabs>
