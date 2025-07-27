@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { getData } from '@/lib/db/functions'
-import { contacts, customerContacts } from '@/lib/db/schema'
+import { contacts, customerContacts, customers } from '@/lib/db/schema'
 import { useApp } from '@/providers/app-provider'
 import { useQuery } from '@tanstack/react-query'
 import { createFileRoute } from '@tanstack/react-router'
@@ -18,7 +18,14 @@ export const Route = createFileRoute('/_private/customers/$id')({
 function RouteComponent() {
   const params = Route.useParams()
   const { setIsCustomerOpen, setEditId } = useApp()
-  const { data, isLoading } = useQuery({
+  const { data, isLoading }: {
+    data: (typeof customers.$inferSelect & {
+      customerContacts: ({
+        contact: typeof contacts.$inferSelect
+      } & typeof customerContacts.$inferSelect)[]
+    }) | undefined,
+    isLoading: boolean
+  } = useQuery({
     queryKey: ['customers', params?.id],
     queryFn: () => getData({ data: {
       id: params?.id,
@@ -100,10 +107,8 @@ function RouteComponent() {
                 </CardTitle>
               </CardHeader>
               <CardContent className='grid grid-cols-1 md:grid-cols-3 gap-4'>
-                {data?.customerContacts?.map((customerContact: typeof customerContacts.$inferSelect & {
-                  contact: typeof contacts.$inferSelect
-                }) => (
-                  <Card key={customerContact?.id}>
+                {data?.customerContacts?.map((customerContact, index) => (
+                  <Card key={index}>
                     <CardHeader className="text-center">
                       <AvatarComponent user={customerContact?.contact} options={{ hideBody: true }} classNames='size-12 mx-auto' />
                       <p className="font-bold">{customerContact?.contact?.name}</p>
