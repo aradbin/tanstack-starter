@@ -15,10 +15,10 @@ import { Label } from "@/components/ui/label"
 import InputField from "@/components/form/input-field"
 
 export default function CustomerForm() {
-  const { contacts, isCustomerOpen, setIsCustomerOpen, setIsContactOpen, editId, setEditId } = useApp()
+  const { contacts, customerModal, setCustomerModal, setContactModal } = useApp()
   const [selected, setSelected] = useState<AnyType[]>([{}])
   const { data, isLoading } = useQuery({
-    queryKey: ['customers', editId],
+    queryKey: ['customers', customerModal?.id],
     queryFn: async () => {
       const response = await getData({ data: {
         table: "customers",
@@ -29,7 +29,7 @@ export default function CustomerForm() {
             }
           }
         },
-        id: editId
+        id: customerModal?.id
       }})
 
       if(response?.customerContacts?.length){
@@ -43,7 +43,7 @@ export default function CustomerForm() {
 
       return response
     },
-    enabled: !!editId && isCustomerOpen
+    enabled: !!customerModal?.id && customerModal?.isOpen
   })
 
   const formFields: FormFieldType[][] = [
@@ -122,7 +122,10 @@ export default function CustomerForm() {
                 }
               }} />
             </div>
-            <Button type="button" size="icon" variant="outline" onClick={() => setIsContactOpen(true)}><Plus /></Button>
+            <Button type="button" size="icon" variant="outline" onClick={() => setContactModal({
+              id: null,
+              isOpen: true
+            })}><Plus /></Button>
             <Button type="button" size="icon" variant="destructive" onClick={() => setSelected((prev) => prev.filter((_, i) => i !== index))}><Trash /></Button>
           </div>
           {selected[index]?.id && (
@@ -187,27 +190,26 @@ export default function CustomerForm() {
 
   return (
     <ModalComponent variant="sheet" options={{
-      header: editId ? 'Edit Customer' : 'Create Customer',
-      isOpen: isCustomerOpen,
+      header: customerModal?.id ? 'Edit Customer' : 'Create Customer',
+      isOpen: customerModal?.isOpen,
       onClose: () => {
-        setIsCustomerOpen(false)
-        setEditId(null)
+        setContactModal(null)
         setSelected([{}])
       }
     }}>
       {(props) => (
         <FormComponent
           fields={formFields}
-          handleSubmit={(values: Record<string, any>) => editId ?
+          handleSubmit={(values: Record<string, any>) => customerModal?.id ?
             updateCustomer({ data: { values: {
               ...values,
               contacts: selected
-            }, id: editId } }) :
+            }, id: customerModal?.id } }) :
             createCustomer({ data: { values: {
               ...values,
               contacts: selected
             }}})}
-          values={isCustomerOpen && editId && data ? data : {}}
+          values={customerModal?.isOpen && customerModal?.id && data ? data : {}}
           onSuccess={() => {
             props.close()
           }}

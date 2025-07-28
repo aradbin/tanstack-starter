@@ -20,7 +20,7 @@ export const Route = createFileRoute('/_private/customers/')({
 function RouteComponent() {
   const params = Route.useSearch()
   const navigate = Route.useNavigate()
-  const { setIsCustomerOpen, setEditId, setDeleteId } = useApp()
+  const { setCustomerModal, setDeleteModal } = useApp()
 
   const query: QueryParamType = {
     table: "customers",
@@ -66,11 +66,13 @@ function RouteComponent() {
             })
           },
           edit: (id) => {
-            setIsCustomerOpen(true)
-            setEditId(id)
+            setCustomerModal({
+              id,
+              isOpen: true
+            })
           },
           delete: (id) => {
-            setDeleteId({
+            setDeleteModal({
               id,
               title: "Customer",
               table: "customers"
@@ -80,7 +82,10 @@ function RouteComponent() {
       })} filters={filters} query={query} options={{
         hasSearch: true
       }} toolbar={(
-        <Button size="sm" variant="outline" onClick={() => setIsCustomerOpen(true)}><PlusCircle /> Create</Button>
+        <Button size="sm" variant="outline" onClick={() => setCustomerModal({
+          id: null,
+          isOpen: true
+        })}><PlusCircle /> Create</Button>
       )} />
     </>
   )

@@ -9,12 +9,10 @@ import { stringRequiredValidation, stringValidation } from "@/lib/validations"
 import { formatDateForInput } from "@/lib/utils"
 
 export default function TaskForm() {
-  const { isTaskOpen, setIsTaskOpen, editId, setEditId, users } = useApp()
-
-  console.count('TaskForm')
+  const { taskModal, setTaskModal, users } = useApp()
   
   const { data, isLoading } = useQuery({
-    queryKey: ['tasks', editId],
+    queryKey: ['tasks', taskModal?.id],
     queryFn: async () => {
       const result = await getData({ data: {
         table: "tasks",
@@ -25,7 +23,7 @@ export default function TaskForm() {
             }
           }
         },
-        id: editId
+        id: taskModal?.id
       }})
       
       if(result){
@@ -38,7 +36,7 @@ export default function TaskForm() {
 
       return result
     },
-    enabled: !!editId && isTaskOpen
+    enabled: !!taskModal?.id && taskModal?.isOpen
   })
 
   const formFields: FormFieldType[][] = [
@@ -103,20 +101,19 @@ export default function TaskForm() {
 
   return (
     <ModalComponent variant="sheet" options={{
-      header: editId ? 'Edit Task' : 'Create Task',
-      isOpen: isTaskOpen,
+      header: taskModal?.id ? 'Edit Task' : 'Create Task',
+      isOpen: taskModal?.isOpen,
       onClose: () => {
-        setIsTaskOpen(false)
-        setEditId(null)
+        setTaskModal(null)
       }
     }}>
       {(props) => (
         <FormComponent
           fields={formFields}
-          handleSubmit={(values: Record<string, any>) => editId ?
-            updateTask({ data: { id: editId, values, } }) :
+          handleSubmit={(values: Record<string, any>) => taskModal?.id ?
+            updateTask({ data: { id: taskModal?.id, values, } }) :
             createTask({ data: { values } })}
-          values={isTaskOpen && editId && data ? data : {}}
+          values={taskModal?.isOpen && taskModal?.id && data ? data : {}}
           onSuccess={() => {
             props.close()
           }}

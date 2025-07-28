@@ -4,25 +4,25 @@ import FormComponent from "../form/form-component";
 import { deleteData } from "@/lib/db/functions";
 
 export default function DeleteComponent () {
-  const { deleteId, setDeleteId } = useApp()
+  const { deleteModal, setDeleteModal } = useApp()
 
   return (
     <ModalComponent options={{
-      header: `Delete${deleteId ? " "+deleteId?.title : ""}`,
-      description: `Are you sure you want to delete this${deleteId ? " "+deleteId?.title?.toLowerCase() : ""}?`,
-      isOpen: deleteId ? true : false,
+      header: `Delete${deleteModal ? " "+deleteModal?.title : ""}`,
+      description: `Are you sure you want to delete this${deleteModal ? " "+deleteModal?.title?.toLowerCase() : ""}?`,
+      isOpen: deleteModal ? true : false,
       onClose: () => {
-        setDeleteId(null)
+        setDeleteModal(null)
       }
     }}>
       {((props) => (
         <FormComponent
           fields={[]}
-          handleSubmit={() => deleteId ? deleteData({
+          handleSubmit={() => deleteModal ? deleteData({
             data: {
-              table: deleteId?.table,
-              id: deleteId?.id,
-              title: deleteId?.title
+              table: deleteModal?.table,
+              id: deleteModal?.id,
+              title: deleteModal?.title
             }
           }) : {}}
           onSuccess={() => {
@@ -32,7 +32,7 @@ export default function DeleteComponent () {
             props.close()
           }}
           options={{
-            queryKey: deleteId?.table,
+            queryKey: deleteModal?.table,
             submitText: 'Delete',
             submitVariant: "destructive"
           }}

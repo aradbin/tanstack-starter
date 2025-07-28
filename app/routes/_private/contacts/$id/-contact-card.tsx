@@ -10,7 +10,7 @@ export default function ContactCard({
 }: {
   contact: typeof contacts.$inferSelect
 }) {
-  const { setIsContactOpen, setEditId } = useApp()
+  const { setContactModal } = useApp()
   
   return (
     <Card className="w-full">
@@ -46,8 +46,10 @@ export default function ContactCard({
         </div>
         <div className="flex flex-col md:flex-row gap-2">
           <Button className="flex-1" onClick={() => {
-            setIsContactOpen(true)
-            setEditId(contact?.id)
+            setContactModal({
+              id: contact?.id,
+              isOpen: true
+            })
           }}>
             <Edit className="w-4 h-4 mr-2" />
             Edit

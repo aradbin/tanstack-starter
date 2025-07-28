@@ -1,42 +1,41 @@
 import { getDatas, TableType } from "@/lib/db/functions";
 import { contacts, users } from "@/lib/db/schema";
-import { AnyType } from "@/lib/types";
 import { getMembers } from "@/routes/_private/members/-utils";
 import { useQuery } from "@tanstack/react-query";
 import { createContext, Dispatch, ReactNode, SetStateAction, useContext, useState } from "react";
 
-type DeleteIdType = {
-  id: AnyType
+type ModalStateType = {
+  id: string | null
+  isOpen: boolean
+} | null
+type DeleteModalStateType = {
+  id: string | null
   title: string
   table: TableType
 } | null
 
 type AppStateType = {
-  isTaskOpen: boolean
-  setIsTaskOpen: Dispatch<SetStateAction<boolean>>
-  isContactOpen: boolean
-  setIsContactOpen: Dispatch<SetStateAction<boolean>>
-  isCustomerOpen: boolean
-  setIsCustomerOpen: Dispatch<SetStateAction<boolean>>
-  editId: AnyType
-  setEditId: Dispatch<SetStateAction<AnyType>>
-  deleteId: DeleteIdType
-  setDeleteId: Dispatch<SetStateAction<DeleteIdType>>
+  taskModal: ModalStateType
+  setTaskModal: Dispatch<SetStateAction<ModalStateType>>
+  contactModal: ModalStateType
+  setContactModal: Dispatch<SetStateAction<ModalStateType>>
+  customerModal: ModalStateType
+  setCustomerModal: Dispatch<SetStateAction<ModalStateType>>
+  deleteModal: DeleteModalStateType
+  setDeleteModal: Dispatch<SetStateAction<DeleteModalStateType>>
   users: typeof users.$inferSelect[]
   contacts: typeof contacts.$inferSelect[]
 }
 
 const initialState: AppStateType = {
-  isTaskOpen: false,
-  setIsTaskOpen: () => {},
-  isContactOpen: false,
-  setIsContactOpen: () => {},
-  isCustomerOpen: false,
-  setIsCustomerOpen: () => {},
-  editId: null,
-  setEditId: () => {},
-  deleteId: null,
-  setDeleteId: () => {},
+  taskModal: null,
+  setTaskModal: () => {},
+  contactModal: null,
+  setContactModal: () => {},
+  customerModal: null,
+  setCustomerModal: () => {},
+  deleteModal: null,
+  setDeleteModal: () => {},
   users: [],
   contacts: [],
 }
@@ -48,11 +47,10 @@ export function AppProvider({
 }: {
   children: ReactNode
 }) {
-  const [isTaskOpen, setIsTaskOpen] = useState<boolean>(false)
-  const [isContactOpen, setIsContactOpen] = useState<boolean>(false)
-  const [isCustomerOpen, setIsCustomerOpen] = useState<boolean>(false)
-  const [editId, setEditId] = useState()
-  const [deleteId, setDeleteId] = useState<DeleteIdType>(null)
+  const [taskModal, setTaskModal] = useState<ModalStateType>(null)
+  const [contactModal, setContactModal] = useState<ModalStateType>(null)
+  const [customerModal, setCustomerModal] = useState<ModalStateType>(null)
+  const [deleteModal, setDeleteModal] = useState<DeleteModalStateType>(null)
 
   const { data: users } = useQuery({
     queryKey: ['members', 'users', 'all'],
@@ -75,16 +73,14 @@ export function AppProvider({
 
   return (
     <AppContext.Provider value={{
-      isTaskOpen,
-      setIsTaskOpen,
-      isContactOpen,
-      setIsContactOpen,
-      isCustomerOpen,
-      setIsCustomerOpen,
-      editId,
-      setEditId,
-      deleteId,
-      setDeleteId,
+      taskModal,
+      setTaskModal,
+      contactModal,
+      setContactModal,
+      customerModal,
+      setCustomerModal,
+      deleteModal,
+      setDeleteModal,
       users: users || [],
       contacts: contacts || [],
     }}>

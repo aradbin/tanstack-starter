@@ -15,7 +15,7 @@ export default function ContactCustomers({
   } & typeof customerContacts.$inferSelect)[]
 }) {
   const navigate = useNavigate()
-  const { setIsCustomerOpen, setEditId } = useApp()
+  const { setCustomerModal } = useApp()
 
   if(data?.length){
     return (
@@ -53,8 +53,10 @@ export default function ContactCustomers({
               </div>
               <div className="flex flex-col md:flex-row gap-2">
                 <Button className="flex-1" onClick={() => {
-                  setIsCustomerOpen(true)
-                  setEditId(customerContact?.customerId)
+                  setCustomerModal({
+                    id: customerContact?.customerId,
+                    isOpen: true
+                  })
                 }}>
                   <Edit />
                   Edit

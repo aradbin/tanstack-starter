@@ -10,7 +10,7 @@ export default function CustomerCard({
 }: {
   customer: typeof customers.$inferSelect
 }) {
-  const { setIsCustomerOpen, setEditId } = useApp()
+  const { setCustomerModal } = useApp()
 
   return (
     <Card className="w-full">
@@ -49,8 +49,10 @@ export default function CustomerCard({
         </div>
         <div className="flex flex-col md:flex-row gap-2">
           <Button className="flex-1" onClick={() => {
-            setIsCustomerOpen(true)
-            setEditId(customer?.id)
+            setCustomerModal({
+              id: customer?.id,
+              isOpen: true
+            })
           }}>
             <Edit className="w-4 h-4 mr-2" />
             Edit

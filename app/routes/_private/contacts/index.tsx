@@ -17,7 +17,7 @@ export const Route = createFileRoute('/_private/contacts/')({
 function RouteComponent() {
   const params = Route.useSearch()
   const navigate = Route.useNavigate()
-  const { setIsContactOpen, setEditId, setDeleteId } = useApp()
+  const { setContactModal, setDeleteModal } = useApp()
 
   const query: QueryParamType = {
     table: "contacts",
@@ -44,11 +44,13 @@ function RouteComponent() {
           })
         },
         edit: (id) => {
-          setIsContactOpen(true)
-          setEditId(id)
+          setContactModal({
+            id,
+            isOpen: true
+          })
         },
         delete: (id) => {
-          setDeleteId({
+          setDeleteModal({
             id,
             title: "Contact",
             table: "contacts"
@@ -58,7 +60,10 @@ function RouteComponent() {
     })} filters={[]} query={query} options={{
       hasSearch: true
     }} toolbar={(
-      <Button size="sm" variant="outline" onClick={() => setIsContactOpen(true)}><PlusCircle /> Create</Button>
+      <Button size="sm" variant="outline" onClick={() => setContactModal({
+        id: null,
+        isOpen: true
+      })}><PlusCircle /> Create</Button>
     )} />
   )
 }

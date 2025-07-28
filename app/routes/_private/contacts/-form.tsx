@@ -8,9 +8,9 @@ import { generateId } from "better-auth"
 import { useApp } from "@/providers/app-provider"
 
 export default function ContactForm() {
-  const { isContactOpen, setIsContactOpen, editId, setEditId } = useApp()
+  const { contactModal, setContactModal } = useApp()
   const { data, isLoading } = useQuery({
-    queryKey: ['contacts', editId],
+    queryKey: ['contacts', contactModal?.id],
     queryFn: async () => getData({ data: {
       table: "contacts",
       relation: {
@@ -20,9 +20,9 @@ export default function ContactForm() {
           }
         }
       },
-      id: editId
+      id: contactModal?.id
     }}),
-    enabled: !!editId && isContactOpen
+    enabled: !!contactModal?.id && contactModal?.isOpen
   })
 
   const formFields: FormFieldType[][] = [
@@ -58,23 +58,22 @@ export default function ContactForm() {
 
   return (
     <ModalComponent variant="sheet" options={{
-      header: editId ? 'Edit Contact' : 'Create Contact',
-      isOpen: isContactOpen,
+      header: contactModal?.id ? 'Edit Contact' : 'Create Contact',
+      isOpen: contactModal?.isOpen,
       onClose: () => {
-        setIsContactOpen(false)
-        setEditId?.(null)
+        setContactModal(null)
       }
     }}>
       {(props) => (
         <FormComponent
           fields={formFields}
-          handleSubmit={(values: Record<string, any>) => editId ?
-            updateData({ data: { table: "contacts", id: editId, values, title: "Contact" } }) :
+          handleSubmit={(values: Record<string, any>) => contactModal?.id ?
+            updateData({ data: { table: "contacts", id: contactModal?.id, values, title: "Contact" } }) :
             createData({ data: { table: "contacts", values: {
               id: generateId(),
               ...values,
             }, title: "Contact" } })}
-          values={isContactOpen && editId && data ? data : {}}
+          values={contactModal?.isOpen && contactModal?.id && data ? data : {}}
           onSuccess={() => {
             props.close()
           }}

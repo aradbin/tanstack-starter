@@ -23,7 +23,7 @@ export const Route = createFileRoute('/_private/tasks/')({
 
 function RouteComponent() {
   const params = Route.useSearch()
-  const { setIsTaskOpen, setEditId, setDeleteId, users } = useApp()
+  const { setTaskModal, setDeleteModal, users } = useApp()
 
   const query: QueryParamType = {
     table: "tasks",
@@ -73,11 +73,13 @@ function RouteComponent() {
       <TableComponent columns={taskColumns({
         actions: {
           edit: (id) => {
-            setIsTaskOpen(true)
-            setEditId(id)
+            setTaskModal({
+              id,
+              isOpen: true
+            })
           },
           delete: (id) => {
-            setDeleteId({
+            setDeleteModal({
               id,
               title: "Task",
               table: "tasks"
@@ -85,7 +87,10 @@ function RouteComponent() {
           }
         }
       })} query={query} queryFn={getTasks} filters={filters} toolbar={(
-        <Button size="sm" variant="outline" onClick={() => setIsTaskOpen(true)}><PlusCircle /> Create</Button>
+        <Button size="sm" variant="outline" onClick={() => setTaskModal({
+          id: null,
+          isOpen: true
+        })}><PlusCircle /> Create</Button>
       )} options={{ hasSearch: true }} />
     </>
   )
