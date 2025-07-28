@@ -9,7 +9,7 @@ export default function AvatarGroupComponent({
   users: OptionType[]
 }) {
   return (
-    <div className="flex items-center -space-x-2 *:ring-3 *:ring-background">
+    <div className="flex items-center -space-x-2">
       {users.slice(0, 4).map((user, index) => (
         <Tooltip key={index}>
           <TooltipTrigger>

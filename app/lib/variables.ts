@@ -1,4 +1,4 @@
-import { Briefcase, Contact, LayoutGrid, ListChecks, Users } from "lucide-react"
+import { Briefcase, Contact, LayoutGrid, ListChecks, Mail, MessageCircle, Users } from "lucide-react"
 
 import { NavigationType, NavItemType } from "@/lib/types"
 import appCss from "@/styles/globals.css?url"
@@ -95,6 +95,21 @@ export const mainNavItems: NavigationType[] = [
         title: "Customers",
         href: "/customers",
         icon: Briefcase,
+      },
+    ],
+  },
+  {
+    title: "Communication",
+    items: [
+      {
+        title: "WhatsApp",
+        href: "/whatsapp",
+        icon: MessageCircle,
+      },
+      {
+        title: "Email",
+        href: "/email",
+        icon: Mail,
       },
     ],
   },

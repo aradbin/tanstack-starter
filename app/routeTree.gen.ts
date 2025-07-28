@@ -14,6 +14,7 @@ import { Route as rootRoute } from './routes/__root'
 import { Route as PrivateRouteImport } from './routes/_private/route'
 import { Route as AuthRouteImport } from './routes/_auth/route'
 import { Route as PrivateIndexImport } from './routes/_private/index'
+import { Route as PrivateWhatsappIndexImport } from './routes/_private/whatsapp/index'
 import { Route as PrivateTasksIndexImport } from './routes/_private/tasks/index'
 import { Route as PrivateMembersIndexImport } from './routes/_private/members/index'
 import { Route as PrivateCustomersIndexImport } from './routes/_private/customers/index'
@@ -39,6 +40,12 @@ const AuthRouteRoute = AuthRouteImport.update({
 const PrivateIndexRoute = PrivateIndexImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => PrivateRouteRoute,
+} as any)
+
+const PrivateWhatsappIndexRoute = PrivateWhatsappIndexImport.update({
+  id: '/whatsapp/',
+  path: '/whatsapp/',
   getParentRoute: () => PrivateRouteRoute,
 } as any)
 
@@ -170,6 +177,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof PrivateTasksIndexImport
       parentRoute: typeof PrivateRouteImport
     }
+    '/_private/whatsapp/': {
+      id: '/_private/whatsapp/'
+      path: '/whatsapp'
+      fullPath: '/whatsapp'
+      preLoaderRoute: typeof PrivateWhatsappIndexImport
+      parentRoute: typeof PrivateRouteImport
+    }
     '/_private/contacts/$id/': {
       id: '/_private/contacts/$id/'
       path: '/contacts/$id'
@@ -211,6 +225,7 @@ interface PrivateRouteRouteChildren {
   PrivateCustomersIndexRoute: typeof PrivateCustomersIndexRoute
   PrivateMembersIndexRoute: typeof PrivateMembersIndexRoute
   PrivateTasksIndexRoute: typeof PrivateTasksIndexRoute
+  PrivateWhatsappIndexRoute: typeof PrivateWhatsappIndexRoute
   PrivateContactsIdIndexRoute: typeof PrivateContactsIdIndexRoute
   PrivateCustomersIdIndexRoute: typeof PrivateCustomersIdIndexRoute
 }
@@ -221,6 +236,7 @@ const PrivateRouteRouteChildren: PrivateRouteRouteChildren = {
   PrivateCustomersIndexRoute: PrivateCustomersIndexRoute,
   PrivateMembersIndexRoute: PrivateMembersIndexRoute,
   PrivateTasksIndexRoute: PrivateTasksIndexRoute,
+  PrivateWhatsappIndexRoute: PrivateWhatsappIndexRoute,
   PrivateContactsIdIndexRoute: PrivateContactsIdIndexRoute,
   PrivateCustomersIdIndexRoute: PrivateCustomersIdIndexRoute,
 }
@@ -239,6 +255,7 @@ export interface FileRoutesByFullPath {
   '/customers': typeof PrivateCustomersIndexRoute
   '/members': typeof PrivateMembersIndexRoute
   '/tasks': typeof PrivateTasksIndexRoute
+  '/whatsapp': typeof PrivateWhatsappIndexRoute
   '/contacts/$id': typeof PrivateContactsIdIndexRoute
   '/customers/$id': typeof PrivateCustomersIdIndexRoute
 }
@@ -253,6 +270,7 @@ export interface FileRoutesByTo {
   '/customers': typeof PrivateCustomersIndexRoute
   '/members': typeof PrivateMembersIndexRoute
   '/tasks': typeof PrivateTasksIndexRoute
+  '/whatsapp': typeof PrivateWhatsappIndexRoute
   '/contacts/$id': typeof PrivateContactsIdIndexRoute
   '/customers/$id': typeof PrivateCustomersIdIndexRoute
 }
@@ -269,6 +287,7 @@ export interface FileRoutesById {
   '/_private/customers/': typeof PrivateCustomersIndexRoute
   '/_private/members/': typeof PrivateMembersIndexRoute
   '/_private/tasks/': typeof PrivateTasksIndexRoute
+  '/_private/whatsapp/': typeof PrivateWhatsappIndexRoute
   '/_private/contacts/$id/': typeof PrivateContactsIdIndexRoute
   '/_private/customers/$id/': typeof PrivateCustomersIdIndexRoute
 }
@@ -285,6 +304,7 @@ export interface FileRouteTypes {
     | '/customers'
     | '/members'
     | '/tasks'
+    | '/whatsapp'
     | '/contacts/$id'
     | '/customers/$id'
   fileRoutesByTo: FileRoutesByTo
@@ -298,6 +318,7 @@ export interface FileRouteTypes {
     | '/customers'
     | '/members'
     | '/tasks'
+    | '/whatsapp'
     | '/contacts/$id'
     | '/customers/$id'
   id:
@@ -312,6 +333,7 @@ export interface FileRouteTypes {
     | '/_private/customers/'
     | '/_private/members/'
     | '/_private/tasks/'
+    | '/_private/whatsapp/'
     | '/_private/contacts/$id/'
     | '/_private/customers/$id/'
   fileRoutesById: FileRoutesById
@@ -357,6 +379,7 @@ export const routeTree = rootRoute
         "/_private/customers/",
         "/_private/members/",
         "/_private/tasks/",
+        "/_private/whatsapp/",
         "/_private/contacts/$id/",
         "/_private/customers/$id/"
       ]
@@ -391,6 +414,10 @@ export const routeTree = rootRoute
     },
     "/_private/tasks/": {
       "filePath": "_private/tasks/index.tsx",
+      "parent": "/_private"
+    },
+    "/_private/whatsapp/": {
+      "filePath": "_private/whatsapp/index.tsx",
       "parent": "/_private"
     },
     "/_private/contacts/$id/": {

@@ -1,6 +1,6 @@
 import AvatarComponent from "@/components/common/avatar-component"
 import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardHeader } from "@/components/ui/card"
+import { Card, CardContent, CardFooter, CardHeader } from "@/components/ui/card"
 import { customers } from "@/lib/db/schema"
 import { useApp } from "@/providers/app-provider"
 import { BriefcaseBusiness, Edit, Mail, MapPin, Phone } from "lucide-react"
@@ -47,18 +47,17 @@ export default function CustomerCard({
             <MapPin className="size-4 mr-2" />{customer?.address}
           </div>
         </div>
-        <div className="flex flex-col md:flex-row gap-2">
-          <Button className="flex-1" onClick={() => {
+      </CardContent>
+      <CardFooter className="gap-2">
+        <Button className="flex-1" onClick={() => {
             setCustomerModal({
               id: customer?.id,
               isOpen: true
             })
           }}>
-            <Edit className="w-4 h-4 mr-2" />
-            Edit
+            <Edit /> Edit
           </Button>
-        </div>
-      </CardContent>
+      </CardFooter>
     </Card>
   )
 }

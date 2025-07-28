@@ -193,7 +193,7 @@ export default function CustomerForm() {
       header: customerModal?.id ? 'Edit Customer' : 'Create Customer',
       isOpen: customerModal?.isOpen,
       onClose: () => {
-        setContactModal(null)
+        setCustomerModal(null)
         setSelected([{}])
       }
     }}>

@@ -1,6 +1,6 @@
 import AvatarComponent from "@/components/common/avatar-component"
 import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardHeader } from "@/components/ui/card"
+import { Card, CardContent, CardFooter, CardHeader } from "@/components/ui/card"
 import { contacts, customerContacts } from "@/lib/db/schema"
 import { useApp } from "@/providers/app-provider"
 import { useNavigate } from "@tanstack/react-router"
@@ -40,21 +40,21 @@ export default function CustomerContacts({
                   <MapPin className="size-4 mr-2" />{customerContact?.contact?.address}
                 </div>
               </div>
-              <div className="flex flex-col md:flex-row gap-2">
-                <Button className="flex-1" onClick={() => {
-                  setCustomerModal({
-                    id: customerContact?.customerId,
-                    isOpen: true
-                  })
-                }}>
-                  <Edit />
-                  Edit
-                </Button>
-                <Button className="flex-1" onClick={() => navigate({ to: `/contacts/${customerContact?.contact?.id}` })}>
-                  <Contact /> Profile
-                </Button>
-              </div>
             </CardContent>
+            <CardFooter className="gap-2">
+              <Button className="flex-1" onClick={() => {
+                setCustomerModal({
+                  id: customerContact?.customerId,
+                  isOpen: true
+                })
+              }}>
+                <Edit />
+                Edit
+              </Button>
+              <Button className="flex-1" onClick={() => navigate({ to: `/contacts/${customerContact?.contact?.id}` })}>
+                <Contact /> Profile
+              </Button>
+            </CardFooter>
           </Card>
         ))}
       </div>
