@@ -22,7 +22,7 @@ export default function FormComponent({ fields, handleSubmit, children, values =
   onCancel?: any
   options?: {
     isLoading?: boolean
-    queryKey?: string | string[]
+    queryKey?: string | string[] | string[][]
     submitText?: string
     cancelText?: string
     loadingText?: string
@@ -78,10 +78,16 @@ export default function FormComponent({ fields, handleSubmit, children, values =
       try {
         const response = await handleSubmit(value)
         console.log('form response', response)
-        if(options?.queryKey) {
-          queryClient.invalidateQueries({
-            queryKey: typeof options.queryKey === 'string' ? [options.queryKey] : options.queryKey
-          })
+        if (options?.queryKey) {
+          const key = options.queryKey
+
+          if (typeof key === 'string' || (Array.isArray(key) && typeof key[0] === 'string')) {
+            queryClient.invalidateQueries({ queryKey: typeof key === 'string' ? [key] : key })
+          } else if (Array.isArray(key) && Array.isArray(key[0])) {
+            (key as string[][]).forEach((k) => {
+              queryClient.invalidateQueries({ queryKey: k })
+            })
+          }
         }
         form.reset()
         if(response?.message) {

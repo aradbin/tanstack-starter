@@ -16,6 +16,7 @@ export const Route = createFileRoute('/_private/contacts/')({
 
 function RouteComponent() {
   const params = Route.useSearch()
+  const navigate = Route.useNavigate()
   const { setIsContactOpen, setEditId, setDeleteId } = useApp()
 
   const query: QueryParamType = {
@@ -37,6 +38,11 @@ function RouteComponent() {
   return (
     <TableComponent columns={contactColumns({
       actions: {
+        view: (id) => {
+          navigate({
+            to: `/contacts/${id}`
+          })
+        },
         edit: (id) => {
           setIsContactOpen(true)
           setEditId(id)

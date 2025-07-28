@@ -8,15 +8,12 @@ import { formatDateTime } from "@/lib/utils"
 import TableCheckboxHeader from "@/components/table/table-checkbox-header"
 import TableCheckboxRow from "@/components/table/table-checkbox-row"
 import { contacts } from "@/lib/db/schema/customers"
-import { AnyType } from "@/lib/types"
+import { AnyType, TableActionType } from "@/lib/types"
 
 export const contactColumns = ({
   actions
 }: {
-  actions?: {
-    edit?: (id: AnyType) => void
-    delete?: (id: AnyType) => void
-  }
+  actions?: TableActionType
 }): ColumnDef<typeof contacts.$inferSelect>[] => [
   {
     id: "select",

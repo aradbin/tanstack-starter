@@ -216,7 +216,7 @@ export default function CustomerForm() {
           }}
           options={{
             isLoading,
-            queryKey: 'customers'
+            queryKey: [['customers'],['contacts']]
           }}
           children={(
             <Card className="flex flex-col gap-4 p-4">

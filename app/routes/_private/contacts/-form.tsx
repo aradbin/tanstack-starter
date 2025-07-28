@@ -13,6 +13,13 @@ export default function ContactForm() {
     queryKey: ['contacts', editId],
     queryFn: async () => getData({ data: {
       table: "contacts",
+      relation: {
+        customerContacts: {
+          with: {
+            customer: true
+          }
+        }
+      },
       id: editId
     }}),
     enabled: !!editId && isContactOpen

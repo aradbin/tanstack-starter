@@ -115,7 +115,7 @@ export const updateCustomer = createServerFn({ method: "POST" })
 
         return {
           ...result,
-          message: "Task Updated Successfully"
+          message: "Customer Updated Successfully"
         }
       })
     } catch {

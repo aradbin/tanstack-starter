@@ -1,4 +1,4 @@
-import { LayoutGrid, ListChecks, Users } from "lucide-react"
+import { Briefcase, Contact, LayoutGrid, ListChecks, Users } from "lucide-react"
 
 import { NavigationType, NavItemType } from "@/lib/types"
 import appCss from "@/styles/globals.css?url"
@@ -89,12 +89,12 @@ export const mainNavItems: NavigationType[] = [
       {
         title: "Contacts",
         href: "/contacts",
-        icon: Users,
+        icon: Contact,
       },
       {
         title: "Customers",
         href: "/customers",
-        icon: Users,
+        icon: Briefcase,
       },
     ],
   },

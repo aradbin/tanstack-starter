@@ -49,6 +49,14 @@ export const customerContacts = pgTable("customer_contacts", {
   ...timestamps,
 })
 
+export const contactRelations = relations(contacts, ({ many, one }) => ({
+  customerContacts: many(customerContacts),
+  organization: one(organizations, {
+    fields: [contacts.organizationId],
+    references: [organizations.id]
+  })
+}))
+
 export const customerRelations = relations(customers, ({ many, one }) => ({
   customerContacts: many(customerContacts),
   organization: one(organizations, {
