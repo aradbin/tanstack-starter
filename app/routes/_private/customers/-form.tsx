@@ -9,7 +9,7 @@ import { useApp } from "@/providers/app-provider"
 import { Card, CardContent } from "@/components/ui/card"
 import SelectField from "@/components/form/select-field"
 import { Button } from "@/components/ui/button"
-import { Minus, Plus, PlusCircle } from "lucide-react"
+import { Plus, PlusCircle, Trash } from "lucide-react"
 import { useState } from "react"
 import { Label } from "@/components/ui/label"
 import InputField from "@/components/form/input-field"
@@ -123,7 +123,7 @@ export default function CustomerForm() {
               }} />
             </div>
             <Button type="button" size="icon" variant="outline" onClick={() => setIsContactOpen(true)}><Plus /></Button>
-            <Button type="button" size="icon" variant="destructive" onClick={() => setSelected((prev) => prev.filter((_, i) => i !== index))}><Minus /></Button>
+            <Button type="button" size="icon" variant="destructive" onClick={() => setSelected((prev) => prev.filter((_, i) => i !== index))}><Trash /></Button>
           </div>
           {selected[index]?.id && (
             <div className="flex flex-col gap-4">
@@ -219,11 +219,11 @@ export default function CustomerForm() {
             queryKey: [['customers'],['contacts']]
           }}
           children={(
-            <Card className="flex flex-col gap-4 p-4">
+            <div className="flex flex-col gap-2">
               <Label>Contacts</Label>
               {selected?.map((_, index) => renderContactForm(index))}
-              <Button type="button" variant="outline" onClick={() => setSelected((prev) => [...prev, {}])}><PlusCircle /> Add Another</Button>
-            </Card>
+              <Button type="button" variant="outline" className="w-full" onClick={() => setSelected((prev) => [...prev, {}])}><PlusCircle /> Add Another Contact</Button>
+            </div>
           )}
         />
       )}
