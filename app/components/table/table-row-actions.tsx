@@ -17,7 +17,7 @@ export function TableRowActions({
     <div className="flex justify-end gap-1">
       {actions?.view && (
         <Tooltip>
-          <TooltipTrigger>
+          <TooltipTrigger asChild>
             <Button variant="outline" size="icon" onClick={() => actions?.view?.(row.original.id)}><Eye /></Button>
           </TooltipTrigger>
           <TooltipContent>View</TooltipContent>
@@ -25,7 +25,7 @@ export function TableRowActions({
       )}
       {actions?.edit && (
         <Tooltip>
-          <TooltipTrigger>
+          <TooltipTrigger asChild>
             <Button variant="outline" size="icon" onClick={() => actions?.edit?.(row.original.id)}><Edit /></Button>
           </TooltipTrigger>
           <TooltipContent>Edit</TooltipContent>
@@ -33,7 +33,7 @@ export function TableRowActions({
       )}
       {actions?.delete && (
         <Tooltip>
-          <TooltipTrigger>
+          <TooltipTrigger asChild>
             <Button variant="outline" size="icon" className="text-red-500" onClick={() => { actions?.delete?.(row.original.id)}}><Trash2 /></Button>
           </TooltipTrigger>
           <TooltipContent>Delete</TooltipContent>
