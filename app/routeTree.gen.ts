@@ -17,6 +17,7 @@ import { Route as PrivateIndexImport } from './routes/_private/index'
 import { Route as PrivateWhatsappIndexImport } from './routes/_private/whatsapp/index'
 import { Route as PrivateTasksIndexImport } from './routes/_private/tasks/index'
 import { Route as PrivateMembersIndexImport } from './routes/_private/members/index'
+import { Route as PrivateEmailIndexImport } from './routes/_private/email/index'
 import { Route as PrivateCustomersIndexImport } from './routes/_private/customers/index'
 import { Route as PrivateContactsIndexImport } from './routes/_private/contacts/index'
 import { Route as AuthRegisterIndexImport } from './routes/_auth/register/index'
@@ -58,6 +59,12 @@ const PrivateTasksIndexRoute = PrivateTasksIndexImport.update({
 const PrivateMembersIndexRoute = PrivateMembersIndexImport.update({
   id: '/members/',
   path: '/members/',
+  getParentRoute: () => PrivateRouteRoute,
+} as any)
+
+const PrivateEmailIndexRoute = PrivateEmailIndexImport.update({
+  id: '/email/',
+  path: '/email/',
   getParentRoute: () => PrivateRouteRoute,
 } as any)
 
@@ -163,6 +170,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof PrivateCustomersIndexImport
       parentRoute: typeof PrivateRouteImport
     }
+    '/_private/email/': {
+      id: '/_private/email/'
+      path: '/email'
+      fullPath: '/email'
+      preLoaderRoute: typeof PrivateEmailIndexImport
+      parentRoute: typeof PrivateRouteImport
+    }
     '/_private/members/': {
       id: '/_private/members/'
       path: '/members'
@@ -223,6 +237,7 @@ interface PrivateRouteRouteChildren {
   PrivateIndexRoute: typeof PrivateIndexRoute
   PrivateContactsIndexRoute: typeof PrivateContactsIndexRoute
   PrivateCustomersIndexRoute: typeof PrivateCustomersIndexRoute
+  PrivateEmailIndexRoute: typeof PrivateEmailIndexRoute
   PrivateMembersIndexRoute: typeof PrivateMembersIndexRoute
   PrivateTasksIndexRoute: typeof PrivateTasksIndexRoute
   PrivateWhatsappIndexRoute: typeof PrivateWhatsappIndexRoute
@@ -234,6 +249,7 @@ const PrivateRouteRouteChildren: PrivateRouteRouteChildren = {
   PrivateIndexRoute: PrivateIndexRoute,
   PrivateContactsIndexRoute: PrivateContactsIndexRoute,
   PrivateCustomersIndexRoute: PrivateCustomersIndexRoute,
+  PrivateEmailIndexRoute: PrivateEmailIndexRoute,
   PrivateMembersIndexRoute: PrivateMembersIndexRoute,
   PrivateTasksIndexRoute: PrivateTasksIndexRoute,
   PrivateWhatsappIndexRoute: PrivateWhatsappIndexRoute,
@@ -253,6 +269,7 @@ export interface FileRoutesByFullPath {
   '/register': typeof AuthRegisterIndexRoute
   '/contacts': typeof PrivateContactsIndexRoute
   '/customers': typeof PrivateCustomersIndexRoute
+  '/email': typeof PrivateEmailIndexRoute
   '/members': typeof PrivateMembersIndexRoute
   '/tasks': typeof PrivateTasksIndexRoute
   '/whatsapp': typeof PrivateWhatsappIndexRoute
@@ -268,6 +285,7 @@ export interface FileRoutesByTo {
   '/register': typeof AuthRegisterIndexRoute
   '/contacts': typeof PrivateContactsIndexRoute
   '/customers': typeof PrivateCustomersIndexRoute
+  '/email': typeof PrivateEmailIndexRoute
   '/members': typeof PrivateMembersIndexRoute
   '/tasks': typeof PrivateTasksIndexRoute
   '/whatsapp': typeof PrivateWhatsappIndexRoute
@@ -285,6 +303,7 @@ export interface FileRoutesById {
   '/_auth/register/': typeof AuthRegisterIndexRoute
   '/_private/contacts/': typeof PrivateContactsIndexRoute
   '/_private/customers/': typeof PrivateCustomersIndexRoute
+  '/_private/email/': typeof PrivateEmailIndexRoute
   '/_private/members/': typeof PrivateMembersIndexRoute
   '/_private/tasks/': typeof PrivateTasksIndexRoute
   '/_private/whatsapp/': typeof PrivateWhatsappIndexRoute
@@ -302,6 +321,7 @@ export interface FileRouteTypes {
     | '/register'
     | '/contacts'
     | '/customers'
+    | '/email'
     | '/members'
     | '/tasks'
     | '/whatsapp'
@@ -316,6 +336,7 @@ export interface FileRouteTypes {
     | '/register'
     | '/contacts'
     | '/customers'
+    | '/email'
     | '/members'
     | '/tasks'
     | '/whatsapp'
@@ -331,6 +352,7 @@ export interface FileRouteTypes {
     | '/_auth/register/'
     | '/_private/contacts/'
     | '/_private/customers/'
+    | '/_private/email/'
     | '/_private/members/'
     | '/_private/tasks/'
     | '/_private/whatsapp/'
@@ -377,6 +399,7 @@ export const routeTree = rootRoute
         "/_private/",
         "/_private/contacts/",
         "/_private/customers/",
+        "/_private/email/",
         "/_private/members/",
         "/_private/tasks/",
         "/_private/whatsapp/",
@@ -406,6 +429,10 @@ export const routeTree = rootRoute
     },
     "/_private/customers/": {
       "filePath": "_private/customers/index.tsx",
+      "parent": "/_private"
+    },
+    "/_private/email/": {
+      "filePath": "_private/email/index.tsx",
       "parent": "/_private"
     },
     "/_private/members/": {
