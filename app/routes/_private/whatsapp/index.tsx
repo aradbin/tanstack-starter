@@ -1,7 +1,6 @@
 import SelectField from '@/components/form/select-field'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader } from '@/components/ui/card'
-import { Input } from '@/components/ui/input'
 import { ScrollArea } from '@/components/ui/scroll-area'
 import { createFileRoute } from '@tanstack/react-router'
 import { Plus, SquarePen } from 'lucide-react'

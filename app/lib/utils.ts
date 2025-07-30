@@ -1,6 +1,6 @@
 import { clsx, type ClassValue } from "clsx"
 import { twMerge } from "tailwind-merge"
-import { format, isValid } from "date-fns"
+import { format, formatDistanceToNow, isValid } from "date-fns"
 import { AnyType, OptionType } from "./types"
 import { users } from "./db/schema"
 
@@ -38,6 +38,35 @@ export const getInitials = (fullName: string | undefined | null): string => {
 export const formatDateTime = (date: AnyType) => {
   if (!date || !isValid(new Date(date))) return ""
   return format(new Date(date), "do MMM, yyyy hh:mm a")
+}
+
+export function formatDateDistance(date: AnyType) {
+  if (!date || !isValid(new Date(date))) return ""
+  const distance = formatDistanceToNow(new Date(date), { addSuffix: true })
+
+  const replacements: Record<string, string> = {
+    minute: "min",
+    minutes: "mins",
+    hour: "hr",
+    hours: "hrs",
+    day: "day",
+    days: "days",
+    month: "month",
+    months: "months",
+    year: "year",
+    years: "years",
+  }
+
+  if (distance === "less than a minute ago") {
+    return "just now"
+  }
+
+  return distance
+    .replace(
+      /less than a minute|minute|minutes|hour|hours|day|days|month|months|year|years/g,
+      (match) => replacements[match]
+    )
+    .replace(/\b(over|almost|about)\b/g, "")
 }
 
 export const formatDate = (date: AnyType) => {

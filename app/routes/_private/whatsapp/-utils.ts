@@ -73,11 +73,11 @@ export const postUnipile = createServerFn({ method: "POST" })
       })
 
       if (!response.ok) {
-        throw new Error(`Something went wrong. Please try again.`);
+        throw response;
       }
 
       return await response.json();
     } catch (error) {
-      throw new Error("Something went wrong. Please try again.");
+      throw error;
     }
   })

@@ -3,7 +3,7 @@ import ModalComponent from "@/components/modal/modal-component";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardFooter, CardHeader } from "@/components/ui/card";
 import ChatList from "./-chat-list";
-import { CheckCheck, EllipsisVertical, Loader2, Menu, MessageCircle, Plus, Send, X } from "lucide-react";
+import { CheckCheck, EllipsisVertical, Loader2, Menu, MessageCircle, Paperclip, Plus, Send, X } from "lucide-react";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Fragment, useEffect, useRef, useState } from "react";
 import { AnyType } from "@/lib/types";
@@ -12,7 +12,7 @@ import { Input } from "@/components/ui/input";
 import { useInfiniteQuery, useQuery } from "@tanstack/react-query";
 import { getUnipile, postUnipile } from "../-utils";
 import LoadingComponent from "@/components/common/loading-component";
-import { formatDateTime, isUrl } from "@/lib/utils";
+import { formatDateDistance, formatDateTime, isUrl } from "@/lib/utils";
 import ChatAttachment from "./-chat-attachment";
 import { toast } from "sonner";
 
@@ -25,6 +25,7 @@ export default function ChatBox({
 }) {
   const scrollAreaRef = useRef<AnyType>(null)
   const [isLoadingSend, setIsLoadingSend] = useState<boolean>(false)
+  const [files, setFiles] = useState<AnyType>(null)
 
   const { data: messages, isLoading, isFetching, hasNextPage, fetchNextPage, isFetchingNextPage, refetch } = useInfiniteQuery({
     queryKey: ['whatsapp', 'messages', selected?.id],
@@ -55,19 +56,32 @@ export default function ChatBox({
 
   const sendMessage = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
-    setIsLoadingSend(true)
     const form = e.currentTarget
-    const formData = new FormData(form)
+    if(!files && form.text.value === ''){
+      return
+    }
+    setIsLoadingSend(true)
+    const formData = new FormData()
+    if(form.text.value){
+      formData.append('text', form.text.value)
+    }
+    if(files && Object.keys(files).length > 0){
+      Object.keys(files)?.forEach((key: any) => {
+        formData.append('attachments', files[key])
+      })
+    }
+
     try {
       await postUnipile({
         data: {
           url: `/chats/${selected?.id}/messages`,
-          formData: formData,
+          formData,
         }
       })
       form.reset()
       refetch()
     } catch (error) {
+      console.log('error',error)
       toast.error('Something went wrong. Please try again.')
     } finally {
       setIsLoadingSend(false)
@@ -88,7 +102,7 @@ export default function ChatBox({
   }
 
   return (
-    <Card className='relative py-3 gap-3'>
+    <Card className='py-3 gap-0'>
       <CardHeader className='px-3 gap-0 border-b [.border-b]:pb-3'>
         <div className='flex justify-between items-center gap-2'>
           <AvatarComponent user={{
@@ -106,41 +120,39 @@ export default function ChatBox({
           <Button variant="outline" size="icon" onClick={() => setSelected(null)}><X /></Button>
         </div>
       </CardHeader>
-      <CardContent className="px-3">
+      <CardContent className="relative p-3">
         <ScrollArea ref={scrollAreaRef} className="h-[calc(100vh-14.8rem)] md:h-[calc(100vh-16.8rem)]">
           <ul className="flex flex-col-reverse gap-y-2">
             {messages?.pages?.map((page: AnyType, indexPage: number) => (
-              <Fragment key={indexPage}>
-                {page?.items?.map((message: AnyType, index: number) => {
+              <Fragment key={`${selected?.id}-${indexPage}`}>
+                {page?.items?.map((message: AnyType, indexMessage: number) => {
                   const isUser = message?.is_sender === 1
                   return (
-                    <li key={index} className={`flex items-start gap-2 ${isUser ? "flex-row-reverse" : ""}`}>
+                    <li key={`${selected?.id}-${indexPage}-${indexMessage}`} className={`flex items-start gap-2 ${isUser ? "flex-row-reverse" : ""}`}>
                       {!isUser && <AvatarComponent user={{
                         name: selected?.name,
                         id: selected?.id,
                         email: selected?.provider_id?.split('@')[0],
                       }} options={{ hideBody: true }} />}
-                      <div className={`flex flex-col gap-1 w-2/3`}>
-                        <div className={`bg-accent p-2 space-y-1 rounded-lg break-all ${isUser ? "bg-primary text-primary-foreground rounded-se-none" : "text-accent-foreground rounded-ss-none"}`}>
-                          <div className="text-sm">
-                            {isUrl(message?.text) ?
-                              <a href={message?.text?.startsWith('http') ? message?.text : 'https://' + message?.text} target='_blank' rel="noreferrer" className="underline hover:text-blue-300">
-                                {message?.text}
-                              </a>
-                            :
-                              message?.text
-                            }
-                          </div>
-                          {message?.attachments && message?.attachments?.map((attachment: any, index: number) => (
-                            <ChatAttachment key={`${index}-${attachment.id}`} id={message?.id} attachment={attachment} />
-                          ))}
-                          <div className={`flex items-center gap-1 ${isUser ? "justify-end" : "justify-start"}`}>
-                            <span className={`text-xs font-normal text-muted-foreground`}>
-                              {formatDateTime(message?.timestamp)}
-                            </span>
-                            {message?.edited ? <span className='text-xs text-muted-foreground'>Edited</span> : <></>}
-                            {isUser ? <CheckCheck className='size-3' /> : <></>}
-                          </div>
+                      <div className={`flex flex-col gap-1 w-auto max-w-2/3 p-2 space-y-1 rounded-lg break-all ${isUser ? "bg-accent text-accent-foreground" : "bg-accent text-accent-foreground"}`}>
+                        <div className="text-sm">
+                          {isUrl(message?.text) ?
+                            <a href={message?.text?.startsWith('http') ? message?.text : 'https://' + message?.text} target='_blank' rel="noreferrer" className="underline hover:text-blue-300">
+                              {message?.text}
+                            </a>
+                          :
+                            message?.text
+                          }
+                        </div>
+                        {message?.attachments && message?.attachments?.map((attachment: any, index: number) => (
+                          <ChatAttachment key={`${selected?.id}-${indexPage}-${indexMessage}-${attachment.id}`} message={message?.id} attachment={attachment} />
+                        ))}
+                        <div className={`flex items-center gap-1 ${isUser ? "justify-end" : "justify-start"}`}>
+                          <span className={`text-xs font-normal text-muted-foreground`}>
+                            {formatDateDistance(message?.timestamp)}
+                          </span>
+                          {message?.edited ? <span className='text-xs text-muted-foreground'>Edited</span> : <></>}
+                          {isUser ? <CheckCheck className='size-3' /> : <></>}
                         </div>
                       </div>
                       <DropdownMenu>
@@ -165,10 +177,12 @@ export default function ChatBox({
             )}
           </ul>
         </ScrollArea>
+        <LoadingComponent isLoading={isLoading} />
       </CardContent>
-      <form onSubmit={sendMessage}>
+      <form onSubmit={sendMessage} encType="multipart/form-data">
         <CardFooter className='px-3 gap-2 border-t [.border-t]:pt-3'>
-          <Button type="button" variant="outline" size="icon" className='rounded-full'><Plus /></Button>
+          <Button type="button" variant="outline" size="icon" onClick={() => document.getElementById('attachments')?.click()}><Paperclip /></Button>
+          <Input type="file" id="attachments" name="attachments[]" multiple className="hidden" onChange={(e) => setFiles(e.target.files)} />
           <Input
             type="text"
             name="text"
@@ -179,7 +193,6 @@ export default function ChatBox({
           <Button type="submit" variant="outline" size="icon">{(isLoadingSend || isFetching) ?  <Loader2 className="animate-spin" /> : <Send />}</Button>
         </CardFooter>
       </form>
-      <LoadingComponent isLoading={isLoading} />
     </Card>
   )
 }

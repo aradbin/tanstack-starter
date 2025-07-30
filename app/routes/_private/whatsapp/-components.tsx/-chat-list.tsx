@@ -38,7 +38,7 @@ export default function ChatList({
         {chats?.pages?.map((page: AnyType, indexPage: number) => (
           <Fragment key={indexPage}>
             {page?.items?.map((chat: AnyType, indexChat: number) => (
-              <li key={indexChat}>
+              <li key={`${indexPage}-${indexChat}`}>
                 <Button variant="ghost" className={`w-full h-fit justify-between gap-2 ${selected?.id === chat?.id ? 'bg-accent' : ''}`} onClick={() => setSelected(chat)}>
                   <AvatarComponent user={{
                     name: chat?.name,
