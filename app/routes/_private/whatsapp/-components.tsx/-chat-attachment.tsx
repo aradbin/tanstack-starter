@@ -41,8 +41,6 @@ export default function ChatAttachment({
     gcTime: Infinity,
     staleTime: Infinity,
     enabled: !attachment?.unavailable && !!id && !!attachment?.id,
-    retry: 2,
-    retryDelay: 1000
   })
 
   // Determine attachment type from MIME type or file extension
