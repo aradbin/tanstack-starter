@@ -17,8 +17,8 @@ function RouteComponent() {
   const [selected, setSelected] = useState<string | null>(null)
 
   return (
-    <div className='flex gap-4 h-full w-full'>
-      <Card className='hidden md:flex py-3 gap-3 w-72 overflow-hidden'>
+    <div className='flex gap-4 size-full'>
+      <Card className='hidden md:flex py-3 gap-3 w-72'>
         <CardHeader className='flex px-3 border-b [.border-b]:pb-3'>
           <div className='grow'>
             <SelectField field={{
@@ -32,24 +32,19 @@ function RouteComponent() {
           <Button variant="outline" size="icon">
             <Plus />
           </Button>
-        </CardHeader>
-        <CardHeader className='flex px-3 border-b [.border-b]:pb-3'>
-          <div className='grow'>
-            <Input placeholder="Search" />
-          </div>
           <Button variant="outline" size="icon">
             <SquarePen />
           </Button>
         </CardHeader>
         <CardContent className='px-3'>
-          <ScrollArea className="h-[calc(100vh-16.8rem)]">
+          <ScrollArea className="h-[calc(100vh-13rem)]">
             <ChatList selected={selected} setSelected={setSelected} />
           </ScrollArea>
         </CardContent>
       </Card>
-      <main className='flex-1'>
+      <div className='grow'>
         <ChatBox selected={selected} setSelected={setSelected} />
-      </main>
+      </div>
     </div>
   )
 }
