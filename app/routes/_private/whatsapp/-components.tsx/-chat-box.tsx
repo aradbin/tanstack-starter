@@ -10,10 +10,11 @@ import { AnyType } from "@/lib/types";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { Input } from "@/components/ui/input";
 import { useInfiniteQuery, useQuery } from "@tanstack/react-query";
-import { getUnipile } from "../-utils";
+import { getUnipile, postUnipile } from "../-utils";
 import LoadingComponent from "@/components/common/loading-component";
 import { formatDateTime, isUrl } from "@/lib/utils";
 import ChatAttachment from "./-chat-attachment";
+import { toast } from "sonner";
 
 export default function ChatBox({
   selected,
@@ -22,10 +23,10 @@ export default function ChatBox({
   selected: AnyType
   setSelected: (value: AnyType) => void
 }) {
-  const [message, setMessage] = useState<string>('')
   const scrollAreaRef = useRef<AnyType>(null)
+  const [isLoadingSend, setIsLoadingSend] = useState<boolean>(false)
 
-  const { data: messages, isLoading, hasNextPage, fetchNextPage, isFetchingNextPage } = useInfiniteQuery({
+  const { data: messages, isLoading, isFetching, hasNextPage, fetchNextPage, isFetchingNextPage, refetch } = useInfiniteQuery({
     queryKey: ['whatsapp', 'messages', selected?.id],
     queryFn: ({ pageParam }) => getUnipile({
       data: {
@@ -51,6 +52,27 @@ export default function ChatBox({
       }
     }
   }, [selected, messages])
+
+  const sendMessage = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault()
+    setIsLoadingSend(true)
+    const form = e.currentTarget
+    const formData = new FormData(form)
+    try {
+      await postUnipile({
+        data: {
+          url: `/chats/${selected?.id}/messages`,
+          formData: formData,
+        }
+      })
+      form.reset()
+      refetch()
+    } catch (error) {
+      toast.error('Something went wrong. Please try again.')
+    } finally {
+      setIsLoadingSend(false)
+    }
+  }
 
   if(!selected) {
     return (
@@ -144,23 +166,19 @@ export default function ChatBox({
           </ul>
         </ScrollArea>
       </CardContent>
-      <CardFooter className='px-3 gap-2 border-t [.border-t]:pt-3'>
-        <Button variant="outline" size="icon" className='rounded-full'><Plus /></Button>
-        <Input
-          type="text"
-          placeholder="Type a message..."
-          autoComplete="off"
-          className="bg-accent"
-          onChange={(e) => setMessage(e.target.value)}
-          onKeyDown={(e) => {
-            if (e.keyCode === 13 && e.shiftKey === false) {
-              e.preventDefault()
-              console.log(message)
-            }
-          }}
-        />
-        <Button variant="outline" size="icon"><Send /></Button>
-      </CardFooter>
+      <form onSubmit={sendMessage}>
+        <CardFooter className='px-3 gap-2 border-t [.border-t]:pt-3'>
+          <Button type="button" variant="outline" size="icon" className='rounded-full'><Plus /></Button>
+          <Input
+            type="text"
+            name="text"
+            placeholder="Type a message..."
+            autoComplete="off"
+            className="bg-accent"
+          />
+          <Button type="submit" variant="outline" size="icon">{(isLoadingSend || isFetching) ?  <Loader2 className="animate-spin" /> : <Send />}</Button>
+        </CardFooter>
+      </form>
       <LoadingComponent isLoading={isLoading} />
     </Card>
   )
