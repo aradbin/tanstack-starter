@@ -1,6 +1,4 @@
 import { ChevronsUpDown, Landmark, Plus } from "lucide-react"
-
-import { useAuth } from "@/lib/auth/hook"
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -10,9 +8,10 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import { SidebarMenuButton, useSidebar } from "@/components/ui/sidebar"
+import { useAuth } from "@/providers/auth-provider"
 
 export default function TeamToggle() {
-  const user = useAuth()
+  const { user } = useAuth()
   const active = user?.activeOrganizationId
     ? user?.organizations?.find(
         (organization) => organization?.id === user?.activeOrganizationId

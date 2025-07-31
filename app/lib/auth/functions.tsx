@@ -57,9 +57,7 @@ export const getUser = createServerFn()
       const organizations = await getUserOrganizations()
 
       if (!context?.session?.activeOrganizationId && organizations?.length) {
-        const activeOrganizationId = await setActiveOrganization(
-          organizations[0].id
-        )
+        const activeOrganizationId = await setActiveOrganization(organizations[0].id)
         
         if (context?.session) {
           await db.update(sessions).set({ activeOrganizationId: organizations[0].id }).where(eq(sessions.id, context.session.id))
@@ -74,7 +72,7 @@ export const getUser = createServerFn()
       }
     }
 
-    return null
+    throw new Error("Session Timeout. Please login again")
   })
 
 export const createOrganization = async (value: { name: string; slug: string }) => {

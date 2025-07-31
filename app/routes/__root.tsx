@@ -5,55 +5,17 @@ import {
   createRootRoute,
   HeadContent,
   Outlet,
-  redirect,
   Scripts,
 } from "@tanstack/react-router"
 
-import { getUser } from "@/lib/auth/functions"
-import { authRoutes, head } from "@/lib/variables"
+import { head } from "@/lib/variables"
 import { QueryProvider } from "@/providers/query-provider"
 import { Toaster } from "@/components/ui/sonner";
+import { AuthProvider } from "@/providers/auth-provider";
 
 export const Route = createRootRoute({
   head: () => head,
   component: RootComponent,
-  beforeLoad: async () => {
-    try {
-      let user = await getUser()
-      return { user }
-    } catch (_) {
-      return { user: null }
-    }
-  },
-  loader: ({ context, location }) => {
-    const isAuthRoute = authRoutes.includes(location.pathname)
-    const isLoggedIn = !!context?.user
-    const hasOrganizations = !!context?.user?.organizations?.length
-
-    if (!isLoggedIn && !isAuthRoute) {
-      throw redirect({
-        to: "/login",
-        search: { redirect: location.href },
-      })
-    }
-
-    if (isLoggedIn && isAuthRoute) {
-      throw redirect({
-        to: "/",
-      })
-    }
-
-    if (
-      isLoggedIn &&
-      !isAuthRoute &&
-      !hasOrganizations &&
-      location.pathname !== "/register/organization"
-    ) {
-      throw redirect({
-        to: "/register/organization",
-      })
-    }
-  },
 })
 
 function RootComponent() {
@@ -76,7 +38,9 @@ function RootDocument({ children }: Readonly<{ children: ReactNode }>) {
       <body className="bg-background text-foreground antialiased overscroll-none">
         <ThemeProvider defaultTheme="system" storageKey="mode">
           <QueryProvider>
-            {children}
+            <AuthProvider>
+              {children}
+            </AuthProvider>
             <Toaster richColors position="bottom-center" />
           </QueryProvider>
         </ThemeProvider>

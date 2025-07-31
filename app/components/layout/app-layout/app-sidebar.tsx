@@ -1,6 +1,5 @@
 import { footerNavItems } from "@/lib/variables"
 import { ScrollArea } from "@/components/ui/scroll-area"
-import { Separator } from "@/components/ui/separator"
 import {
   Sidebar,
   SidebarContent,
