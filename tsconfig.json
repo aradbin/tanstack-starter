@@ -4,12 +4,11 @@
     "moduleResolution": "Bundler",
     "module": "ESNext",
     "target": "ES2022",
-    "strict": true,
     "skipLibCheck": true,
     "strictNullChecks": true,
     "baseUrl": ".",
     "paths": {
-      "@/*": ["./app/*"]
+      "@/*": ["./src/*"]
     }
   }
 }
