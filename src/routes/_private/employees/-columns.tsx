@@ -6,35 +6,44 @@ import { TableRowActions } from "@/components/table/table-row-actions"
 import AvatarComponent from "@/components/common/avatar-component"
 import { capitalize, formatDate } from "@/lib/utils"
 import { TableActionType } from "@/lib/types"
-import { employees } from "@/lib/db/schema/employees"
+import { designations, employees } from "@/lib/db/schema/employees"
 
 export const employeeColumns = ({
   actions
 }: {
   actions?: TableActionType
-}): ColumnDef<typeof employees.$inferSelect>[] => [
+}): ColumnDef<typeof employees.$inferSelect & {
+  designation: typeof designations.$inferSelect
+}>[] => [
   {
     id: "name",
     header: ({ column }) => <TableColumnHeader column={column} title="Employee" />,
     cell: ({ row }) => <AvatarComponent user={row.original} />,
   },
   {
-    accessorKey: "designation",
+    accessorKey: "designation.name",
     header: ({ column }) => <TableColumnHeader column={column} title="Designation" />,
-    cell: ({ row }) => capitalize(row.original.designation),
   },
   {
     accessorKey: "phone",
     header: ({ column }) => <TableColumnHeader column={column} title="Phone" />,
   },
   {
-    accessorKey: "dob",
-    header: ({ column }) => <TableColumnHeader column={column} title="Date of Birth" />,
-    cell: ({ row }) => formatDate(row.original.dob),
+    accessorKey: "metadata.nid",
+    header: ({ column }) => <TableColumnHeader column={column} title="NID" />,
   },
   {
-    accessorKey: "nid",
-    header: ({ column }) => <TableColumnHeader column={column} title="NID" />,
+    accessorKey: "metadata.licenseNumber",
+    header: ({ column }) => <TableColumnHeader column={column} title="License Number" />,
+  },
+  {
+    accessorKey: "metadata.portId",
+    header: ({ column }) => <TableColumnHeader column={column} title="Port ID" />,
+  },
+  {
+    accessorKey: "joiningDate",
+    header: ({ column }) => <TableColumnHeader column={column} title="Joining Date" />,
+    cell: ({ row }) => formatDate(row.original.joiningDate),
   },
   {
     id: "actions",

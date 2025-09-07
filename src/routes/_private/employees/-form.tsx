@@ -1,22 +1,43 @@
 import FormComponent from "@/components/form/form-component"
 import ModalComponent from "@/components/modal/modal-component"
 import { useQuery } from "@tanstack/react-query"
-import { createData, getData, updateData } from "@/lib/db/functions"
+import { createData, getData, getDatas, updateData } from "@/lib/db/functions"
 import { FormFieldType } from "@/lib/types"
 import { stringRequiredValidation, stringValidation } from "@/lib/validations"
 import { generateId } from "better-auth"
 import { useApp } from "@/providers/app-provider"
-import { designations } from "@/lib/variables"
 
 export default function EmployeeForm() {
   const { employeeModal, setEmployeeModal } = useApp()
   const { data, isLoading } = useQuery({
     queryKey: ['employees', employeeModal?.id],
-    queryFn: async () => getData({ data: {
-      table: "employees",
-      id: employeeModal?.id
-    }}),
+    queryFn: async () => {
+      const response = await getData({ data: {
+        table: "employees",
+        id: employeeModal?.id
+      }})
+
+      return {
+        ...response,
+        nid: response?.metadata?.nid,
+        licenseNumber: response?.metadata?.licenseNumber,
+        portId: response?.metadata?.portId
+      }
+    },
     enabled: !!employeeModal?.id && employeeModal?.isOpen
+  })
+
+  const { data: designations } = useQuery({
+    queryKey: ['designations', 'all'],
+    queryFn: async () => {
+      const response = await getDatas({ data: { table: "designations" } })
+
+      if(response?.result) {
+        return response?.result
+      }
+
+      return []
+    },
   })
 
   const formFields: FormFieldType[][] = [
@@ -29,7 +50,8 @@ export default function EmployeeForm() {
     ],
     [
       {
-        name: "designation",
+        name: "designationId",
+        label: "Designation",
         type: "select",
         options: designations,
         validationOnSubmit: stringRequiredValidation("Designation"),
@@ -45,19 +67,35 @@ export default function EmployeeForm() {
     ],
     [
       {
-        name: "dob",
-        type: "date",
-        label: "Date of Birth",
-        validationOnSubmit: stringValidation("Date of Birth"),
-        placeholder: "Enter Date of Birth",
-      },
-    ],
-    [
-      {
         name: "nid",
         label: "NID",
         validationOnSubmit: stringValidation("NID"),
         placeholder: "Enter NID",
+      },
+    ],
+    [
+      {
+        name: "licenseNumber",
+        label: "License Number",
+        validationOnSubmit: stringValidation("License Number"),
+        placeholder: "Enter license number",
+      },
+    ],
+    [
+      {
+        name: "portId",
+        label: "Port ID",
+        validationOnSubmit: stringValidation("Port ID"),
+        placeholder: "Enter port ID",
+      },
+    ],
+    [
+      {
+        name: "joiningDate",
+        type: "date",
+        label: "Joining Date",
+        validationOnSubmit: stringValidation("Joining Date"),
+        placeholder: "Enter joining date",
       },
     ],
   ]
@@ -73,12 +111,25 @@ export default function EmployeeForm() {
       {(props) => (
         <FormComponent
           fields={formFields}
-          handleSubmit={(values: Record<string, any>) => employeeModal?.id ?
-            updateData({ data: { table: "employees", id: employeeModal?.id, values, title: "Employee" } }) :
-            createData({ data: { table: "employees", values: {
-              id: generateId(),
+          handleSubmit={(values: Record<string, any>) => {
+            const payload = {
               ...values,
-            }, title: "Employee" } })}
+              joiningDate: values?.joiningDate || null,
+              metadata: {
+                nid: values?.nid,
+                licenseNumber: values?.licenseNumber,
+                portId: values?.portId
+              }
+            }
+            if(employeeModal?.id){
+              return updateData({ data: { table: "employees", id: employeeModal?.id, values: payload, title: "Employee" } })
+            }
+
+            return createData({ data: { table: "employees", values: {
+              id: generateId(),
+              ...payload,
+            }, title: "Employee" } })
+          }}
           values={employeeModal?.isOpen && employeeModal?.id && data ? data : {}}
           onSuccess={() => {
             props.close()

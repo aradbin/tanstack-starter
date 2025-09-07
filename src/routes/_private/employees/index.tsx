@@ -1,17 +1,17 @@
 import TableComponent from '@/components/table/table-component'
 import { createFileRoute } from '@tanstack/react-router'
 import { employeeColumns } from './-columns'
-import { QueryParamType } from '@/lib/db/functions'
-import { defaultSearchParamValidation, enamValidation, validate } from '@/lib/validations'
+import { getDatas, QueryParamType } from '@/lib/db/functions'
+import { defaultSearchParamValidation, enamValidation, stringValidation, validate } from '@/lib/validations'
 import { Button } from '@/components/ui/button'
 import { PlusCircle } from 'lucide-react'
 import { useApp } from '@/providers/app-provider'
-import { designations } from '@/lib/variables'
+import { useQuery } from '@tanstack/react-query'
 
 export const Route = createFileRoute('/_private/employees/')({
   validateSearch: validate({
     ...defaultSearchParamValidation,
-    designation: enamValidation('Designation', designations?.map(d => d.id)).catch(undefined),
+    designation: stringValidation('Designation').catch(undefined),
   }),
   component: RouteComponent,
 })
@@ -21,8 +21,24 @@ function RouteComponent() {
   const navigate = Route.useNavigate()
   const { setEmployeeModal, setDeleteModal } = useApp()
 
+  const { data: designations } = useQuery({
+    queryKey: ['designations', 'all'],
+    queryFn: async () => {
+      const response = await getDatas({ data: { table: "designations" } })
+
+      if(response?.result) {
+        return response?.result
+      }
+
+      return []
+    },
+  })
+
   const query: QueryParamType = {
     table: "employees",
+    relation: {
+      designation: true
+    },
     sort: {
       field: params.sort,
       order: params.order
@@ -36,7 +52,7 @@ function RouteComponent() {
       key: ["name", "nid", "phone"]
     },
     where: {
-      designation: params.designation
+      designationId: params.designation
     }
   }
 

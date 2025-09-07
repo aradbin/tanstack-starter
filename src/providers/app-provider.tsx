@@ -1,13 +1,10 @@
 import { getDatas, TableType } from "@/lib/db/functions";
-import { contacts, users } from "@/lib/db/schema";
+import { contacts, employees, users } from "@/lib/db/schema";
+import { ModalStateType } from "@/lib/types";
 import { getMembers } from "@/routes/_private/members/-utils";
 import { useQuery } from "@tanstack/react-query";
 import { createContext, Dispatch, ReactNode, SetStateAction, useContext, useState } from "react";
 
-type ModalStateType = {
-  id: string | null
-  isOpen: boolean
-} | null
 type DeleteModalStateType = {
   id: string | null
   title: string

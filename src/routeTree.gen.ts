@@ -20,9 +20,11 @@ import { Route as PrivateWhatsappIndexRouteImport } from './routes/_private/what
 import { Route as PrivateVehiclesIndexRouteImport } from './routes/_private/vehicles/index'
 import { Route as PrivateTripsIndexRouteImport } from './routes/_private/trips/index'
 import { Route as PrivateTasksIndexRouteImport } from './routes/_private/tasks/index'
+import { Route as PrivateRolesIndexRouteImport } from './routes/_private/roles/index'
 import { Route as PrivateMembersIndexRouteImport } from './routes/_private/members/index'
 import { Route as PrivateEmployeesIndexRouteImport } from './routes/_private/employees/index'
 import { Route as PrivateEmailIndexRouteImport } from './routes/_private/email/index'
+import { Route as PrivateDesignationsIndexRouteImport } from './routes/_private/designations/index'
 import { Route as PrivateCustomersIndexRouteImport } from './routes/_private/customers/index'
 import { Route as PrivateContactsIndexRouteImport } from './routes/_private/contacts/index'
 import { Route as AuthRegisterIndexRouteImport } from './routes/_auth/register/index'
@@ -84,6 +86,11 @@ const PrivateTasksIndexRoute = PrivateTasksIndexRouteImport.update({
   path: '/tasks/',
   getParentRoute: () => PrivateRouteRoute,
 } as any)
+const PrivateRolesIndexRoute = PrivateRolesIndexRouteImport.update({
+  id: '/roles/',
+  path: '/roles/',
+  getParentRoute: () => PrivateRouteRoute,
+} as any)
 const PrivateMembersIndexRoute = PrivateMembersIndexRouteImport.update({
   id: '/members/',
   path: '/members/',
@@ -99,6 +106,12 @@ const PrivateEmailIndexRoute = PrivateEmailIndexRouteImport.update({
   path: '/email/',
   getParentRoute: () => PrivateRouteRoute,
 } as any)
+const PrivateDesignationsIndexRoute =
+  PrivateDesignationsIndexRouteImport.update({
+    id: '/designations/',
+    path: '/designations/',
+    getParentRoute: () => PrivateRouteRoute,
+  } as any)
 const PrivateCustomersIndexRoute = PrivateCustomersIndexRouteImport.update({
   id: '/customers/',
   path: '/customers/',
@@ -189,9 +202,11 @@ export interface FileRoutesByFullPath {
   '/register': typeof AuthRegisterIndexRoute
   '/contacts': typeof PrivateContactsIndexRoute
   '/customers': typeof PrivateCustomersIndexRoute
+  '/designations': typeof PrivateDesignationsIndexRoute
   '/email': typeof PrivateEmailIndexRoute
   '/employees/': typeof PrivateEmployeesIndexRoute
   '/members': typeof PrivateMembersIndexRoute
+  '/roles': typeof PrivateRolesIndexRoute
   '/tasks': typeof PrivateTasksIndexRoute
   '/trips': typeof PrivateTripsIndexRoute
   '/vehicles/': typeof PrivateVehiclesIndexRoute
@@ -213,9 +228,11 @@ export interface FileRoutesByTo {
   '/register': typeof AuthRegisterIndexRoute
   '/contacts': typeof PrivateContactsIndexRoute
   '/customers': typeof PrivateCustomersIndexRoute
+  '/designations': typeof PrivateDesignationsIndexRoute
   '/email': typeof PrivateEmailIndexRoute
   '/employees': typeof PrivateEmployeesIndexRoute
   '/members': typeof PrivateMembersIndexRoute
+  '/roles': typeof PrivateRolesIndexRoute
   '/tasks': typeof PrivateTasksIndexRoute
   '/trips': typeof PrivateTripsIndexRoute
   '/vehicles': typeof PrivateVehiclesIndexRoute
@@ -242,9 +259,11 @@ export interface FileRoutesById {
   '/_auth/register/': typeof AuthRegisterIndexRoute
   '/_private/contacts/': typeof PrivateContactsIndexRoute
   '/_private/customers/': typeof PrivateCustomersIndexRoute
+  '/_private/designations/': typeof PrivateDesignationsIndexRoute
   '/_private/email/': typeof PrivateEmailIndexRoute
   '/_private/employees/': typeof PrivateEmployeesIndexRoute
   '/_private/members/': typeof PrivateMembersIndexRoute
+  '/_private/roles/': typeof PrivateRolesIndexRoute
   '/_private/tasks/': typeof PrivateTasksIndexRoute
   '/_private/trips/': typeof PrivateTripsIndexRoute
   '/_private/vehicles/': typeof PrivateVehiclesIndexRoute
@@ -270,9 +289,11 @@ export interface FileRouteTypes {
     | '/register'
     | '/contacts'
     | '/customers'
+    | '/designations'
     | '/email'
     | '/employees/'
     | '/members'
+    | '/roles'
     | '/tasks'
     | '/trips'
     | '/vehicles/'
@@ -294,9 +315,11 @@ export interface FileRouteTypes {
     | '/register'
     | '/contacts'
     | '/customers'
+    | '/designations'
     | '/email'
     | '/employees'
     | '/members'
+    | '/roles'
     | '/tasks'
     | '/trips'
     | '/vehicles'
@@ -322,9 +345,11 @@ export interface FileRouteTypes {
     | '/_auth/register/'
     | '/_private/contacts/'
     | '/_private/customers/'
+    | '/_private/designations/'
     | '/_private/email/'
     | '/_private/employees/'
     | '/_private/members/'
+    | '/_private/roles/'
     | '/_private/tasks/'
     | '/_private/trips/'
     | '/_private/vehicles/'
@@ -431,6 +456,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof PrivateTasksIndexRouteImport
       parentRoute: typeof PrivateRouteRoute
     }
+    '/_private/roles/': {
+      id: '/_private/roles/'
+      path: '/roles'
+      fullPath: '/roles'
+      preLoaderRoute: typeof PrivateRolesIndexRouteImport
+      parentRoute: typeof PrivateRouteRoute
+    }
     '/_private/members/': {
       id: '/_private/members/'
       path: '/members'
@@ -450,6 +482,13 @@ declare module '@tanstack/react-router' {
       path: '/email'
       fullPath: '/email'
       preLoaderRoute: typeof PrivateEmailIndexRouteImport
+      parentRoute: typeof PrivateRouteRoute
+    }
+    '/_private/designations/': {
+      id: '/_private/designations/'
+      path: '/designations'
+      fullPath: '/designations'
+      preLoaderRoute: typeof PrivateDesignationsIndexRouteImport
       parentRoute: typeof PrivateRouteRoute
     }
     '/_private/customers/': {
@@ -614,8 +653,10 @@ interface PrivateRouteRouteChildren {
   PrivateIndexRoute: typeof PrivateIndexRoute
   PrivateContactsIndexRoute: typeof PrivateContactsIndexRoute
   PrivateCustomersIndexRoute: typeof PrivateCustomersIndexRoute
+  PrivateDesignationsIndexRoute: typeof PrivateDesignationsIndexRoute
   PrivateEmailIndexRoute: typeof PrivateEmailIndexRoute
   PrivateMembersIndexRoute: typeof PrivateMembersIndexRoute
+  PrivateRolesIndexRoute: typeof PrivateRolesIndexRoute
   PrivateTasksIndexRoute: typeof PrivateTasksIndexRoute
   PrivateTripsIndexRoute: typeof PrivateTripsIndexRoute
   PrivateWhatsappIndexRoute: typeof PrivateWhatsappIndexRoute
@@ -634,8 +675,10 @@ const PrivateRouteRouteChildren: PrivateRouteRouteChildren = {
   PrivateIndexRoute: PrivateIndexRoute,
   PrivateContactsIndexRoute: PrivateContactsIndexRoute,
   PrivateCustomersIndexRoute: PrivateCustomersIndexRoute,
+  PrivateDesignationsIndexRoute: PrivateDesignationsIndexRoute,
   PrivateEmailIndexRoute: PrivateEmailIndexRoute,
   PrivateMembersIndexRoute: PrivateMembersIndexRoute,
+  PrivateRolesIndexRoute: PrivateRolesIndexRoute,
   PrivateTasksIndexRoute: PrivateTasksIndexRoute,
   PrivateTripsIndexRoute: PrivateTripsIndexRoute,
   PrivateWhatsappIndexRoute: PrivateWhatsappIndexRoute,

@@ -76,4 +76,9 @@ export interface SearchType {
   key?: string[]
 }
 
+export type ModalStateType = {
+  id: string | null
+  isOpen: boolean
+} | null
+
 export type WhereType = Record<string, AnyType>
