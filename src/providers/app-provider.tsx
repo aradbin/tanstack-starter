@@ -1,5 +1,5 @@
 import { getDatas, TableType } from "@/lib/db/functions";
-import { contacts, employees, users } from "@/lib/db/schema";
+import { assets, contacts, employees, users } from "@/lib/db/schema";
 import { ModalStateType } from "@/lib/types";
 import { getMembers } from "@/routes/_private/members/-utils";
 import { useQuery } from "@tanstack/react-query";
@@ -92,16 +92,16 @@ export function AppProvider({
   })
   // transport
   const { data: vehicles } = useQuery({
-    queryKey: ['vehicles', 'all'],
+    queryKey: ['assets', 'all'],
     queryFn: async () => {
       const response = await getDatas({ data: {
-        table: "vehicles",
+        table: "assets",
       }})
 
       if(response?.result){
-        return response?.result?.map((vehicle: typeof vehicles.$inferSelect) => ({
+        return response?.result?.map((vehicle: typeof assets.$inferSelect) => ({
           id: vehicle?.id,
-          name: vehicle?.registrationNumber,
+          name: vehicle?.metadata?.registrationNumber,
           image: vehicle?.image,
         }))
       }

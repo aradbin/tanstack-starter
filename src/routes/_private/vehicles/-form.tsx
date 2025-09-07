@@ -10,11 +10,22 @@ import { useApp } from "@/providers/app-provider"
 export default function VehicleForm() {
   const { vehicleModal, setVehicleModal } = useApp()
   const { data, isLoading } = useQuery({
-    queryKey: ['vehicles', vehicleModal?.id],
-    queryFn: async () => getData({ data: {
-      table: "vehicles",
-      id: vehicleModal?.id
-    }}),
+    queryKey: ['assets', vehicleModal?.id],
+    queryFn: async () => {
+      const response = await getData({ data: {
+        table: "assets",
+        id: vehicleModal?.id
+      }})
+
+      return {
+        ...response,
+        registrationNumber: response?.metadata?.registrationNumber,
+        registrationDate: response?.metadata?.registrationDate,
+        fitnessExpiryDate: response?.metadata?.fitnessExpiryDate,
+        taxTokenExpiryDate: response?.metadata?.taxTokenExpiryDate,
+        roadPermitExpiryDate: response?.metadata?.roadPermitExpiryDate
+      }
+    },
     enabled: !!vehicleModal?.id && vehicleModal?.isOpen
   })
 
@@ -38,18 +49,29 @@ export default function VehicleForm() {
     ],
     [
       {
-        name: "chassisNumber",
-        label: "Chassis Number",
-        validationOnSubmit: stringValidation("Chassis Number"),
-        placeholder: "Enter chassis number",
+        name: "fitnessExpiryDate",
+        label: "Fitness Expiry Date",
+        type: "date",
+        validationOnSubmit: stringValidation("Fitness Expiry Date"),
+        placeholder: "Enter fitness expiry date",
       },
     ],
     [
       {
-        name: "engineNumber",
-        label: "Engine Number",
-        validationOnSubmit: stringValidation("Engine Number"),
-        placeholder: "Enter engine number",
+        name: "taxTokenExpiryDate",
+        label: "Tax Token Expiry Date",
+        type: "date",
+        validationOnSubmit: stringValidation("Tax Token Expiry Date"),
+        placeholder: "Enter tax token expiry date",
+      },
+    ],
+    [
+      {
+        name: "roadPermitExpiryDate",
+        label: "Road Permit Expiry Date",
+        type: "date",
+        validationOnSubmit: stringValidation("Road Permit Expiry Date"),
+        placeholder: "Enter road permit expiry date",
       },
     ],
   ]
@@ -65,12 +87,26 @@ export default function VehicleForm() {
       {(props) => (
         <FormComponent
           fields={formFields}
-          handleSubmit={(values: Record<string, any>) => vehicleModal?.id ?
-            updateData({ data: { table: "vehicles", id: vehicleModal?.id, values, title: "Vehicle" } }) :
-            createData({ data: { table: "vehicles", values: {
+          handleSubmit={(values: Record<string, any>) => {
+            const payload = {
+              type: "vehicle",
+              metadata: {
+                registrationNumber: values.registrationNumber,
+                registrationDate: values.registrationDate,
+                fitnessExpiryDate: values.fitnessExpiryDate,
+                taxTokenExpiryDate: values.taxTokenExpiryDate,
+                roadPermitExpiryDate: values.roadPermitExpiryDate
+              }
+            }
+            if(vehicleModal?.id){
+              return updateData({ data: { table: "assets", id: vehicleModal?.id, values: payload, title: "Vehicle" } })
+            }
+            
+            return createData({ data: { table: "assets", values: {
               id: generateId(),
-              ...values,
-            }, title: "Vehicle" } })}
+              ...payload,
+            }, title: "Vehicle" } })
+          }}
           values={vehicleModal?.isOpen && vehicleModal?.id && data ? data : {}}
           onSuccess={() => {
             props.close()
@@ -80,7 +116,7 @@ export default function VehicleForm() {
           }}
           options={{
             isLoading,
-            queryKey: 'vehicles',
+            queryKey: 'assets',
           }}
         />
       )}

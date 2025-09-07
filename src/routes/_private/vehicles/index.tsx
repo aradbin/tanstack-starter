@@ -20,7 +20,7 @@ function RouteComponent() {
   const { setVehicleModal, setDeleteModal } = useApp()
 
   const query: QueryParamType = {
-    table: "vehicles",
+    table: "assets",
     sort: {
       field: params.sort,
       order: params.order
@@ -31,7 +31,7 @@ function RouteComponent() {
     },
     search: {
       term: params.search,
-      key: ["registrationNumber", "chassisNumber", "engineNumber"]
+      key: ["registrationNumber"]
     }
   }
 
@@ -52,8 +52,8 @@ function RouteComponent() {
         delete: (id) => {
           setDeleteModal({
             id,
-            title: "Employee",
-            table: "employees"
+            title: "Vehicle",
+            table: "assets"
           })
         }
       }

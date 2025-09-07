@@ -25,12 +25,7 @@ function RouteComponent() {
     queryKey: ['designations', 'all'],
     queryFn: async () => {
       const response = await getDatas({ data: { table: "designations" } })
-
-      if(response?.result) {
-        return response?.result
-      }
-
-      return []
+      return response?.result || []
     },
   })
 

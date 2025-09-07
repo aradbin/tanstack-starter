@@ -3,30 +3,37 @@ import { ColumnDef } from "@tanstack/react-table"
 import { TableColumnHeader } from "@/components/table/table-column-header"
 import { TableRowActions } from "@/components/table/table-row-actions"
 import { TableActionType } from "@/lib/types"
-import { vehicles } from "@/lib/db/schema/vehicles"
+import { assets } from "@/lib/db/schema/assets"
 import { formatDate } from "@/lib/utils"
 
 export const vehicleColumns = ({
   actions
 }: {
   actions?: TableActionType
-}): ColumnDef<typeof vehicles.$inferSelect>[] => [
+}): ColumnDef<typeof assets.$inferSelect>[] => [
   {
-    accessorKey: "registrationNumber",
+    accessorKey: "metadata.registrationNumber",
     header: ({ column }) => <TableColumnHeader column={column} title="Registration Number" />,
   },
   {
-    accessorKey: "registrationDate",
+    accessorKey: "metadata.registrationDate",
     header: ({ column }) => <TableColumnHeader column={column} title="Registration Date" />,
-    cell: ({ row }) => formatDate(row.original.registrationDate),
+    cell: ({ row }) => formatDate(row.original.metadata?.registrationDate),
   },
   {
-    accessorKey: "chassisNumber",
-    header: ({ column }) => <TableColumnHeader column={column} title="Chassis Number" />,
+    accessorKey: "metadata.fitnessExpiryDate",
+    header: ({ column }) => <TableColumnHeader column={column} title="Fitness Expiry Date" />,
+    cell: ({ row }) => formatDate(row.original.metadata?.fitnessExpiryDate),
   },
   {
-    accessorKey: "engineNumber",
-    header: ({ column }) => <TableColumnHeader column={column} title="Engine Number" />,
+    accessorKey: "metadata.taxTokenExpiryDate",
+    header: ({ column }) => <TableColumnHeader column={column} title="Tax Token Expiry Date" />,
+    cell: ({ row }) => formatDate(row.original.metadata?.taxTokenExpiryDate),
+  },
+  {
+    accessorKey: "metadata.roadPermitExpiryDate",
+    header: ({ column }) => <TableColumnHeader column={column} title="Road Permit Expiry Date" />,
+    cell: ({ row }) => formatDate(row.original.metadata?.roadPermitExpiryDate),
   },
   {
     id: "actions",

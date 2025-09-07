@@ -13,9 +13,9 @@ function RouteComponent() {
   const params = Route.useParams()
 
   const { data, isLoading } = useQuery({
-    queryKey: ['vehicles', params?.id],
+    queryKey: ['assets', params?.id],
     queryFn: () => getData({ data: {
-      table: "vehicles",
+      table: "assets",
       id: params?.id,
     }})
   })

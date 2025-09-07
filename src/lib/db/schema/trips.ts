@@ -2,7 +2,7 @@ import { pgTable } from "drizzle-orm/pg-core"
 import * as table from "drizzle-orm/pg-core"
 
 import { timestamps } from "./columns.helpers"
-import { vehicles } from "./vehicles"
+import { assets } from "./assets"
 import { employees } from "./employees"
 import { relations } from "drizzle-orm"
 import { organizations } from "./users"
@@ -11,10 +11,10 @@ export const trips = pgTable("trips", {
   id: table.text().primaryKey(),
   date: table.date().notNull(),
   type: table.text().notNull(), // depot, district
-  vehicleId: table
-    .text("vehicle_id")
+  assetId: table
+    .text("asset_id")
     .notNull()
-    .references(() => vehicles.id, { onDelete: "cascade" }),
+    .references(() => assets.id, { onDelete: "cascade" }),
   driverId: table
     .text("driver_id")
     .notNull()
@@ -35,9 +35,9 @@ export const trips = pgTable("trips", {
 })
 
 export const tripRelations = relations(trips, ({ one }) => ({
-  vehicle: one(vehicles, {
-    fields: [trips.vehicleId],
-    references: [vehicles.id],
+  asset: one(assets, {
+    fields: [trips.assetId],
+    references: [assets.id],
   }),
   driver: one(employees, {
     fields: [trips.driverId],
