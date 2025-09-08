@@ -7,7 +7,7 @@ import AvatarComponent from "@/components/common/avatar-component"
 import { formatDateTime } from "@/lib/utils"
 import TableCheckboxHeader from "@/components/table/table-checkbox-header"
 import TableCheckboxRow from "@/components/table/table-checkbox-row"
-import { contacts, customerContacts, customers } from "@/lib/db/schema/customers"
+import { contacts, customerContacts, customers } from "@/lib/db/schema"
 import { TableActionType } from "@/lib/types"
 import AvatarGroupComponent from "@/components/common/avatar-group-component"
 

@@ -3,9 +3,9 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { getData } from '@/lib/db/functions'
 import { useQuery } from '@tanstack/react-query'
 import { createFileRoute } from '@tanstack/react-router'
-import VehicleCard from './-vehicle-card'
+import AssetCard from './-asset-card'
 
-export const Route = createFileRoute('/_private/vehicles/$id/')({
+export const Route = createFileRoute('/_private/assets/$id/')({
   component: RouteComponent,
 })
 
@@ -27,7 +27,7 @@ function RouteComponent() {
   if(data){
     return (
       <div className='grid grid-cols-1 md:grid-cols-3 gap-4'>
-        <VehicleCard vehicle={data} />
+        <AssetCard asset={data} />
         <Tabs defaultValue="trips" className='col-span-2'>
           <TabsList className='w-full'>
             <TabsTrigger value="trips">Trips</TabsTrigger>

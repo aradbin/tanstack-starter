@@ -32,8 +32,8 @@ type AppStateType = {
   helpers: typeof employees.$inferSelect[],
   employeeModal: ModalStateType
   setEmployeeModal: Dispatch<SetStateAction<ModalStateType>>
-  vehicleModal: ModalStateType
-  setVehicleModal: Dispatch<SetStateAction<ModalStateType>>
+  assetModal: ModalStateType
+  setAssetModal: Dispatch<SetStateAction<ModalStateType>>
 }
 
 const initialState: AppStateType = {
@@ -53,8 +53,8 @@ const initialState: AppStateType = {
   helpers: [],
   employeeModal: null,
   setEmployeeModal: () => {},
-  vehicleModal: null,
-  setVehicleModal: () => {},
+  assetModal: null,
+  setAssetModal: () => {},
 }
 
 const AppContext = createContext<AppStateType>(initialState)
@@ -70,7 +70,7 @@ export function AppProvider({
   const [deleteModal, setDeleteModal] = useState<DeleteModalStateType>(null)
   // transport
   const [employeeModal, setEmployeeModal] = useState<ModalStateType>(null)
-  const [vehicleModal, setVehicleModal] = useState<ModalStateType>(null)
+  const [assetModal, setAssetModal] = useState<ModalStateType>(null)
 
   const { data: users } = useQuery({
     queryKey: ['members', 'users', 'all'],
@@ -161,8 +161,8 @@ export function AppProvider({
       helpers,
       employeeModal,
       setEmployeeModal,
-      vehicleModal,
-      setVehicleModal,
+      assetModal,
+      setAssetModal,
     }}>
       {children}
     </AppContext.Provider>

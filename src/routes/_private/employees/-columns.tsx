@@ -4,9 +4,9 @@ import { TableColumnHeader } from "@/components/table/table-column-header"
 import { TableRowActions } from "@/components/table/table-row-actions"
 
 import AvatarComponent from "@/components/common/avatar-component"
-import { capitalize, formatDate } from "@/lib/utils"
+import { formatDate } from "@/lib/utils"
 import { TableActionType } from "@/lib/types"
-import { designations, employees } from "@/lib/db/schema/employees"
+import { designations, employees } from "@/lib/db/schema"
 
 export const employeeColumns = ({
   actions

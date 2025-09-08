@@ -1,8 +1,8 @@
 import { Outlet } from '@tanstack/react-router'
 import { createFileRoute } from '@tanstack/react-router'
-import VehicleForm from './-form'
+import AssetForm from './-form'
 
-export const Route = createFileRoute('/_private/vehicles')({
+export const Route = createFileRoute('/_private/assets')({
   component: RouteComponent,
 })
 
@@ -10,7 +10,7 @@ function RouteComponent() {
   return (
     <>
       <Outlet />
-      <VehicleForm />
+      <AssetForm />
     </>
   )
 }

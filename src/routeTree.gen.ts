@@ -14,10 +14,9 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as PrivateRouteRouteImport } from './routes/_private/route'
 import { Route as AuthRouteRouteImport } from './routes/_auth/route'
 import { Route as PrivateIndexRouteImport } from './routes/_private/index'
-import { Route as PrivateVehiclesRouteRouteImport } from './routes/_private/vehicles/route'
 import { Route as PrivateEmployeesRouteRouteImport } from './routes/_private/employees/route'
+import { Route as PrivateAssetsRouteRouteImport } from './routes/_private/assets/route'
 import { Route as PrivateWhatsappIndexRouteImport } from './routes/_private/whatsapp/index'
-import { Route as PrivateVehiclesIndexRouteImport } from './routes/_private/vehicles/index'
 import { Route as PrivateTripsIndexRouteImport } from './routes/_private/trips/index'
 import { Route as PrivateTasksIndexRouteImport } from './routes/_private/tasks/index'
 import { Route as PrivateRolesIndexRouteImport } from './routes/_private/roles/index'
@@ -27,15 +26,16 @@ import { Route as PrivateEmailIndexRouteImport } from './routes/_private/email/i
 import { Route as PrivateDesignationsIndexRouteImport } from './routes/_private/designations/index'
 import { Route as PrivateCustomersIndexRouteImport } from './routes/_private/customers/index'
 import { Route as PrivateContactsIndexRouteImport } from './routes/_private/contacts/index'
+import { Route as PrivateAssetsIndexRouteImport } from './routes/_private/assets/index'
 import { Route as AuthRegisterIndexRouteImport } from './routes/_auth/register/index'
 import { Route as AuthLoginIndexRouteImport } from './routes/_auth/login/index'
 import { Route as AuthRegisterOrganizationRouteImport } from './routes/_auth/register/organization'
-import { Route as PrivateVehiclesIdIndexRouteImport } from './routes/_private/vehicles/$id/index'
 import { Route as PrivateTripsDistrictIndexRouteImport } from './routes/_private/trips/district/index'
 import { Route as PrivateTripsDepotIndexRouteImport } from './routes/_private/trips/depot/index'
 import { Route as PrivateEmployeesIdIndexRouteImport } from './routes/_private/employees/$id/index'
 import { Route as PrivateCustomersIdIndexRouteImport } from './routes/_private/customers/$id/index'
 import { Route as PrivateContactsIdIndexRouteImport } from './routes/_private/contacts/$id/index'
+import { Route as PrivateAssetsIdIndexRouteImport } from './routes/_private/assets/$id/index'
 import { Route as PrivateTripsDepotCreateIndexRouteImport } from './routes/_private/trips/depot/create/index'
 import { Route as PrivateTripsDepotIdIndexRouteImport } from './routes/_private/trips/depot/$id/index'
 import { Route as PrivateTripsDepotIdEditIndexRouteImport } from './routes/_private/trips/depot/$id/edit/index'
@@ -56,25 +56,20 @@ const PrivateIndexRoute = PrivateIndexRouteImport.update({
   path: '/',
   getParentRoute: () => PrivateRouteRoute,
 } as any)
-const PrivateVehiclesRouteRoute = PrivateVehiclesRouteRouteImport.update({
-  id: '/vehicles',
-  path: '/vehicles',
-  getParentRoute: () => PrivateRouteRoute,
-} as any)
 const PrivateEmployeesRouteRoute = PrivateEmployeesRouteRouteImport.update({
   id: '/employees',
   path: '/employees',
+  getParentRoute: () => PrivateRouteRoute,
+} as any)
+const PrivateAssetsRouteRoute = PrivateAssetsRouteRouteImport.update({
+  id: '/assets',
+  path: '/assets',
   getParentRoute: () => PrivateRouteRoute,
 } as any)
 const PrivateWhatsappIndexRoute = PrivateWhatsappIndexRouteImport.update({
   id: '/whatsapp/',
   path: '/whatsapp/',
   getParentRoute: () => PrivateRouteRoute,
-} as any)
-const PrivateVehiclesIndexRoute = PrivateVehiclesIndexRouteImport.update({
-  id: '/',
-  path: '/',
-  getParentRoute: () => PrivateVehiclesRouteRoute,
 } as any)
 const PrivateTripsIndexRoute = PrivateTripsIndexRouteImport.update({
   id: '/trips/',
@@ -122,6 +117,11 @@ const PrivateContactsIndexRoute = PrivateContactsIndexRouteImport.update({
   path: '/contacts/',
   getParentRoute: () => PrivateRouteRoute,
 } as any)
+const PrivateAssetsIndexRoute = PrivateAssetsIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => PrivateAssetsRouteRoute,
+} as any)
 const AuthRegisterIndexRoute = AuthRegisterIndexRouteImport.update({
   id: '/register/',
   path: '/register/',
@@ -138,11 +138,6 @@ const AuthRegisterOrganizationRoute =
     path: '/register/organization',
     getParentRoute: () => AuthRouteRoute,
   } as any)
-const PrivateVehiclesIdIndexRoute = PrivateVehiclesIdIndexRouteImport.update({
-  id: '/$id/',
-  path: '/$id/',
-  getParentRoute: () => PrivateVehiclesRouteRoute,
-} as any)
 const PrivateTripsDistrictIndexRoute =
   PrivateTripsDistrictIndexRouteImport.update({
     id: '/trips/district/',
@@ -169,6 +164,11 @@ const PrivateContactsIdIndexRoute = PrivateContactsIdIndexRouteImport.update({
   path: '/contacts/$id/',
   getParentRoute: () => PrivateRouteRoute,
 } as any)
+const PrivateAssetsIdIndexRoute = PrivateAssetsIdIndexRouteImport.update({
+  id: '/$id/',
+  path: '/$id/',
+  getParentRoute: () => PrivateAssetsRouteRoute,
+} as any)
 const PrivateTripsDepotCreateIndexRoute =
   PrivateTripsDepotCreateIndexRouteImport.update({
     id: '/trips/depot/create/',
@@ -194,12 +194,13 @@ const ApiAuthSplatServerRoute = ApiAuthSplatServerRouteImport.update({
 } as any)
 
 export interface FileRoutesByFullPath {
+  '/assets': typeof PrivateAssetsRouteRouteWithChildren
   '/employees': typeof PrivateEmployeesRouteRouteWithChildren
-  '/vehicles': typeof PrivateVehiclesRouteRouteWithChildren
   '/': typeof PrivateIndexRoute
   '/register/organization': typeof AuthRegisterOrganizationRoute
   '/login': typeof AuthLoginIndexRoute
   '/register': typeof AuthRegisterIndexRoute
+  '/assets/': typeof PrivateAssetsIndexRoute
   '/contacts': typeof PrivateContactsIndexRoute
   '/customers': typeof PrivateCustomersIndexRoute
   '/designations': typeof PrivateDesignationsIndexRoute
@@ -209,14 +210,13 @@ export interface FileRoutesByFullPath {
   '/roles': typeof PrivateRolesIndexRoute
   '/tasks': typeof PrivateTasksIndexRoute
   '/trips': typeof PrivateTripsIndexRoute
-  '/vehicles/': typeof PrivateVehiclesIndexRoute
   '/whatsapp': typeof PrivateWhatsappIndexRoute
+  '/assets/$id': typeof PrivateAssetsIdIndexRoute
   '/contacts/$id': typeof PrivateContactsIdIndexRoute
   '/customers/$id': typeof PrivateCustomersIdIndexRoute
   '/employees/$id': typeof PrivateEmployeesIdIndexRoute
   '/trips/depot': typeof PrivateTripsDepotIndexRoute
   '/trips/district': typeof PrivateTripsDistrictIndexRoute
-  '/vehicles/$id': typeof PrivateVehiclesIdIndexRoute
   '/trips/depot/$id': typeof PrivateTripsDepotIdIndexRoute
   '/trips/depot/create': typeof PrivateTripsDepotCreateIndexRoute
   '/trips/depot/$id/edit': typeof PrivateTripsDepotIdEditIndexRoute
@@ -226,6 +226,7 @@ export interface FileRoutesByTo {
   '/register/organization': typeof AuthRegisterOrganizationRoute
   '/login': typeof AuthLoginIndexRoute
   '/register': typeof AuthRegisterIndexRoute
+  '/assets': typeof PrivateAssetsIndexRoute
   '/contacts': typeof PrivateContactsIndexRoute
   '/customers': typeof PrivateCustomersIndexRoute
   '/designations': typeof PrivateDesignationsIndexRoute
@@ -235,14 +236,13 @@ export interface FileRoutesByTo {
   '/roles': typeof PrivateRolesIndexRoute
   '/tasks': typeof PrivateTasksIndexRoute
   '/trips': typeof PrivateTripsIndexRoute
-  '/vehicles': typeof PrivateVehiclesIndexRoute
   '/whatsapp': typeof PrivateWhatsappIndexRoute
+  '/assets/$id': typeof PrivateAssetsIdIndexRoute
   '/contacts/$id': typeof PrivateContactsIdIndexRoute
   '/customers/$id': typeof PrivateCustomersIdIndexRoute
   '/employees/$id': typeof PrivateEmployeesIdIndexRoute
   '/trips/depot': typeof PrivateTripsDepotIndexRoute
   '/trips/district': typeof PrivateTripsDistrictIndexRoute
-  '/vehicles/$id': typeof PrivateVehiclesIdIndexRoute
   '/trips/depot/$id': typeof PrivateTripsDepotIdIndexRoute
   '/trips/depot/create': typeof PrivateTripsDepotCreateIndexRoute
   '/trips/depot/$id/edit': typeof PrivateTripsDepotIdEditIndexRoute
@@ -251,12 +251,13 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/_auth': typeof AuthRouteRouteWithChildren
   '/_private': typeof PrivateRouteRouteWithChildren
+  '/_private/assets': typeof PrivateAssetsRouteRouteWithChildren
   '/_private/employees': typeof PrivateEmployeesRouteRouteWithChildren
-  '/_private/vehicles': typeof PrivateVehiclesRouteRouteWithChildren
   '/_private/': typeof PrivateIndexRoute
   '/_auth/register/organization': typeof AuthRegisterOrganizationRoute
   '/_auth/login/': typeof AuthLoginIndexRoute
   '/_auth/register/': typeof AuthRegisterIndexRoute
+  '/_private/assets/': typeof PrivateAssetsIndexRoute
   '/_private/contacts/': typeof PrivateContactsIndexRoute
   '/_private/customers/': typeof PrivateCustomersIndexRoute
   '/_private/designations/': typeof PrivateDesignationsIndexRoute
@@ -266,14 +267,13 @@ export interface FileRoutesById {
   '/_private/roles/': typeof PrivateRolesIndexRoute
   '/_private/tasks/': typeof PrivateTasksIndexRoute
   '/_private/trips/': typeof PrivateTripsIndexRoute
-  '/_private/vehicles/': typeof PrivateVehiclesIndexRoute
   '/_private/whatsapp/': typeof PrivateWhatsappIndexRoute
+  '/_private/assets/$id/': typeof PrivateAssetsIdIndexRoute
   '/_private/contacts/$id/': typeof PrivateContactsIdIndexRoute
   '/_private/customers/$id/': typeof PrivateCustomersIdIndexRoute
   '/_private/employees/$id/': typeof PrivateEmployeesIdIndexRoute
   '/_private/trips/depot/': typeof PrivateTripsDepotIndexRoute
   '/_private/trips/district/': typeof PrivateTripsDistrictIndexRoute
-  '/_private/vehicles/$id/': typeof PrivateVehiclesIdIndexRoute
   '/_private/trips/depot/$id/': typeof PrivateTripsDepotIdIndexRoute
   '/_private/trips/depot/create/': typeof PrivateTripsDepotCreateIndexRoute
   '/_private/trips/depot/$id/edit/': typeof PrivateTripsDepotIdEditIndexRoute
@@ -281,12 +281,13 @@ export interface FileRoutesById {
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
+    | '/assets'
     | '/employees'
-    | '/vehicles'
     | '/'
     | '/register/organization'
     | '/login'
     | '/register'
+    | '/assets/'
     | '/contacts'
     | '/customers'
     | '/designations'
@@ -296,14 +297,13 @@ export interface FileRouteTypes {
     | '/roles'
     | '/tasks'
     | '/trips'
-    | '/vehicles/'
     | '/whatsapp'
+    | '/assets/$id'
     | '/contacts/$id'
     | '/customers/$id'
     | '/employees/$id'
     | '/trips/depot'
     | '/trips/district'
-    | '/vehicles/$id'
     | '/trips/depot/$id'
     | '/trips/depot/create'
     | '/trips/depot/$id/edit'
@@ -313,6 +313,7 @@ export interface FileRouteTypes {
     | '/register/organization'
     | '/login'
     | '/register'
+    | '/assets'
     | '/contacts'
     | '/customers'
     | '/designations'
@@ -322,14 +323,13 @@ export interface FileRouteTypes {
     | '/roles'
     | '/tasks'
     | '/trips'
-    | '/vehicles'
     | '/whatsapp'
+    | '/assets/$id'
     | '/contacts/$id'
     | '/customers/$id'
     | '/employees/$id'
     | '/trips/depot'
     | '/trips/district'
-    | '/vehicles/$id'
     | '/trips/depot/$id'
     | '/trips/depot/create'
     | '/trips/depot/$id/edit'
@@ -337,12 +337,13 @@ export interface FileRouteTypes {
     | '__root__'
     | '/_auth'
     | '/_private'
+    | '/_private/assets'
     | '/_private/employees'
-    | '/_private/vehicles'
     | '/_private/'
     | '/_auth/register/organization'
     | '/_auth/login/'
     | '/_auth/register/'
+    | '/_private/assets/'
     | '/_private/contacts/'
     | '/_private/customers/'
     | '/_private/designations/'
@@ -352,14 +353,13 @@ export interface FileRouteTypes {
     | '/_private/roles/'
     | '/_private/tasks/'
     | '/_private/trips/'
-    | '/_private/vehicles/'
     | '/_private/whatsapp/'
+    | '/_private/assets/$id/'
     | '/_private/contacts/$id/'
     | '/_private/customers/$id/'
     | '/_private/employees/$id/'
     | '/_private/trips/depot/'
     | '/_private/trips/district/'
-    | '/_private/vehicles/$id/'
     | '/_private/trips/depot/$id/'
     | '/_private/trips/depot/create/'
     | '/_private/trips/depot/$id/edit/'
@@ -414,18 +414,18 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof PrivateIndexRouteImport
       parentRoute: typeof PrivateRouteRoute
     }
-    '/_private/vehicles': {
-      id: '/_private/vehicles'
-      path: '/vehicles'
-      fullPath: '/vehicles'
-      preLoaderRoute: typeof PrivateVehiclesRouteRouteImport
-      parentRoute: typeof PrivateRouteRoute
-    }
     '/_private/employees': {
       id: '/_private/employees'
       path: '/employees'
       fullPath: '/employees'
       preLoaderRoute: typeof PrivateEmployeesRouteRouteImport
+      parentRoute: typeof PrivateRouteRoute
+    }
+    '/_private/assets': {
+      id: '/_private/assets'
+      path: '/assets'
+      fullPath: '/assets'
+      preLoaderRoute: typeof PrivateAssetsRouteRouteImport
       parentRoute: typeof PrivateRouteRoute
     }
     '/_private/whatsapp/': {
@@ -434,13 +434,6 @@ declare module '@tanstack/react-router' {
       fullPath: '/whatsapp'
       preLoaderRoute: typeof PrivateWhatsappIndexRouteImport
       parentRoute: typeof PrivateRouteRoute
-    }
-    '/_private/vehicles/': {
-      id: '/_private/vehicles/'
-      path: '/'
-      fullPath: '/vehicles/'
-      preLoaderRoute: typeof PrivateVehiclesIndexRouteImport
-      parentRoute: typeof PrivateVehiclesRouteRoute
     }
     '/_private/trips/': {
       id: '/_private/trips/'
@@ -505,6 +498,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof PrivateContactsIndexRouteImport
       parentRoute: typeof PrivateRouteRoute
     }
+    '/_private/assets/': {
+      id: '/_private/assets/'
+      path: '/'
+      fullPath: '/assets/'
+      preLoaderRoute: typeof PrivateAssetsIndexRouteImport
+      parentRoute: typeof PrivateAssetsRouteRoute
+    }
     '/_auth/register/': {
       id: '/_auth/register/'
       path: '/register'
@@ -525,13 +525,6 @@ declare module '@tanstack/react-router' {
       fullPath: '/register/organization'
       preLoaderRoute: typeof AuthRegisterOrganizationRouteImport
       parentRoute: typeof AuthRouteRoute
-    }
-    '/_private/vehicles/$id/': {
-      id: '/_private/vehicles/$id/'
-      path: '/$id'
-      fullPath: '/vehicles/$id'
-      preLoaderRoute: typeof PrivateVehiclesIdIndexRouteImport
-      parentRoute: typeof PrivateVehiclesRouteRoute
     }
     '/_private/trips/district/': {
       id: '/_private/trips/district/'
@@ -567,6 +560,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/contacts/$id'
       preLoaderRoute: typeof PrivateContactsIdIndexRouteImport
       parentRoute: typeof PrivateRouteRoute
+    }
+    '/_private/assets/$id/': {
+      id: '/_private/assets/$id/'
+      path: '/$id'
+      fullPath: '/assets/$id'
+      preLoaderRoute: typeof PrivateAssetsIdIndexRouteImport
+      parentRoute: typeof PrivateAssetsRouteRoute
     }
     '/_private/trips/depot/create/': {
       id: '/_private/trips/depot/create/'
@@ -619,6 +619,19 @@ const AuthRouteRouteWithChildren = AuthRouteRoute._addFileChildren(
   AuthRouteRouteChildren,
 )
 
+interface PrivateAssetsRouteRouteChildren {
+  PrivateAssetsIndexRoute: typeof PrivateAssetsIndexRoute
+  PrivateAssetsIdIndexRoute: typeof PrivateAssetsIdIndexRoute
+}
+
+const PrivateAssetsRouteRouteChildren: PrivateAssetsRouteRouteChildren = {
+  PrivateAssetsIndexRoute: PrivateAssetsIndexRoute,
+  PrivateAssetsIdIndexRoute: PrivateAssetsIdIndexRoute,
+}
+
+const PrivateAssetsRouteRouteWithChildren =
+  PrivateAssetsRouteRoute._addFileChildren(PrivateAssetsRouteRouteChildren)
+
 interface PrivateEmployeesRouteRouteChildren {
   PrivateEmployeesIndexRoute: typeof PrivateEmployeesIndexRoute
   PrivateEmployeesIdIndexRoute: typeof PrivateEmployeesIdIndexRoute
@@ -634,22 +647,9 @@ const PrivateEmployeesRouteRouteWithChildren =
     PrivateEmployeesRouteRouteChildren,
   )
 
-interface PrivateVehiclesRouteRouteChildren {
-  PrivateVehiclesIndexRoute: typeof PrivateVehiclesIndexRoute
-  PrivateVehiclesIdIndexRoute: typeof PrivateVehiclesIdIndexRoute
-}
-
-const PrivateVehiclesRouteRouteChildren: PrivateVehiclesRouteRouteChildren = {
-  PrivateVehiclesIndexRoute: PrivateVehiclesIndexRoute,
-  PrivateVehiclesIdIndexRoute: PrivateVehiclesIdIndexRoute,
-}
-
-const PrivateVehiclesRouteRouteWithChildren =
-  PrivateVehiclesRouteRoute._addFileChildren(PrivateVehiclesRouteRouteChildren)
-
 interface PrivateRouteRouteChildren {
+  PrivateAssetsRouteRoute: typeof PrivateAssetsRouteRouteWithChildren
   PrivateEmployeesRouteRoute: typeof PrivateEmployeesRouteRouteWithChildren
-  PrivateVehiclesRouteRoute: typeof PrivateVehiclesRouteRouteWithChildren
   PrivateIndexRoute: typeof PrivateIndexRoute
   PrivateContactsIndexRoute: typeof PrivateContactsIndexRoute
   PrivateCustomersIndexRoute: typeof PrivateCustomersIndexRoute
@@ -670,8 +670,8 @@ interface PrivateRouteRouteChildren {
 }
 
 const PrivateRouteRouteChildren: PrivateRouteRouteChildren = {
+  PrivateAssetsRouteRoute: PrivateAssetsRouteRouteWithChildren,
   PrivateEmployeesRouteRoute: PrivateEmployeesRouteRouteWithChildren,
-  PrivateVehiclesRouteRoute: PrivateVehiclesRouteRouteWithChildren,
   PrivateIndexRoute: PrivateIndexRoute,
   PrivateContactsIndexRoute: PrivateContactsIndexRoute,
   PrivateCustomersIndexRoute: PrivateCustomersIndexRoute,

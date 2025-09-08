@@ -3,11 +3,11 @@ import { QueryParamType } from '@/lib/db/functions'
 import { defaultSearchParamValidation, validate } from '@/lib/validations'
 import { useApp } from '@/providers/app-provider'
 import { createFileRoute } from '@tanstack/react-router'
-import { vehicleColumns } from './-columns'
+import { assetColumns } from './-columns'
 import { Button } from '@/components/ui/button'
 import { PlusCircle } from 'lucide-react'
 
-export const Route = createFileRoute('/_private/vehicles/')({
+export const Route = createFileRoute('/_private/assets/')({
   validateSearch: validate({
     ...defaultSearchParamValidation,
   }),
@@ -17,7 +17,7 @@ export const Route = createFileRoute('/_private/vehicles/')({
 function RouteComponent() {
   const params = Route.useSearch()
   const navigate = Route.useNavigate()
-  const { setVehicleModal, setDeleteModal } = useApp()
+  const { setAssetModal, setDeleteModal } = useApp()
 
   const query: QueryParamType = {
     table: "assets",
@@ -36,15 +36,15 @@ function RouteComponent() {
   }
 
   return (
-    <TableComponent columns={vehicleColumns({
+    <TableComponent columns={assetColumns({
       actions: {
-        view: (id) => {
-          navigate({
-            to: `/vehicles/${id}`
-          })
-        },
+        // view: (id) => {
+        //   navigate({
+        //     to: `/assets/${id}`
+        //   })
+        // },
         edit: (id) => {
-          setVehicleModal({
+          setAssetModal({
             id,
             isOpen: true
           })
@@ -60,7 +60,7 @@ function RouteComponent() {
     })} filters={[]} query={query} options={{
       hasSearch: true
     }} toolbar={(
-      <Button size="sm" variant="outline" onClick={() => setVehicleModal({
+      <Button size="sm" variant="outline" onClick={() => setAssetModal({
         id: null,
         isOpen: true
       })}><PlusCircle /> Create</Button>

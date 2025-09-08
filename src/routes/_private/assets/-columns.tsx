@@ -2,15 +2,17 @@ import { ColumnDef } from "@tanstack/react-table"
 
 import { TableColumnHeader } from "@/components/table/table-column-header"
 import { TableRowActions } from "@/components/table/table-row-actions"
-import { TableActionType } from "@/lib/types"
-import { assets } from "@/lib/db/schema/assets"
+import { AnyType, TableActionType } from "@/lib/types"
+import { assets } from "@/lib/db/schema"
 import { formatDate } from "@/lib/utils"
 
-export const vehicleColumns = ({
+export const assetColumns = ({
   actions
 }: {
   actions?: TableActionType
-}): ColumnDef<typeof assets.$inferSelect>[] => [
+}): ColumnDef<typeof assets.$inferSelect & {
+  metadata: AnyType
+}>[] => [
   {
     accessorKey: "metadata.registrationNumber",
     header: ({ column }) => <TableColumnHeader column={column} title="Registration Number" />,

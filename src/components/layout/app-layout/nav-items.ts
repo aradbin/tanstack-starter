@@ -16,7 +16,7 @@ export const mainNavItems: NavigationType[] = [
       },
       {
         title: "Vehicles",
-        href: "/vehicles",
+        href: "/assets",
         icon: Truck,
       },
       {

@@ -7,8 +7,8 @@ import AvatarComponent from "@/components/common/avatar-component"
 import { formatDateTime } from "@/lib/utils"
 import TableCheckboxHeader from "@/components/table/table-checkbox-header"
 import TableCheckboxRow from "@/components/table/table-checkbox-row"
-import { contacts } from "@/lib/db/schema/customers"
-import { AnyType, TableActionType } from "@/lib/types"
+import { contacts } from "@/lib/db/schema"
+import { TableActionType } from "@/lib/types"
 
 export const contactColumns = ({
   actions

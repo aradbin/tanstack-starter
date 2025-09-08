@@ -7,14 +7,14 @@ import { stringRequiredValidation, stringValidation } from "@/lib/validations"
 import { generateId } from "better-auth"
 import { useApp } from "@/providers/app-provider"
 
-export default function VehicleForm() {
-  const { vehicleModal, setVehicleModal } = useApp()
+export default function AssetForm() {
+  const { assetModal, setAssetModal } = useApp()
   const { data, isLoading } = useQuery({
-    queryKey: ['assets', vehicleModal?.id],
+    queryKey: ['assets', assetModal?.id],
     queryFn: async () => {
       const response = await getData({ data: {
         table: "assets",
-        id: vehicleModal?.id
+        id: assetModal?.id
       }})
 
       return {
@@ -26,7 +26,7 @@ export default function VehicleForm() {
         roadPermitExpiryDate: response?.metadata?.roadPermitExpiryDate
       }
     },
-    enabled: !!vehicleModal?.id && vehicleModal?.isOpen
+    enabled: !!assetModal?.id && assetModal?.isOpen
   })
 
   const formFields: FormFieldType[][] = [
@@ -78,10 +78,10 @@ export default function VehicleForm() {
 
   return (
     <ModalComponent variant="sheet" options={{
-      header: vehicleModal?.id ? 'Edit Vehicle' : 'Create Vehicle',
-      isOpen: vehicleModal?.isOpen,
+      header: assetModal?.id ? 'Edit Vehicle' : 'Create Vehicle',
+      isOpen: assetModal?.isOpen,
       onClose: () => {
-        setVehicleModal(null)
+        setAssetModal(null)
       }
     }}>
       {(props) => (
@@ -98,8 +98,8 @@ export default function VehicleForm() {
                 roadPermitExpiryDate: values.roadPermitExpiryDate
               }
             }
-            if(vehicleModal?.id){
-              return updateData({ data: { table: "assets", id: vehicleModal?.id, values: payload, title: "Vehicle" } })
+            if(assetModal?.id){
+              return updateData({ data: { table: "assets", id: assetModal?.id, values: payload, title: "Vehicle" } })
             }
             
             return createData({ data: { table: "assets", values: {
@@ -107,7 +107,7 @@ export default function VehicleForm() {
               ...payload,
             }, title: "Vehicle" } })
           }}
-          values={vehicleModal?.isOpen && vehicleModal?.id && data ? data : {}}
+          values={assetModal?.isOpen && assetModal?.id && data ? data : {}}
           onSuccess={() => {
             props.close()
           }}
