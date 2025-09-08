@@ -34,6 +34,13 @@ export function TableFilter({
   const onSelect = (value: AnyType) => {
     navigate({
       search: (prev: AnyType) => {
+        if(filter?.type === 'date' && filter?.multiple){
+          return {
+            ...prev,
+            ...(prev.page ? { page: 1 } : {}),
+            ...value
+          }
+        }
         if(filter?.multiple){
           const key = filter.key.toLowerCase()
           const current = filter?.value ? Array.isArray(filter?.value) ? filter?.value : [filter?.value] : []
@@ -77,6 +84,17 @@ export function TableFilter({
           <Button variant="outline" size="sm" className="h-8 border-dashed">
             {filter?.icon ? <filter.icon className="size-3" /> : <Filter className="size-3" />}
             {capitalize(filter?.label || filter?.key)}
+            {filter?.multiple && filter?.value?.from && filter?.value?.to && (
+              <>
+                <Separator orientation="vertical" className="mx-2 h-4" />
+                <Badge
+                  variant="secondary"
+                  className="rounded-sm px-1 font-normal"
+                >
+                  {formatDate(filter?.value?.from)} - {formatDate(filter?.value?.to)}
+                </Badge>
+              </>
+            )}
             {filter?.value?.length > 0 && (
               <>
                 <Separator orientation="vertical" className="mx-2 h-4" />
@@ -91,12 +109,31 @@ export function TableFilter({
           </Button>
         </PopoverTrigger>
         <PopoverContent className="w-full p-0" align="start">
-          <Calendar
-            mode="single"
-            selected={filter?.value ? new Date(filter?.value) : undefined}
-            onSelect={(date) => onSelect(formatDateForInput(date))}
-            captionLayout="dropdown"
-          />
+          {filter?.multiple ? (
+            <Calendar
+              mode="range"
+              selected={filter?.value?.from && filter?.value?.to ? {
+                from: new Date(filter?.value?.from),
+                to: new Date(filter?.value?.to)
+              } : undefined}
+              onSelect={(date) => {
+                if(date?.from && date?.to){
+                  onSelect({
+                    from: formatDateForInput(date?.from),
+                    to: formatDateForInput(date?.to)
+                  })
+                }
+              }}
+              captionLayout="dropdown"
+            />
+          ) : (
+            <Calendar
+              mode="single"
+              selected={filter?.value ? new Date(filter?.value) : undefined}
+              onSelect={(date) => onSelect(formatDateForInput(date))}
+              captionLayout="dropdown"
+            />
+          )}
         </PopoverContent>
       </Popover>
     )

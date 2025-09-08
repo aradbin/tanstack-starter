@@ -1,7 +1,7 @@
 import { createServerFn } from "@tanstack/react-start"
 import { db } from "@/lib/db"
 import * as schema from "@/lib/db/schema"
-import { and, desc, eq, ilike, inArray, isNull, or } from "drizzle-orm"
+import { and, desc, eq, gte, ilike, inArray, isNull, lte, or } from "drizzle-orm"
 import { defaultPageSize } from "../variables"
 import { AnyType, PaginationType, SearchType, SortType, WhereType } from "../types"
 import { authOrgMiddleware } from "../auth/middleware"
@@ -48,13 +48,27 @@ export const getOrderArgs = (tableSchema?: AnyType, sort?: SortType) => {
 export const getWhereArgs = (activeOrganizationId: string, tableSchema: AnyType, where?: WhereType, search?: SearchType) => {
   const baseConditions = [
     isNull(tableSchema?.deletedAt),
-    eq(tableSchema?.organizationId, activeOrganizationId)
+    ...[tableSchema?.organizationId ? eq(tableSchema?.organizationId, activeOrganizationId) : undefined],
   ]
   const dynamicConditions = Object.entries(where ?? {}).flatMap(([key, value]) => {
     const column = tableSchema?.[key]
     if (!column || value === undefined || value === null) return []
-
-    return Array.isArray(value) ? inArray(column, value) : eq(column, value)
+    if (Array.isArray(value)) {
+      return inArray(column, value)
+    } else if (typeof value === "object" && value !== null) {
+      return Object.entries(value).map(([op, val]) => {
+        switch (op) {
+          case "gte":
+            return gte(column, val)
+          case "lte":
+            return lte(column, val)
+          default:
+            return eq(column, val)
+        }
+      })
+    } else {
+      return eq(column, value)
+    }
   })
   const searchConditions = search?.term && search?.key && Array.isArray(search?.key)
     ? [or(...search.key?.filter((key) => tableSchema?.[key])?.map((key) => ilike(tableSchema[key], `%${search.term}%`)))]

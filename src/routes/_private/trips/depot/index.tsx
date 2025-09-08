@@ -4,20 +4,19 @@ import { Button } from '@/components/ui/button'
 import { QueryParamType } from '@/lib/db/functions'
 import { defaultSearchParamValidation, stringValidation, validate } from '@/lib/validations'
 import { useApp } from '@/providers/app-provider'
-import { BaggageClaim, Calendar, DollarSign, Fuel, Loader2, PlusCircle, TrendingUp } from 'lucide-react'
+import { BaggageClaim, Calendar, DollarSign, Fuel, Loader2, PlusCircle } from 'lucide-react'
 import { tripDepotColumns } from './-columns'
 import { formatDateForInput } from '@/lib/utils'
-import { sub } from 'date-fns'
-import { Card, CardAction, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card'
-import { Badge } from '@/components/ui/badge'
-import LoadingComponent from '@/components/common/loading-component'
+import { endOfMonth, startOfMonth, sub } from 'date-fns'
+import { Card, CardAction, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { AnyType } from '@/lib/types'
 
 export const Route = createFileRoute('/_private/trips/depot/')({
   validateSearch: validate({
     ...defaultSearchParamValidation,
-    date: stringValidation('Date').catch(undefined),
-    vehicle: stringValidation('Vehicle').catch(undefined),
+    from: stringValidation('From Date').catch(undefined),
+    to: stringValidation('To Date').catch(undefined),
+    asset: stringValidation('Asset').catch(undefined),
     driver: stringValidation('Driver').catch(undefined),
     helper: stringValidation('Helper').catch(undefined),
   }),
@@ -32,7 +31,7 @@ function RouteComponent() {
   const query: QueryParamType = {
     table: "trips",
     relation: {
-      vehicle: true,
+      asset: true,
       driver: true,
       helper: true,
     },
@@ -45,8 +44,11 @@ function RouteComponent() {
     },
     where: {
       type: "depot",
-      date: params.date || formatDateForInput(sub(new Date(), { days: 1 })),
-      vehicleId: params.vehicle,
+      date: {
+        gte: params.from ? formatDateForInput(params.from) : formatDateForInput(startOfMonth(new Date())),
+        lte: params.to ? formatDateForInput(params.to) : formatDateForInput(endOfMonth(new Date())),
+      },
+      assetId: params.asset,
       driverId: params.driver,
       helperId: params.helper,
     }
@@ -74,8 +76,14 @@ function RouteComponent() {
         }
       }
     })} filters={[
-      { key: "date", value: params.date || formatDateForInput(sub(new Date(), { days: 1 })), label: "Date", type: "date", icon: Calendar },
-      { key: "vehicle", value: params.vehicle, label: "Vehicle", options: vehicles },
+      { key: "from", value: params.from && params.to ? {
+        from: params.from,
+        to: params.to
+      } : {
+        from: formatDateForInput(startOfMonth(new Date())),
+        to: formatDateForInput(endOfMonth(new Date()))
+      }, label: "Date", type: "date", icon: Calendar, multiple: true },
+      { key: "asset", value: params.asset, label: "Vehicle", options: vehicles },
       { key: "driver", value: params.driver, label: "Driver", type: "avatar", options: drivers },
       { key: "helper", value: params.helper, label: "Helper", type: "avatar", options: helpers },
     ]} query={query} options={{}} toolbar={(

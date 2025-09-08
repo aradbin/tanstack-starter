@@ -21,7 +21,7 @@ export const tripDepotColumns = ({
     cell: ({ row }) => formatDate(row?.original?.date),
   },
   {
-    accessorKey: "vehicle.registrationNumber",
+    accessorKey: "asset.metadata.registrationNumber",
     header: ({ column }) => <TableColumnHeader column={column} title="Vehicle" />,
   },
   {

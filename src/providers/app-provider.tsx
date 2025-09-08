@@ -116,8 +116,8 @@ export function AppProvider({
       const response = await getDatas({
         data: {
           table: "employees",
-          where: {
-            designation: ["driver", "helper"],
+          relation: {
+            designation: true
           },
         },
       });
@@ -129,15 +129,15 @@ export function AppProvider({
         name: employee.name,
         image: employee.image,
         email: employee.phone,
-        designation: employee.designation,
+        designation: employee.designation?.name,
       });
 
       return {
         drivers: employees
-          .filter((employee: typeof employees.$inferSelect) => employee.designation === "driver")
+          .filter((employee: typeof employees.$inferSelect) => employee.designation?.name?.toLowerCase() === "driver")
           .map(mapEmployee),
         helpers: employees
-          .filter((employee: typeof employees.$inferSelect) => employee.designation === "helper")
+          .filter((employee: typeof employees.$inferSelect) => employee.designation?.name?.toLowerCase() === "helper")
           .map(mapEmployee),
       };
     },

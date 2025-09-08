@@ -1,5 +1,5 @@
 import { NavigationType, NavItemType } from "@/lib/types";
-import { BaggageClaim, BriefcaseBusiness, LayoutGrid, ShieldUser, Truck, Users } from "lucide-react";
+import { BaggageClaim, Briefcase, BriefcaseBusiness, Contact, LayoutGrid, ListChecks, Mail, MessageCircle, ShieldUser, Truck, Users } from "lucide-react";
 
 export const mainNavItems: NavigationType[] = [
   {
@@ -31,56 +31,56 @@ export const mainNavItems: NavigationType[] = [
       },
     ],
   },
-  // {
-  //   title: "Organization",
-  //   items: [
-  //     {
-  //       title: "Members",
-  //       href: "/members",
-  //       icon: Users,
-  //     }
-  //   ],
-  // },
-  // {
-  //   title: "Tasks",
-  //   items: [
-  //     {
-  //       title: "All Tasks",
-  //       href: "/tasks",
-  //       icon: ListChecks,
-  //     },
-  //   ],
-  // },
-  // {
-  //   title: "CRM",
-  //   items: [
-  //     {
-  //       title: "Contacts",
-  //       href: "/contacts",
-  //       icon: Contact,
-  //     },
-  //     {
-  //       title: "Customers",
-  //       href: "/customers",
-  //       icon: Briefcase,
-  //     },
-  //   ],
-  // },
-  // {
-  //   title: "Communication",
-  //   items: [
-  //     {
-  //       title: "WhatsApp",
-  //       href: "/whatsapp",
-  //       icon: MessageCircle,
-  //     },
-  //     {
-  //       title: "Email",
-  //       href: "/email",
-  //       icon: Mail,
-  //     },
-  //   ],
-  // },
+  {
+    title: "Organization",
+    items: [
+      {
+        title: "Members",
+        href: "/members",
+        icon: Users,
+      }
+    ],
+  },
+  {
+    title: "Tasks",
+    items: [
+      {
+        title: "All Tasks",
+        href: "/tasks",
+        icon: ListChecks,
+      },
+    ],
+  },
+  {
+    title: "CRM",
+    items: [
+      {
+        title: "Contacts",
+        href: "/contacts",
+        icon: Contact,
+      },
+      {
+        title: "Customers",
+        href: "/customers",
+        icon: Briefcase,
+      },
+    ],
+  },
+  {
+    title: "Communication",
+    items: [
+      {
+        title: "WhatsApp",
+        href: "/whatsapp",
+        icon: MessageCircle,
+      },
+      {
+        title: "Email",
+        href: "/email",
+        icon: Mail,
+      },
+    ],
+  },
 ]
 
 export const footerNavItems: NavItemType[] = []

@@ -27,7 +27,7 @@ export default function TripForm({ id }: { id?: string }) {
   const [expenses, setExpenses] = useState<AnyType[]>([
     { description: "Toll", amount: 90 },
     { description: "Tips", amount: 710 },
-    { description: "Fuel", amount: (tripRoutesDepot[0]?.cost || 0) * fuelPrice },
+    { description: "Fuel", amount: (tripRoutesDepot[0]?.consumption || 0) * fuelPrice },
   ])
   const { data, isLoading } = useQuery({
     queryKey: ['trips', id],
@@ -46,24 +46,50 @@ export default function TripForm({ id }: { id?: string }) {
   })
   
   useEffect(() => {
-    const fuelExpense = items.reduce((total, item) => {
-      if(item.to){
-        return total + (item.cost * item.count * (data?.fuelPrice || fuelPrice))
-      }
+    const expenses = {
+      toll: 0,
+      tips: 0,
+      fuel: 0
+    }
 
-      return total
-    }, 0)
+    items.forEach((item) => {
+      if (item.to) {
+        expenses.toll += item.toll * item.count
+        expenses.tips += item.tips * item.count
+        expenses.fuel += item.consumption * item.count * (data?.fuelPrice || fuelPrice)
+      }
+    })
 
     setExpenses((prev) => {
       const newExpenses = [...prev]
-      if (newExpenses[2]) {
-        newExpenses[2] = {
-          ...newExpenses[2],
-          amount: fuelExpense,
+      const tollIndex = newExpenses.findIndex((expense) => expense.description === "Toll")
+      const tipsIndex = newExpenses.findIndex((expense) => expense.description === "Tips")
+      const fuelIndex = newExpenses.findIndex((expense) => expense.description === "Fuel")
+      if(tollIndex > -1) {
+        newExpenses[tollIndex] = {
+          ...newExpenses[tollIndex],
+          amount: expenses.toll
         }
       } else {
-        newExpenses.push({ description: "Fuel", amount: fuelExpense })
+        newExpenses.push({ description: "Toll", amount: expenses.toll })
       }
+      if(tipsIndex > -1) {
+        newExpenses[tipsIndex] = {
+          ...newExpenses[tipsIndex],
+          amount: expenses.tips
+        }
+      } else {
+        newExpenses.push({ description: "Tips", amount: expenses.tips })
+      }
+      if (fuelIndex > -1) {
+        newExpenses[fuelIndex] = {
+          ...newExpenses[fuelIndex],
+          amount: expenses.fuel,
+        }
+      } else {
+        newExpenses.push({ description: "Fuel", amount: expenses.fuel })
+      }
+
       return newExpenses
     })
   }, [items, fuelPrice])
@@ -78,7 +104,7 @@ export default function TripForm({ id }: { id?: string }) {
         placeholder: "Enter Trip Date",
       },
       {
-        name: "vehicleId",
+        name: "assetId",
         label: "Vehicle",
         type: "select",
         options: vehicles,

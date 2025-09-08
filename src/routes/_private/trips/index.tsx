@@ -1,5 +1,5 @@
 import { createFileRoute, Link } from '@tanstack/react-router'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { Card, CardHeader, CardTitle } from '@/components/ui/card'
 import { MapPinHouse, Warehouse } from 'lucide-react'
 
 export const Route = createFileRoute('/_private/trips/')({
