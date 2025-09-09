@@ -9,20 +9,75 @@ export const mainNavItems: NavigationType[] = [
         href: "/",
         icon: LayoutGrid,
       },
+    ]
+  },
+  // {
+  //   title: "Tasks",
+  //   items: [
+  //     {
+  //       title: "All Tasks",
+  //       href: "/tasks",
+  //       icon: ListChecks,
+  //     },
+  //   ],
+  // },
+  {
+    title: "Trips",
+    items: [
       {
-        title: "Employees",
-        href: "/employees",
-        icon: Users,
+        title: "Depot Trips",
+        href: "/events/regal-transtrade/depot",
+        icon: BaggageClaim,
       },
+    ]
+  },
+  // {
+  //   title: "Communication",
+  //   items: [
+  //     {
+  //       title: "WhatsApp",
+  //       href: "/whatsapp",
+  //       icon: MessageCircle,
+  //     },
+  //     {
+  //       title: "Email",
+  //       href: "/email",
+  //       icon: Mail,
+  //     },
+  //   ],
+  // },
+  {
+    title: "Assets",
+    items: [
       {
         title: "Vehicles",
         href: "/assets",
         icon: Truck,
       },
+    ]
+  },
+  // {
+  //   title: "CRM",
+  //   items: [
+  //     {
+  //       title: "Contacts",
+  //       href: "/contacts",
+  //       icon: Contact,
+  //     },
+  //     {
+  //       title: "Customers",
+  //       href: "/customers",
+  //       icon: Briefcase,
+  //     },
+  //   ],
+  // },
+  {
+    title: "HRM",
+    items: [
       {
-        title: "Depot Trips",
-        href: "/events/regal-transtrade/depot",
-        icon: BaggageClaim,
+        title: "Employees",
+        href: "/employees",
+        icon: Users,
       },
       {
         title: "Designations",
@@ -31,56 +86,16 @@ export const mainNavItems: NavigationType[] = [
       },
     ],
   },
-  {
-    title: "Organization",
-    items: [
-      {
-        title: "Members",
-        href: "/members",
-        icon: Users,
-      }
-    ],
-  },
-  {
-    title: "Tasks",
-    items: [
-      {
-        title: "All Tasks",
-        href: "/tasks",
-        icon: ListChecks,
-      },
-    ],
-  },
-  {
-    title: "CRM",
-    items: [
-      {
-        title: "Contacts",
-        href: "/contacts",
-        icon: Contact,
-      },
-      {
-        title: "Customers",
-        href: "/customers",
-        icon: Briefcase,
-      },
-    ],
-  },
-  {
-    title: "Communication",
-    items: [
-      {
-        title: "WhatsApp",
-        href: "/whatsapp",
-        icon: MessageCircle,
-      },
-      {
-        title: "Email",
-        href: "/email",
-        icon: Mail,
-      },
-    ],
-  },
+  // {
+  //   title: "Organization",
+  //   items: [
+  //     {
+  //       title: "Members",
+  //       href: "/members",
+  //       icon: Users,
+  //     }
+  //   ],
+  // },
 ]
 
 export const footerNavItems: NavItemType[] = []

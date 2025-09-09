@@ -36,7 +36,7 @@ function RouteComponent() {
 
   return (
     <div className="grid gap-6">
-      <AuthProviders />
+      {/* <AuthProviders /> */}
       <FormComponent
         fields={fields}
         handleSubmit={signIn}
@@ -58,12 +58,12 @@ function RouteComponent() {
             Forgot your password?
           </a>
         </div>
-        <div className="text-center text-sm">
+        {/* <div className="text-center text-sm">
           Don&apos;t have an account?{" "}
           <Link to="/register" className="underline underline-offset-4">
             Register
           </Link>
-        </div>
+        </div> */}
       </div>
     </div>
   )
