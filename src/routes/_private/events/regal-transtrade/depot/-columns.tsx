@@ -2,7 +2,7 @@ import { ColumnDef } from "@tanstack/react-table"
 import { TableColumnHeader } from "@/components/table/table-column-header"
 import { TableRowActions } from "@/components/table/table-row-actions"
 import { AnyType, TableActionType } from "@/lib/types"
-import { employees, trips } from "@/lib/db/schema"
+import { assets, employees, events } from "@/lib/db/schema"
 import { Badge } from "@/components/ui/badge"
 import AvatarComponent from "@/components/common/avatar-component"
 import { formatDate } from "@/lib/utils"
@@ -11,17 +11,18 @@ export const tripDepotColumns = ({
   actions
 }: {
   actions?: TableActionType
-}): ColumnDef<typeof trips.$inferSelect & {
-  driver: typeof employees.$inferSelect | null,
-  helper: typeof employees.$inferSelect | null,
+}): ColumnDef<typeof events.$inferSelect & {
+  vehicle: typeof assets.$inferSelect,
+  driver: typeof employees.$inferSelect,
+  helper: typeof employees.$inferSelect,
 }>[] => [
   {
-    id: "date",
+    id: "from",
     header: ({ column }) => <TableColumnHeader column={column} title="Date" />,
-    cell: ({ row }) => formatDate(row?.original?.date),
+    cell: ({ row }) => formatDate(row?.original?.from),
   },
   {
-    accessorKey: "asset.metadata.registrationNumber",
+    accessorKey: "vehicle.metadata.registrationNumber",
     header: ({ column }) => <TableColumnHeader column={column} title="Vehicle" />,
   },
   {
@@ -47,7 +48,7 @@ export const tripDepotColumns = ({
       let total = 0
       return (
         <div className="flex flex-col gap-1">
-          {row?.original?.items?.map((item: any, index: number) => {
+          {row?.original?.metadata?.items?.map((item: any, index: number) => {
             total += item.count
             return (
               <Badge key={index} variant="outline"><span>{item.to === 'PL' ? 'CPA to PL' : item.to}</span> - <span>{item.count}</span></Badge>
@@ -65,7 +66,7 @@ export const tripDepotColumns = ({
       let total = 0
       return (
         <div className="flex flex-col gap-1">
-          {row?.original?.expenses?.map((item: any, index: number) => {
+          {row?.original?.metadata?.expenses?.map((item: any, index: number) => {
             total += item.amount
             return (
               <Badge key={index} variant="outline"><span>{item.description}</span> - <span>{item.amount}</span></Badge>

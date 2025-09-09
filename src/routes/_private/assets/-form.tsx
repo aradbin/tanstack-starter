@@ -89,7 +89,7 @@ export default function AssetForm() {
           fields={formFields}
           handleSubmit={(values: Record<string, any>) => {
             const payload = {
-              type: "vehicle",
+              typeId: "kP47g0lpyblJWVgH0XTHEWh3ftZMhuk0",
               metadata: {
                 registrationNumber: values.registrationNumber,
                 registrationDate: values.registrationDate,

@@ -17,10 +17,10 @@ import { Route as PrivateIndexRouteImport } from './routes/_private/index'
 import { Route as PrivateEmployeesRouteRouteImport } from './routes/_private/employees/route'
 import { Route as PrivateAssetsRouteRouteImport } from './routes/_private/assets/route'
 import { Route as PrivateWhatsappIndexRouteImport } from './routes/_private/whatsapp/index'
-import { Route as PrivateTripsIndexRouteImport } from './routes/_private/trips/index'
 import { Route as PrivateTasksIndexRouteImport } from './routes/_private/tasks/index'
 import { Route as PrivateRolesIndexRouteImport } from './routes/_private/roles/index'
 import { Route as PrivateMembersIndexRouteImport } from './routes/_private/members/index'
+import { Route as PrivateEventsIndexRouteImport } from './routes/_private/events/index'
 import { Route as PrivateEmployeesIndexRouteImport } from './routes/_private/employees/index'
 import { Route as PrivateEmailIndexRouteImport } from './routes/_private/email/index'
 import { Route as PrivateDesignationsIndexRouteImport } from './routes/_private/designations/index'
@@ -30,15 +30,15 @@ import { Route as PrivateAssetsIndexRouteImport } from './routes/_private/assets
 import { Route as AuthRegisterIndexRouteImport } from './routes/_auth/register/index'
 import { Route as AuthLoginIndexRouteImport } from './routes/_auth/login/index'
 import { Route as AuthRegisterOrganizationRouteImport } from './routes/_auth/register/organization'
-import { Route as PrivateTripsDistrictIndexRouteImport } from './routes/_private/trips/district/index'
-import { Route as PrivateTripsDepotIndexRouteImport } from './routes/_private/trips/depot/index'
+import { Route as PrivateEventsRegalTranstradeIndexRouteImport } from './routes/_private/events/regal-transtrade/index'
 import { Route as PrivateEmployeesIdIndexRouteImport } from './routes/_private/employees/$id/index'
 import { Route as PrivateCustomersIdIndexRouteImport } from './routes/_private/customers/$id/index'
 import { Route as PrivateContactsIdIndexRouteImport } from './routes/_private/contacts/$id/index'
 import { Route as PrivateAssetsIdIndexRouteImport } from './routes/_private/assets/$id/index'
-import { Route as PrivateTripsDepotCreateIndexRouteImport } from './routes/_private/trips/depot/create/index'
-import { Route as PrivateTripsDepotIdIndexRouteImport } from './routes/_private/trips/depot/$id/index'
-import { Route as PrivateTripsDepotIdEditIndexRouteImport } from './routes/_private/trips/depot/$id/edit/index'
+import { Route as PrivateEventsRegalTranstradeDepotIndexRouteImport } from './routes/_private/events/regal-transtrade/depot/index'
+import { Route as PrivateEventsRegalTranstradeDepotCreateIndexRouteImport } from './routes/_private/events/regal-transtrade/depot/create/index'
+import { Route as PrivateEventsRegalTranstradeDepotIdIndexRouteImport } from './routes/_private/events/regal-transtrade/depot/$id/index'
+import { Route as PrivateEventsRegalTranstradeDepotIdEditIndexRouteImport } from './routes/_private/events/regal-transtrade/depot/$id/edit/index'
 import { ServerRoute as ApiAuthSplatServerRouteImport } from './routes/api/auth/$'
 
 const rootServerRouteImport = createServerRootRoute()
@@ -71,11 +71,6 @@ const PrivateWhatsappIndexRoute = PrivateWhatsappIndexRouteImport.update({
   path: '/whatsapp/',
   getParentRoute: () => PrivateRouteRoute,
 } as any)
-const PrivateTripsIndexRoute = PrivateTripsIndexRouteImport.update({
-  id: '/trips/',
-  path: '/trips/',
-  getParentRoute: () => PrivateRouteRoute,
-} as any)
 const PrivateTasksIndexRoute = PrivateTasksIndexRouteImport.update({
   id: '/tasks/',
   path: '/tasks/',
@@ -89,6 +84,11 @@ const PrivateRolesIndexRoute = PrivateRolesIndexRouteImport.update({
 const PrivateMembersIndexRoute = PrivateMembersIndexRouteImport.update({
   id: '/members/',
   path: '/members/',
+  getParentRoute: () => PrivateRouteRoute,
+} as any)
+const PrivateEventsIndexRoute = PrivateEventsIndexRouteImport.update({
+  id: '/events/',
+  path: '/events/',
   getParentRoute: () => PrivateRouteRoute,
 } as any)
 const PrivateEmployeesIndexRoute = PrivateEmployeesIndexRouteImport.update({
@@ -138,17 +138,12 @@ const AuthRegisterOrganizationRoute =
     path: '/register/organization',
     getParentRoute: () => AuthRouteRoute,
   } as any)
-const PrivateTripsDistrictIndexRoute =
-  PrivateTripsDistrictIndexRouteImport.update({
-    id: '/trips/district/',
-    path: '/trips/district/',
+const PrivateEventsRegalTranstradeIndexRoute =
+  PrivateEventsRegalTranstradeIndexRouteImport.update({
+    id: '/events/regal-transtrade/',
+    path: '/events/regal-transtrade/',
     getParentRoute: () => PrivateRouteRoute,
   } as any)
-const PrivateTripsDepotIndexRoute = PrivateTripsDepotIndexRouteImport.update({
-  id: '/trips/depot/',
-  path: '/trips/depot/',
-  getParentRoute: () => PrivateRouteRoute,
-} as any)
 const PrivateEmployeesIdIndexRoute = PrivateEmployeesIdIndexRouteImport.update({
   id: '/$id/',
   path: '/$id/',
@@ -169,22 +164,28 @@ const PrivateAssetsIdIndexRoute = PrivateAssetsIdIndexRouteImport.update({
   path: '/$id/',
   getParentRoute: () => PrivateAssetsRouteRoute,
 } as any)
-const PrivateTripsDepotCreateIndexRoute =
-  PrivateTripsDepotCreateIndexRouteImport.update({
-    id: '/trips/depot/create/',
-    path: '/trips/depot/create/',
+const PrivateEventsRegalTranstradeDepotIndexRoute =
+  PrivateEventsRegalTranstradeDepotIndexRouteImport.update({
+    id: '/events/regal-transtrade/depot/',
+    path: '/events/regal-transtrade/depot/',
     getParentRoute: () => PrivateRouteRoute,
   } as any)
-const PrivateTripsDepotIdIndexRoute =
-  PrivateTripsDepotIdIndexRouteImport.update({
-    id: '/trips/depot/$id/',
-    path: '/trips/depot/$id/',
+const PrivateEventsRegalTranstradeDepotCreateIndexRoute =
+  PrivateEventsRegalTranstradeDepotCreateIndexRouteImport.update({
+    id: '/events/regal-transtrade/depot/create/',
+    path: '/events/regal-transtrade/depot/create/',
     getParentRoute: () => PrivateRouteRoute,
   } as any)
-const PrivateTripsDepotIdEditIndexRoute =
-  PrivateTripsDepotIdEditIndexRouteImport.update({
-    id: '/trips/depot/$id/edit/',
-    path: '/trips/depot/$id/edit/',
+const PrivateEventsRegalTranstradeDepotIdIndexRoute =
+  PrivateEventsRegalTranstradeDepotIdIndexRouteImport.update({
+    id: '/events/regal-transtrade/depot/$id/',
+    path: '/events/regal-transtrade/depot/$id/',
+    getParentRoute: () => PrivateRouteRoute,
+  } as any)
+const PrivateEventsRegalTranstradeDepotIdEditIndexRoute =
+  PrivateEventsRegalTranstradeDepotIdEditIndexRouteImport.update({
+    id: '/events/regal-transtrade/depot/$id/edit/',
+    path: '/events/regal-transtrade/depot/$id/edit/',
     getParentRoute: () => PrivateRouteRoute,
   } as any)
 const ApiAuthSplatServerRoute = ApiAuthSplatServerRouteImport.update({
@@ -206,20 +207,20 @@ export interface FileRoutesByFullPath {
   '/designations': typeof PrivateDesignationsIndexRoute
   '/email': typeof PrivateEmailIndexRoute
   '/employees/': typeof PrivateEmployeesIndexRoute
+  '/events': typeof PrivateEventsIndexRoute
   '/members': typeof PrivateMembersIndexRoute
   '/roles': typeof PrivateRolesIndexRoute
   '/tasks': typeof PrivateTasksIndexRoute
-  '/trips': typeof PrivateTripsIndexRoute
   '/whatsapp': typeof PrivateWhatsappIndexRoute
   '/assets/$id': typeof PrivateAssetsIdIndexRoute
   '/contacts/$id': typeof PrivateContactsIdIndexRoute
   '/customers/$id': typeof PrivateCustomersIdIndexRoute
   '/employees/$id': typeof PrivateEmployeesIdIndexRoute
-  '/trips/depot': typeof PrivateTripsDepotIndexRoute
-  '/trips/district': typeof PrivateTripsDistrictIndexRoute
-  '/trips/depot/$id': typeof PrivateTripsDepotIdIndexRoute
-  '/trips/depot/create': typeof PrivateTripsDepotCreateIndexRoute
-  '/trips/depot/$id/edit': typeof PrivateTripsDepotIdEditIndexRoute
+  '/events/regal-transtrade': typeof PrivateEventsRegalTranstradeIndexRoute
+  '/events/regal-transtrade/depot': typeof PrivateEventsRegalTranstradeDepotIndexRoute
+  '/events/regal-transtrade/depot/$id': typeof PrivateEventsRegalTranstradeDepotIdIndexRoute
+  '/events/regal-transtrade/depot/create': typeof PrivateEventsRegalTranstradeDepotCreateIndexRoute
+  '/events/regal-transtrade/depot/$id/edit': typeof PrivateEventsRegalTranstradeDepotIdEditIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof PrivateIndexRoute
@@ -232,20 +233,20 @@ export interface FileRoutesByTo {
   '/designations': typeof PrivateDesignationsIndexRoute
   '/email': typeof PrivateEmailIndexRoute
   '/employees': typeof PrivateEmployeesIndexRoute
+  '/events': typeof PrivateEventsIndexRoute
   '/members': typeof PrivateMembersIndexRoute
   '/roles': typeof PrivateRolesIndexRoute
   '/tasks': typeof PrivateTasksIndexRoute
-  '/trips': typeof PrivateTripsIndexRoute
   '/whatsapp': typeof PrivateWhatsappIndexRoute
   '/assets/$id': typeof PrivateAssetsIdIndexRoute
   '/contacts/$id': typeof PrivateContactsIdIndexRoute
   '/customers/$id': typeof PrivateCustomersIdIndexRoute
   '/employees/$id': typeof PrivateEmployeesIdIndexRoute
-  '/trips/depot': typeof PrivateTripsDepotIndexRoute
-  '/trips/district': typeof PrivateTripsDistrictIndexRoute
-  '/trips/depot/$id': typeof PrivateTripsDepotIdIndexRoute
-  '/trips/depot/create': typeof PrivateTripsDepotCreateIndexRoute
-  '/trips/depot/$id/edit': typeof PrivateTripsDepotIdEditIndexRoute
+  '/events/regal-transtrade': typeof PrivateEventsRegalTranstradeIndexRoute
+  '/events/regal-transtrade/depot': typeof PrivateEventsRegalTranstradeDepotIndexRoute
+  '/events/regal-transtrade/depot/$id': typeof PrivateEventsRegalTranstradeDepotIdIndexRoute
+  '/events/regal-transtrade/depot/create': typeof PrivateEventsRegalTranstradeDepotCreateIndexRoute
+  '/events/regal-transtrade/depot/$id/edit': typeof PrivateEventsRegalTranstradeDepotIdEditIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -263,20 +264,20 @@ export interface FileRoutesById {
   '/_private/designations/': typeof PrivateDesignationsIndexRoute
   '/_private/email/': typeof PrivateEmailIndexRoute
   '/_private/employees/': typeof PrivateEmployeesIndexRoute
+  '/_private/events/': typeof PrivateEventsIndexRoute
   '/_private/members/': typeof PrivateMembersIndexRoute
   '/_private/roles/': typeof PrivateRolesIndexRoute
   '/_private/tasks/': typeof PrivateTasksIndexRoute
-  '/_private/trips/': typeof PrivateTripsIndexRoute
   '/_private/whatsapp/': typeof PrivateWhatsappIndexRoute
   '/_private/assets/$id/': typeof PrivateAssetsIdIndexRoute
   '/_private/contacts/$id/': typeof PrivateContactsIdIndexRoute
   '/_private/customers/$id/': typeof PrivateCustomersIdIndexRoute
   '/_private/employees/$id/': typeof PrivateEmployeesIdIndexRoute
-  '/_private/trips/depot/': typeof PrivateTripsDepotIndexRoute
-  '/_private/trips/district/': typeof PrivateTripsDistrictIndexRoute
-  '/_private/trips/depot/$id/': typeof PrivateTripsDepotIdIndexRoute
-  '/_private/trips/depot/create/': typeof PrivateTripsDepotCreateIndexRoute
-  '/_private/trips/depot/$id/edit/': typeof PrivateTripsDepotIdEditIndexRoute
+  '/_private/events/regal-transtrade/': typeof PrivateEventsRegalTranstradeIndexRoute
+  '/_private/events/regal-transtrade/depot/': typeof PrivateEventsRegalTranstradeDepotIndexRoute
+  '/_private/events/regal-transtrade/depot/$id/': typeof PrivateEventsRegalTranstradeDepotIdIndexRoute
+  '/_private/events/regal-transtrade/depot/create/': typeof PrivateEventsRegalTranstradeDepotCreateIndexRoute
+  '/_private/events/regal-transtrade/depot/$id/edit/': typeof PrivateEventsRegalTranstradeDepotIdEditIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -293,20 +294,20 @@ export interface FileRouteTypes {
     | '/designations'
     | '/email'
     | '/employees/'
+    | '/events'
     | '/members'
     | '/roles'
     | '/tasks'
-    | '/trips'
     | '/whatsapp'
     | '/assets/$id'
     | '/contacts/$id'
     | '/customers/$id'
     | '/employees/$id'
-    | '/trips/depot'
-    | '/trips/district'
-    | '/trips/depot/$id'
-    | '/trips/depot/create'
-    | '/trips/depot/$id/edit'
+    | '/events/regal-transtrade'
+    | '/events/regal-transtrade/depot'
+    | '/events/regal-transtrade/depot/$id'
+    | '/events/regal-transtrade/depot/create'
+    | '/events/regal-transtrade/depot/$id/edit'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -319,20 +320,20 @@ export interface FileRouteTypes {
     | '/designations'
     | '/email'
     | '/employees'
+    | '/events'
     | '/members'
     | '/roles'
     | '/tasks'
-    | '/trips'
     | '/whatsapp'
     | '/assets/$id'
     | '/contacts/$id'
     | '/customers/$id'
     | '/employees/$id'
-    | '/trips/depot'
-    | '/trips/district'
-    | '/trips/depot/$id'
-    | '/trips/depot/create'
-    | '/trips/depot/$id/edit'
+    | '/events/regal-transtrade'
+    | '/events/regal-transtrade/depot'
+    | '/events/regal-transtrade/depot/$id'
+    | '/events/regal-transtrade/depot/create'
+    | '/events/regal-transtrade/depot/$id/edit'
   id:
     | '__root__'
     | '/_auth'
@@ -349,20 +350,20 @@ export interface FileRouteTypes {
     | '/_private/designations/'
     | '/_private/email/'
     | '/_private/employees/'
+    | '/_private/events/'
     | '/_private/members/'
     | '/_private/roles/'
     | '/_private/tasks/'
-    | '/_private/trips/'
     | '/_private/whatsapp/'
     | '/_private/assets/$id/'
     | '/_private/contacts/$id/'
     | '/_private/customers/$id/'
     | '/_private/employees/$id/'
-    | '/_private/trips/depot/'
-    | '/_private/trips/district/'
-    | '/_private/trips/depot/$id/'
-    | '/_private/trips/depot/create/'
-    | '/_private/trips/depot/$id/edit/'
+    | '/_private/events/regal-transtrade/'
+    | '/_private/events/regal-transtrade/depot/'
+    | '/_private/events/regal-transtrade/depot/$id/'
+    | '/_private/events/regal-transtrade/depot/create/'
+    | '/_private/events/regal-transtrade/depot/$id/edit/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -435,13 +436,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof PrivateWhatsappIndexRouteImport
       parentRoute: typeof PrivateRouteRoute
     }
-    '/_private/trips/': {
-      id: '/_private/trips/'
-      path: '/trips'
-      fullPath: '/trips'
-      preLoaderRoute: typeof PrivateTripsIndexRouteImport
-      parentRoute: typeof PrivateRouteRoute
-    }
     '/_private/tasks/': {
       id: '/_private/tasks/'
       path: '/tasks'
@@ -461,6 +455,13 @@ declare module '@tanstack/react-router' {
       path: '/members'
       fullPath: '/members'
       preLoaderRoute: typeof PrivateMembersIndexRouteImport
+      parentRoute: typeof PrivateRouteRoute
+    }
+    '/_private/events/': {
+      id: '/_private/events/'
+      path: '/events'
+      fullPath: '/events'
+      preLoaderRoute: typeof PrivateEventsIndexRouteImport
       parentRoute: typeof PrivateRouteRoute
     }
     '/_private/employees/': {
@@ -526,18 +527,11 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthRegisterOrganizationRouteImport
       parentRoute: typeof AuthRouteRoute
     }
-    '/_private/trips/district/': {
-      id: '/_private/trips/district/'
-      path: '/trips/district'
-      fullPath: '/trips/district'
-      preLoaderRoute: typeof PrivateTripsDistrictIndexRouteImport
-      parentRoute: typeof PrivateRouteRoute
-    }
-    '/_private/trips/depot/': {
-      id: '/_private/trips/depot/'
-      path: '/trips/depot'
-      fullPath: '/trips/depot'
-      preLoaderRoute: typeof PrivateTripsDepotIndexRouteImport
+    '/_private/events/regal-transtrade/': {
+      id: '/_private/events/regal-transtrade/'
+      path: '/events/regal-transtrade'
+      fullPath: '/events/regal-transtrade'
+      preLoaderRoute: typeof PrivateEventsRegalTranstradeIndexRouteImport
       parentRoute: typeof PrivateRouteRoute
     }
     '/_private/employees/$id/': {
@@ -568,25 +562,32 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof PrivateAssetsIdIndexRouteImport
       parentRoute: typeof PrivateAssetsRouteRoute
     }
-    '/_private/trips/depot/create/': {
-      id: '/_private/trips/depot/create/'
-      path: '/trips/depot/create'
-      fullPath: '/trips/depot/create'
-      preLoaderRoute: typeof PrivateTripsDepotCreateIndexRouteImport
+    '/_private/events/regal-transtrade/depot/': {
+      id: '/_private/events/regal-transtrade/depot/'
+      path: '/events/regal-transtrade/depot'
+      fullPath: '/events/regal-transtrade/depot'
+      preLoaderRoute: typeof PrivateEventsRegalTranstradeDepotIndexRouteImport
       parentRoute: typeof PrivateRouteRoute
     }
-    '/_private/trips/depot/$id/': {
-      id: '/_private/trips/depot/$id/'
-      path: '/trips/depot/$id'
-      fullPath: '/trips/depot/$id'
-      preLoaderRoute: typeof PrivateTripsDepotIdIndexRouteImport
+    '/_private/events/regal-transtrade/depot/create/': {
+      id: '/_private/events/regal-transtrade/depot/create/'
+      path: '/events/regal-transtrade/depot/create'
+      fullPath: '/events/regal-transtrade/depot/create'
+      preLoaderRoute: typeof PrivateEventsRegalTranstradeDepotCreateIndexRouteImport
       parentRoute: typeof PrivateRouteRoute
     }
-    '/_private/trips/depot/$id/edit/': {
-      id: '/_private/trips/depot/$id/edit/'
-      path: '/trips/depot/$id/edit'
-      fullPath: '/trips/depot/$id/edit'
-      preLoaderRoute: typeof PrivateTripsDepotIdEditIndexRouteImport
+    '/_private/events/regal-transtrade/depot/$id/': {
+      id: '/_private/events/regal-transtrade/depot/$id/'
+      path: '/events/regal-transtrade/depot/$id'
+      fullPath: '/events/regal-transtrade/depot/$id'
+      preLoaderRoute: typeof PrivateEventsRegalTranstradeDepotIdIndexRouteImport
+      parentRoute: typeof PrivateRouteRoute
+    }
+    '/_private/events/regal-transtrade/depot/$id/edit/': {
+      id: '/_private/events/regal-transtrade/depot/$id/edit/'
+      path: '/events/regal-transtrade/depot/$id/edit'
+      fullPath: '/events/regal-transtrade/depot/$id/edit'
+      preLoaderRoute: typeof PrivateEventsRegalTranstradeDepotIdEditIndexRouteImport
       parentRoute: typeof PrivateRouteRoute
     }
   }
@@ -655,18 +656,18 @@ interface PrivateRouteRouteChildren {
   PrivateCustomersIndexRoute: typeof PrivateCustomersIndexRoute
   PrivateDesignationsIndexRoute: typeof PrivateDesignationsIndexRoute
   PrivateEmailIndexRoute: typeof PrivateEmailIndexRoute
+  PrivateEventsIndexRoute: typeof PrivateEventsIndexRoute
   PrivateMembersIndexRoute: typeof PrivateMembersIndexRoute
   PrivateRolesIndexRoute: typeof PrivateRolesIndexRoute
   PrivateTasksIndexRoute: typeof PrivateTasksIndexRoute
-  PrivateTripsIndexRoute: typeof PrivateTripsIndexRoute
   PrivateWhatsappIndexRoute: typeof PrivateWhatsappIndexRoute
   PrivateContactsIdIndexRoute: typeof PrivateContactsIdIndexRoute
   PrivateCustomersIdIndexRoute: typeof PrivateCustomersIdIndexRoute
-  PrivateTripsDepotIndexRoute: typeof PrivateTripsDepotIndexRoute
-  PrivateTripsDistrictIndexRoute: typeof PrivateTripsDistrictIndexRoute
-  PrivateTripsDepotIdIndexRoute: typeof PrivateTripsDepotIdIndexRoute
-  PrivateTripsDepotCreateIndexRoute: typeof PrivateTripsDepotCreateIndexRoute
-  PrivateTripsDepotIdEditIndexRoute: typeof PrivateTripsDepotIdEditIndexRoute
+  PrivateEventsRegalTranstradeIndexRoute: typeof PrivateEventsRegalTranstradeIndexRoute
+  PrivateEventsRegalTranstradeDepotIndexRoute: typeof PrivateEventsRegalTranstradeDepotIndexRoute
+  PrivateEventsRegalTranstradeDepotIdIndexRoute: typeof PrivateEventsRegalTranstradeDepotIdIndexRoute
+  PrivateEventsRegalTranstradeDepotCreateIndexRoute: typeof PrivateEventsRegalTranstradeDepotCreateIndexRoute
+  PrivateEventsRegalTranstradeDepotIdEditIndexRoute: typeof PrivateEventsRegalTranstradeDepotIdEditIndexRoute
 }
 
 const PrivateRouteRouteChildren: PrivateRouteRouteChildren = {
@@ -677,18 +678,23 @@ const PrivateRouteRouteChildren: PrivateRouteRouteChildren = {
   PrivateCustomersIndexRoute: PrivateCustomersIndexRoute,
   PrivateDesignationsIndexRoute: PrivateDesignationsIndexRoute,
   PrivateEmailIndexRoute: PrivateEmailIndexRoute,
+  PrivateEventsIndexRoute: PrivateEventsIndexRoute,
   PrivateMembersIndexRoute: PrivateMembersIndexRoute,
   PrivateRolesIndexRoute: PrivateRolesIndexRoute,
   PrivateTasksIndexRoute: PrivateTasksIndexRoute,
-  PrivateTripsIndexRoute: PrivateTripsIndexRoute,
   PrivateWhatsappIndexRoute: PrivateWhatsappIndexRoute,
   PrivateContactsIdIndexRoute: PrivateContactsIdIndexRoute,
   PrivateCustomersIdIndexRoute: PrivateCustomersIdIndexRoute,
-  PrivateTripsDepotIndexRoute: PrivateTripsDepotIndexRoute,
-  PrivateTripsDistrictIndexRoute: PrivateTripsDistrictIndexRoute,
-  PrivateTripsDepotIdIndexRoute: PrivateTripsDepotIdIndexRoute,
-  PrivateTripsDepotCreateIndexRoute: PrivateTripsDepotCreateIndexRoute,
-  PrivateTripsDepotIdEditIndexRoute: PrivateTripsDepotIdEditIndexRoute,
+  PrivateEventsRegalTranstradeIndexRoute:
+    PrivateEventsRegalTranstradeIndexRoute,
+  PrivateEventsRegalTranstradeDepotIndexRoute:
+    PrivateEventsRegalTranstradeDepotIndexRoute,
+  PrivateEventsRegalTranstradeDepotIdIndexRoute:
+    PrivateEventsRegalTranstradeDepotIdIndexRoute,
+  PrivateEventsRegalTranstradeDepotCreateIndexRoute:
+    PrivateEventsRegalTranstradeDepotCreateIndexRoute,
+  PrivateEventsRegalTranstradeDepotIdEditIndexRoute:
+    PrivateEventsRegalTranstradeDepotIdEditIndexRoute,
 }
 
 const PrivateRouteRouteWithChildren = PrivateRouteRoute._addFileChildren(

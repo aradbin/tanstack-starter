@@ -1,9 +1,8 @@
 import FormComponent from "@/components/form/form-component"
 import { useQuery } from "@tanstack/react-query"
-import { createData, getData, updateData } from "@/lib/db/functions"
+import { getData } from "@/lib/db/functions"
 import { AnyType, FormFieldType } from "@/lib/types"
 import { stringRequiredValidation, stringValidation } from "@/lib/validations"
-import { generateId } from "better-auth"
 import { fuelPrice, tripRoutesDepot } from "@/lib/organizations/regal-transtrade"
 import { useEffect, useState } from "react"
 import { formatDateForInput } from "@/lib/utils"
@@ -16,6 +15,7 @@ import { Label } from "@/components/ui/label"
 import InputField from "@/components/form/input-field"
 import { useNavigate } from "@tanstack/react-router"
 import { useApp } from "@/providers/app-provider"
+import { createTripDepot, updateTripDepot } from "./-utils"
 
 export default function TripForm({ id }: { id?: string }) {
   const navigate = useNavigate()
@@ -30,17 +30,26 @@ export default function TripForm({ id }: { id?: string }) {
     { description: "Fuel", amount: (tripRoutesDepot[0]?.consumption || 0) * fuelPrice },
   ])
   const { data, isLoading } = useQuery({
-    queryKey: ['trips', id],
+    queryKey: ['events', id],
     queryFn: async () => {
       const trip = await getData({ data: {
-        table: "trips",
+        table: "events",
+        relation: {
+          eventParticipants: true
+        },
         id
       }})
 
-      setItems(trip?.items || [])
-      setExpenses(trip?.expenses || [])
+      setItems(trip?.metadata?.items || [])
+      setExpenses(trip?.metadata?.expenses || [])
 
-      return trip
+      return {
+        date: formatDateForInput(trip?.from),
+        vehicleId: trip?.eventParticipants?.find((participant: AnyType) => participant.participantType === "assets" && participant.role === "vehicle")?.participantId,
+        driverId: trip?.eventParticipants?.find((participant: AnyType) => participant.participantType === "employees" && participant.role === "driver")?.participantId,
+        helperId: trip?.eventParticipants?.find((participant: AnyType) => participant.participantType === "employees" && participant.role === "helper")?.participantId,
+        fuelPrice: trip?.metadata?.fuelPrice
+      }
     },
     enabled: !!id
   })
@@ -104,7 +113,7 @@ export default function TripForm({ id }: { id?: string }) {
         placeholder: "Enter Trip Date",
       },
       {
-        name: "assetId",
+        name: "vehicleId",
         label: "Vehicle",
         type: "select",
         options: vehicles,
@@ -254,32 +263,28 @@ export default function TripForm({ id }: { id?: string }) {
           helperId: values?.helperId || null,
           expenses: expenses?.filter((expense) => expense?.description && expense?.amount),
           items: items?.filter((item) => item?.to && item?.count),
+          fuelPrice
         }
         if(id){
-          return await updateData({ data: { table: "trips", id: id, values: payload, title: "Trip" } })
+          return await updateTripDepot({ data: { id: id, values: payload } })
         }else{
-          return await createData({ data: { table: "trips", values: {
-            ...payload,
-            id: generateId(),
-            type: "depot",
-            fuelPrice: fuelPrice,
-          }, title: "Trip" }})
+          return await createTripDepot({ data: { values: payload }})
         }
       }}
       values={id && data ? data : {}}
       onSuccess={() => {
         navigate({
-          to: `/trips/depot`
+          to: `/events/regal-transtrade/depot`
         })
       }}
       onCancel={() => {
         navigate({
-          to: `/trips/depot`
+          to: `/events/regal-transtrade/depot`
         })
       }}
       options={{
         isLoading,
-        queryKey: 'trips',
+        queryKey: 'events',
       }}
       children={(
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-2">

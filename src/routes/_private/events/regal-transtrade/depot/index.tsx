@@ -7,16 +7,17 @@ import { useApp } from '@/providers/app-provider'
 import { BaggageClaim, Calendar, DollarSign, Fuel, Loader2, PlusCircle } from 'lucide-react'
 import { tripDepotColumns } from './-columns'
 import { formatDateForInput } from '@/lib/utils'
-import { endOfMonth, startOfMonth, sub } from 'date-fns'
+import { endOfMonth, isValid, startOfMonth } from 'date-fns'
 import { Card, CardAction, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { AnyType } from '@/lib/types'
+import { getTrips } from './-utils'
 
-export const Route = createFileRoute('/_private/trips/depot/')({
+export const Route = createFileRoute('/_private/events/regal-transtrade/depot/')({
   validateSearch: validate({
     ...defaultSearchParamValidation,
     from: stringValidation('From Date').catch(undefined),
     to: stringValidation('To Date').catch(undefined),
-    asset: stringValidation('Asset').catch(undefined),
+    vehicle: stringValidation('Vehicle').catch(undefined),
     driver: stringValidation('Driver').catch(undefined),
     helper: stringValidation('Helper').catch(undefined),
   }),
@@ -29,26 +30,21 @@ function RouteComponent() {
   const { vehicles, drivers, helpers, setDeleteModal } = useApp()
 
   const query: QueryParamType = {
-    table: "trips",
-    relation: {
-      asset: true,
-      driver: true,
-      helper: true,
-    },
+    table: "events",
     sort: {
-      field: params.sort,
+      field: params.sort || "from",
       order: params.order
     },
     pagination: {
       hasPagination: false
     },
     where: {
-      type: "depot",
-      date: {
-        gte: params.from ? formatDateForInput(params.from) : formatDateForInput(startOfMonth(new Date())),
-        lte: params.to ? formatDateForInput(params.to) : formatDateForInput(endOfMonth(new Date())),
+      // type: type,
+      from: {
+        gte: params.from && isValid(new Date(params.from)) ? new Date(params.from) : new Date(startOfMonth(new Date())),
+        lte: params.to && isValid(new Date(params.to)) ? new Date(params.to) : new Date(endOfMonth(new Date())),
       },
-      assetId: params.asset,
+      vehicleId: params.vehicle,
       driverId: params.driver,
       helperId: params.helper,
     }
@@ -57,21 +53,21 @@ function RouteComponent() {
   return (
     <TableComponent columns={tripDepotColumns({
       actions: {
-        view: (id) => {
-          navigate({
-            to: `/trips/depot/${id}`
-          })
-        },
+        // view: (id) => {
+        //   navigate({
+        //     to: `/events/regal-transtrade/depot/${id}`
+        //   })
+        // },
         edit: (id) => {
           navigate({
-            to: `/trips/depot/${id}/edit`
+            to: `/events/regal-transtrade/depot/${id}/edit`
           })
         },
         delete: (id) => {
           setDeleteModal({
             id,
             title: "Trip",
-            table: "trips"
+            table: "events"
           })
         }
       }
@@ -83,13 +79,13 @@ function RouteComponent() {
         from: formatDateForInput(startOfMonth(new Date())),
         to: formatDateForInput(endOfMonth(new Date()))
       }, label: "Date", type: "date", icon: Calendar, multiple: true },
-      { key: "asset", value: params.asset, label: "Vehicle", options: vehicles },
+      { key: "vehicle", value: params.vehicle, label: "Vehicle", options: vehicles },
       { key: "driver", value: params.driver, label: "Driver", type: "avatar", options: drivers },
       { key: "helper", value: params.helper, label: "Helper", type: "avatar", options: helpers },
-    ]} query={query} options={{}} toolbar={(
+    ]} query={query} queryFn={getTrips} options={{}} toolbar={(
       <Button size="sm" variant="outline" onClick={() => {
         navigate({
-          to: `/trips/depot/create`
+          to: `/events/regal-transtrade/depot/create`
         })
       }}><PlusCircle /> Create</Button>
     )} children={{
@@ -100,7 +96,7 @@ function RouteComponent() {
               <CardHeader>
                 <CardDescription>Total Trips</CardDescription>
                 <CardTitle className="text-2xl">
-                  {isLoading ? <Loader2 className="animate-spin size-6 mt-2" /> : tableData?.result?.flatMap((trip: AnyType) => trip.items || []).reduce((total: number, item: AnyType) => total + (item.count || 0), 0)}
+                  {isLoading ? <Loader2 className="animate-spin size-6 mt-2" /> : tableData?.result?.flatMap((trip: AnyType) => trip?.metadata?.items || []).reduce((total: number, item: AnyType) => total + (item.count || 0), 0)}
                 </CardTitle>
                 <CardAction>
                   <BaggageClaim />
@@ -111,7 +107,7 @@ function RouteComponent() {
               <CardHeader>
                 <CardDescription>Total Fuels</CardDescription>
                 <CardTitle className="text-2xl">
-                  {isLoading ? <Loader2 className="animate-spin size-6 mt-2" /> : tableData?.result?.flatMap((trip: AnyType) => trip.items || []).reduce((total: number, item: AnyType) => total + ((item.cost * item.count) || 0), 0)}
+                  {isLoading ? <Loader2 className="animate-spin size-6 mt-2" /> : tableData?.result?.flatMap((trip: AnyType) => trip?.metadata?.items || []).reduce((total: number, item: AnyType) => total + ((item.consumption * item.count) || 0), 0)}
                 </CardTitle>
                 <CardAction>
                   <Fuel />
@@ -122,7 +118,7 @@ function RouteComponent() {
               <CardHeader>
                 <CardDescription>Total Expenses</CardDescription>
                 <CardTitle className="text-2xl">
-                  {isLoading ? <Loader2 className="animate-spin size-6 mt-2" /> : tableData?.result?.flatMap((trip: AnyType) => trip.expenses || []).reduce((total: number, item: AnyType) => total + (item.amount || 0), 0)}
+                  {isLoading ? <Loader2 className="animate-spin size-6 mt-2" /> : tableData?.result?.flatMap((trip: AnyType) => trip?.metadata?.expenses || []).reduce((total: number, item: AnyType) => total + (item.amount || 0), 0)}
                 </CardTitle>
                 <CardAction>
                   <DollarSign />

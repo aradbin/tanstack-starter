@@ -21,7 +21,7 @@ export const mainNavItems: NavigationType[] = [
       },
       {
         title: "Depot Trips",
-        href: "/trips/depot",
+        href: "/events/regal-transtrade/depot",
         icon: BaggageClaim,
       },
       {

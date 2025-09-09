@@ -21,10 +21,10 @@ export const assets = pgTable("assets", {
   id: table.text().primaryKey(),
   image: table.text(),
   metadata: table.jsonb(),
-  // typeId: table
-  //   .text("type_id")
-  //   .notNull()
-  //   .references(() => assetTypes.id, { onDelete: "cascade" }),
+  typeId: table
+    .text("type_id")
+    .notNull()
+    .references(() => assetTypes.id, { onDelete: "cascade" }),
   organizationId: table
     .text("organization_id")
     .notNull()

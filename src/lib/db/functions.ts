@@ -48,7 +48,7 @@ export const getOrderArgs = (tableSchema?: AnyType, sort?: SortType) => {
 export const getWhereArgs = (activeOrganizationId: string, tableSchema: AnyType, where?: WhereType, search?: SearchType) => {
   const baseConditions = [
     isNull(tableSchema?.deletedAt),
-    ...[tableSchema?.organizationId ? eq(tableSchema?.organizationId, activeOrganizationId) : undefined],
+    ...tableSchema?.organizationId ? [eq(tableSchema?.organizationId, activeOrganizationId)] : [],
   ]
   const dynamicConditions = Object.entries(where ?? {}).flatMap(([key, value]) => {
     const column = tableSchema?.[key]

@@ -9,7 +9,7 @@ import { useQuery } from '@tanstack/react-query'
 import { createFileRoute, Link } from '@tanstack/react-router'
 import { ArrowLeft, Edit, Trash } from 'lucide-react'
 
-export const Route = createFileRoute('/_private/trips/depot/$id/')({
+export const Route = createFileRoute('/_private/events/regal-transtrade/depot/$id/')({
   component: RouteComponent,
 })
 
