@@ -1,7 +1,4 @@
-import { Button } from "@/components/ui/button"
-import { Card, CardAction, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
-import { createFileRoute, Link } from "@tanstack/react-router"
-import { ArrowRight, ShieldUser } from "lucide-react"
+import { createFileRoute } from "@tanstack/react-router"
 
 export const Route = createFileRoute("/_private/")({
   component: Home,
