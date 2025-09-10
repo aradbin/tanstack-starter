@@ -1,5 +1,5 @@
 import { NavigationType, NavItemType } from "@/lib/types";
-import { BaggageClaim, Briefcase, BriefcaseBusiness, Contact, LayoutGrid, ListChecks, Mail, MessageCircle, ShieldUser, Truck, Users } from "lucide-react";
+import { BaggageClaim, Briefcase, BriefcaseBusiness, Contact, LayoutGrid, ListChecks, Mail, MapPin, MapPinned, MessageCircle, ShieldUser, Truck, Users } from "lucide-react";
 
 export const mainNavItems: NavigationType[] = [
   {
@@ -28,6 +28,11 @@ export const mainNavItems: NavigationType[] = [
         title: "Depot Trips",
         href: "/events/regal-transtrade/depot",
         icon: BaggageClaim,
+      },
+      {
+        title: "District Trips",
+        href: "/events/regal-transtrade/district",
+        icon: MapPinned,
       },
     ]
   },

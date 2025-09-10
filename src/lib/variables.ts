@@ -29,3 +29,10 @@ export const authRoutes = [
 ]
 
 export const defaultPageSize = 10
+
+export const paymentMethods = [
+  { id: "cash", name: "Cash" },
+  { id: "card", name: "Card" },
+  { id: "bank_transfer", name: "Bank Transfer" },
+  { id: "mobile_transfer", name: "Mobile Transfer" },
+]

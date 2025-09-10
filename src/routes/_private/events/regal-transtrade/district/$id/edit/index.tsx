@@ -2,7 +2,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { createFileRoute } from '@tanstack/react-router'
 import TripForm from '../../-form'
 
-export const Route = createFileRoute('/_private/events/regal-transtrade/depot/$id/edit/')({
+export const Route = createFileRoute('/_private/events/regal-transtrade/district/$id/edit/')({
   component: RouteComponent,
 })
 
@@ -12,7 +12,7 @@ function RouteComponent() {
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Edit Depot Trip</CardTitle>
+        <CardTitle>Edit Trip</CardTitle>
       </CardHeader>
       <CardContent>
         <TripForm id={params?.id} />

@@ -73,7 +73,7 @@ export const getTrips = createServerFn()
     }
   })
 
-export const createTripDepot = createServerFn({ method: "POST" })
+export const createTrip = createServerFn({ method: "POST" })
   .middleware([authOrgMiddleware])
   .validator((data: {
     values: AnyType
@@ -90,9 +90,12 @@ export const createTripDepot = createServerFn({ method: "POST" })
           metadata: {
             items: values?.items,
             expenses: values?.expenses,
-            fuelPrice: values?.fuelPrice
+            ...values?.fuelPrice ? { fuelPrice: values?.fuelPrice } : {},
+            ...values?.payments ? { payments: values?.payments } : {},
+            ...values?.customer ? { customer: values?.customer } : {},
+            ...values?.reference ? { reference: values?.reference } : {},
           },
-          typeId: "VOVj5e0Qn0lRuF5JXE0QplbVFKLdSbjM",
+          typeId: values?.type === "depot" ? "VOVj5e0Qn0lRuF5JXE0QplbVFKLdSbjM" : "zeA6cPLyvfLXMFXOs5fsi4SPpKatGm3I",
           organizationId: context?.session?.activeOrganizationId,
           createdBy: context?.user?.id,
         }).returning()
@@ -134,7 +137,7 @@ export const createTripDepot = createServerFn({ method: "POST" })
     }
   })
 
-export const updateTripDepot = createServerFn({ method: "POST" })
+export const updateTrip = createServerFn({ method: "POST" })
   .middleware([authOrgMiddleware])
   .validator((data: {
     values: AnyType,
@@ -150,7 +153,10 @@ export const updateTripDepot = createServerFn({ method: "POST" })
           metadata: {
             items: values?.items,
             expenses: values?.expenses,
-            fuelPrice: values?.fuelPrice
+            ...values?.fuelPrice ? { fuelPrice: values?.fuelPrice } : {},
+            ...values?.payments ? { payments: values?.payments } : {},
+            ...values?.customer ? { customer: values?.customer } : {},
+            ...values?.reference ? { reference: values?.reference } : {},
           },
           updatedBy: context?.user?.id,
         }).where(eq(events.id, id)).returning()

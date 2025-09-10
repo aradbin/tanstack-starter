@@ -15,7 +15,7 @@ import { Label } from "@/components/ui/label"
 import InputField from "@/components/form/input-field"
 import { useNavigate } from "@tanstack/react-router"
 import { useApp } from "@/providers/app-provider"
-import { createTripDepot, updateTripDepot } from "./-utils"
+import { createTrip, updateTrip } from "../-utils"
 
 export default function TripForm({ id }: { id?: string }) {
   const navigate = useNavigate()
@@ -260,15 +260,16 @@ export default function TripForm({ id }: { id?: string }) {
       handleSubmit={async (values: Record<string, any>) => {
         const payload = {
           ...values,
+          type: "depot",
           helperId: values?.helperId || null,
           expenses: expenses?.filter((expense) => expense?.description && expense?.amount),
           items: items?.filter((item) => item?.to && item?.count),
           fuelPrice
         }
         if(id){
-          return await updateTripDepot({ data: { id: id, values: payload } })
+          return await updateTrip({ data: { id: id, values: payload } })
         }else{
-          return await createTripDepot({ data: { values: payload }})
+          return await createTrip({ data: { values: payload }})
         }
       }}
       values={id && data ? data : {}}

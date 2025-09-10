@@ -35,9 +35,13 @@ import { Route as PrivateEmployeesIdIndexRouteImport } from './routes/_private/e
 import { Route as PrivateCustomersIdIndexRouteImport } from './routes/_private/customers/$id/index'
 import { Route as PrivateContactsIdIndexRouteImport } from './routes/_private/contacts/$id/index'
 import { Route as PrivateAssetsIdIndexRouteImport } from './routes/_private/assets/$id/index'
+import { Route as PrivateEventsRegalTranstradeDistrictIndexRouteImport } from './routes/_private/events/regal-transtrade/district/index'
 import { Route as PrivateEventsRegalTranstradeDepotIndexRouteImport } from './routes/_private/events/regal-transtrade/depot/index'
+import { Route as PrivateEventsRegalTranstradeDistrictCreateIndexRouteImport } from './routes/_private/events/regal-transtrade/district/create/index'
+import { Route as PrivateEventsRegalTranstradeDistrictIdIndexRouteImport } from './routes/_private/events/regal-transtrade/district/$id/index'
 import { Route as PrivateEventsRegalTranstradeDepotCreateIndexRouteImport } from './routes/_private/events/regal-transtrade/depot/create/index'
 import { Route as PrivateEventsRegalTranstradeDepotIdIndexRouteImport } from './routes/_private/events/regal-transtrade/depot/$id/index'
+import { Route as PrivateEventsRegalTranstradeDistrictIdEditIndexRouteImport } from './routes/_private/events/regal-transtrade/district/$id/edit/index'
 import { Route as PrivateEventsRegalTranstradeDepotIdEditIndexRouteImport } from './routes/_private/events/regal-transtrade/depot/$id/edit/index'
 import { ServerRoute as ApiAuthSplatServerRouteImport } from './routes/api/auth/$'
 
@@ -164,10 +168,28 @@ const PrivateAssetsIdIndexRoute = PrivateAssetsIdIndexRouteImport.update({
   path: '/$id/',
   getParentRoute: () => PrivateAssetsRouteRoute,
 } as any)
+const PrivateEventsRegalTranstradeDistrictIndexRoute =
+  PrivateEventsRegalTranstradeDistrictIndexRouteImport.update({
+    id: '/events/regal-transtrade/district/',
+    path: '/events/regal-transtrade/district/',
+    getParentRoute: () => PrivateRouteRoute,
+  } as any)
 const PrivateEventsRegalTranstradeDepotIndexRoute =
   PrivateEventsRegalTranstradeDepotIndexRouteImport.update({
     id: '/events/regal-transtrade/depot/',
     path: '/events/regal-transtrade/depot/',
+    getParentRoute: () => PrivateRouteRoute,
+  } as any)
+const PrivateEventsRegalTranstradeDistrictCreateIndexRoute =
+  PrivateEventsRegalTranstradeDistrictCreateIndexRouteImport.update({
+    id: '/events/regal-transtrade/district/create/',
+    path: '/events/regal-transtrade/district/create/',
+    getParentRoute: () => PrivateRouteRoute,
+  } as any)
+const PrivateEventsRegalTranstradeDistrictIdIndexRoute =
+  PrivateEventsRegalTranstradeDistrictIdIndexRouteImport.update({
+    id: '/events/regal-transtrade/district/$id/',
+    path: '/events/regal-transtrade/district/$id/',
     getParentRoute: () => PrivateRouteRoute,
   } as any)
 const PrivateEventsRegalTranstradeDepotCreateIndexRoute =
@@ -180,6 +202,12 @@ const PrivateEventsRegalTranstradeDepotIdIndexRoute =
   PrivateEventsRegalTranstradeDepotIdIndexRouteImport.update({
     id: '/events/regal-transtrade/depot/$id/',
     path: '/events/regal-transtrade/depot/$id/',
+    getParentRoute: () => PrivateRouteRoute,
+  } as any)
+const PrivateEventsRegalTranstradeDistrictIdEditIndexRoute =
+  PrivateEventsRegalTranstradeDistrictIdEditIndexRouteImport.update({
+    id: '/events/regal-transtrade/district/$id/edit/',
+    path: '/events/regal-transtrade/district/$id/edit/',
     getParentRoute: () => PrivateRouteRoute,
   } as any)
 const PrivateEventsRegalTranstradeDepotIdEditIndexRoute =
@@ -218,9 +246,13 @@ export interface FileRoutesByFullPath {
   '/employees/$id': typeof PrivateEmployeesIdIndexRoute
   '/events/regal-transtrade': typeof PrivateEventsRegalTranstradeIndexRoute
   '/events/regal-transtrade/depot': typeof PrivateEventsRegalTranstradeDepotIndexRoute
+  '/events/regal-transtrade/district': typeof PrivateEventsRegalTranstradeDistrictIndexRoute
   '/events/regal-transtrade/depot/$id': typeof PrivateEventsRegalTranstradeDepotIdIndexRoute
   '/events/regal-transtrade/depot/create': typeof PrivateEventsRegalTranstradeDepotCreateIndexRoute
+  '/events/regal-transtrade/district/$id': typeof PrivateEventsRegalTranstradeDistrictIdIndexRoute
+  '/events/regal-transtrade/district/create': typeof PrivateEventsRegalTranstradeDistrictCreateIndexRoute
   '/events/regal-transtrade/depot/$id/edit': typeof PrivateEventsRegalTranstradeDepotIdEditIndexRoute
+  '/events/regal-transtrade/district/$id/edit': typeof PrivateEventsRegalTranstradeDistrictIdEditIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof PrivateIndexRoute
@@ -244,9 +276,13 @@ export interface FileRoutesByTo {
   '/employees/$id': typeof PrivateEmployeesIdIndexRoute
   '/events/regal-transtrade': typeof PrivateEventsRegalTranstradeIndexRoute
   '/events/regal-transtrade/depot': typeof PrivateEventsRegalTranstradeDepotIndexRoute
+  '/events/regal-transtrade/district': typeof PrivateEventsRegalTranstradeDistrictIndexRoute
   '/events/regal-transtrade/depot/$id': typeof PrivateEventsRegalTranstradeDepotIdIndexRoute
   '/events/regal-transtrade/depot/create': typeof PrivateEventsRegalTranstradeDepotCreateIndexRoute
+  '/events/regal-transtrade/district/$id': typeof PrivateEventsRegalTranstradeDistrictIdIndexRoute
+  '/events/regal-transtrade/district/create': typeof PrivateEventsRegalTranstradeDistrictCreateIndexRoute
   '/events/regal-transtrade/depot/$id/edit': typeof PrivateEventsRegalTranstradeDepotIdEditIndexRoute
+  '/events/regal-transtrade/district/$id/edit': typeof PrivateEventsRegalTranstradeDistrictIdEditIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -275,9 +311,13 @@ export interface FileRoutesById {
   '/_private/employees/$id/': typeof PrivateEmployeesIdIndexRoute
   '/_private/events/regal-transtrade/': typeof PrivateEventsRegalTranstradeIndexRoute
   '/_private/events/regal-transtrade/depot/': typeof PrivateEventsRegalTranstradeDepotIndexRoute
+  '/_private/events/regal-transtrade/district/': typeof PrivateEventsRegalTranstradeDistrictIndexRoute
   '/_private/events/regal-transtrade/depot/$id/': typeof PrivateEventsRegalTranstradeDepotIdIndexRoute
   '/_private/events/regal-transtrade/depot/create/': typeof PrivateEventsRegalTranstradeDepotCreateIndexRoute
+  '/_private/events/regal-transtrade/district/$id/': typeof PrivateEventsRegalTranstradeDistrictIdIndexRoute
+  '/_private/events/regal-transtrade/district/create/': typeof PrivateEventsRegalTranstradeDistrictCreateIndexRoute
   '/_private/events/regal-transtrade/depot/$id/edit/': typeof PrivateEventsRegalTranstradeDepotIdEditIndexRoute
+  '/_private/events/regal-transtrade/district/$id/edit/': typeof PrivateEventsRegalTranstradeDistrictIdEditIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -305,9 +345,13 @@ export interface FileRouteTypes {
     | '/employees/$id'
     | '/events/regal-transtrade'
     | '/events/regal-transtrade/depot'
+    | '/events/regal-transtrade/district'
     | '/events/regal-transtrade/depot/$id'
     | '/events/regal-transtrade/depot/create'
+    | '/events/regal-transtrade/district/$id'
+    | '/events/regal-transtrade/district/create'
     | '/events/regal-transtrade/depot/$id/edit'
+    | '/events/regal-transtrade/district/$id/edit'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -331,9 +375,13 @@ export interface FileRouteTypes {
     | '/employees/$id'
     | '/events/regal-transtrade'
     | '/events/regal-transtrade/depot'
+    | '/events/regal-transtrade/district'
     | '/events/regal-transtrade/depot/$id'
     | '/events/regal-transtrade/depot/create'
+    | '/events/regal-transtrade/district/$id'
+    | '/events/regal-transtrade/district/create'
     | '/events/regal-transtrade/depot/$id/edit'
+    | '/events/regal-transtrade/district/$id/edit'
   id:
     | '__root__'
     | '/_auth'
@@ -361,9 +409,13 @@ export interface FileRouteTypes {
     | '/_private/employees/$id/'
     | '/_private/events/regal-transtrade/'
     | '/_private/events/regal-transtrade/depot/'
+    | '/_private/events/regal-transtrade/district/'
     | '/_private/events/regal-transtrade/depot/$id/'
     | '/_private/events/regal-transtrade/depot/create/'
+    | '/_private/events/regal-transtrade/district/$id/'
+    | '/_private/events/regal-transtrade/district/create/'
     | '/_private/events/regal-transtrade/depot/$id/edit/'
+    | '/_private/events/regal-transtrade/district/$id/edit/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -562,11 +614,32 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof PrivateAssetsIdIndexRouteImport
       parentRoute: typeof PrivateAssetsRouteRoute
     }
+    '/_private/events/regal-transtrade/district/': {
+      id: '/_private/events/regal-transtrade/district/'
+      path: '/events/regal-transtrade/district'
+      fullPath: '/events/regal-transtrade/district'
+      preLoaderRoute: typeof PrivateEventsRegalTranstradeDistrictIndexRouteImport
+      parentRoute: typeof PrivateRouteRoute
+    }
     '/_private/events/regal-transtrade/depot/': {
       id: '/_private/events/regal-transtrade/depot/'
       path: '/events/regal-transtrade/depot'
       fullPath: '/events/regal-transtrade/depot'
       preLoaderRoute: typeof PrivateEventsRegalTranstradeDepotIndexRouteImport
+      parentRoute: typeof PrivateRouteRoute
+    }
+    '/_private/events/regal-transtrade/district/create/': {
+      id: '/_private/events/regal-transtrade/district/create/'
+      path: '/events/regal-transtrade/district/create'
+      fullPath: '/events/regal-transtrade/district/create'
+      preLoaderRoute: typeof PrivateEventsRegalTranstradeDistrictCreateIndexRouteImport
+      parentRoute: typeof PrivateRouteRoute
+    }
+    '/_private/events/regal-transtrade/district/$id/': {
+      id: '/_private/events/regal-transtrade/district/$id/'
+      path: '/events/regal-transtrade/district/$id'
+      fullPath: '/events/regal-transtrade/district/$id'
+      preLoaderRoute: typeof PrivateEventsRegalTranstradeDistrictIdIndexRouteImport
       parentRoute: typeof PrivateRouteRoute
     }
     '/_private/events/regal-transtrade/depot/create/': {
@@ -581,6 +654,13 @@ declare module '@tanstack/react-router' {
       path: '/events/regal-transtrade/depot/$id'
       fullPath: '/events/regal-transtrade/depot/$id'
       preLoaderRoute: typeof PrivateEventsRegalTranstradeDepotIdIndexRouteImport
+      parentRoute: typeof PrivateRouteRoute
+    }
+    '/_private/events/regal-transtrade/district/$id/edit/': {
+      id: '/_private/events/regal-transtrade/district/$id/edit/'
+      path: '/events/regal-transtrade/district/$id/edit'
+      fullPath: '/events/regal-transtrade/district/$id/edit'
+      preLoaderRoute: typeof PrivateEventsRegalTranstradeDistrictIdEditIndexRouteImport
       parentRoute: typeof PrivateRouteRoute
     }
     '/_private/events/regal-transtrade/depot/$id/edit/': {
@@ -665,9 +745,13 @@ interface PrivateRouteRouteChildren {
   PrivateCustomersIdIndexRoute: typeof PrivateCustomersIdIndexRoute
   PrivateEventsRegalTranstradeIndexRoute: typeof PrivateEventsRegalTranstradeIndexRoute
   PrivateEventsRegalTranstradeDepotIndexRoute: typeof PrivateEventsRegalTranstradeDepotIndexRoute
+  PrivateEventsRegalTranstradeDistrictIndexRoute: typeof PrivateEventsRegalTranstradeDistrictIndexRoute
   PrivateEventsRegalTranstradeDepotIdIndexRoute: typeof PrivateEventsRegalTranstradeDepotIdIndexRoute
   PrivateEventsRegalTranstradeDepotCreateIndexRoute: typeof PrivateEventsRegalTranstradeDepotCreateIndexRoute
+  PrivateEventsRegalTranstradeDistrictIdIndexRoute: typeof PrivateEventsRegalTranstradeDistrictIdIndexRoute
+  PrivateEventsRegalTranstradeDistrictCreateIndexRoute: typeof PrivateEventsRegalTranstradeDistrictCreateIndexRoute
   PrivateEventsRegalTranstradeDepotIdEditIndexRoute: typeof PrivateEventsRegalTranstradeDepotIdEditIndexRoute
+  PrivateEventsRegalTranstradeDistrictIdEditIndexRoute: typeof PrivateEventsRegalTranstradeDistrictIdEditIndexRoute
 }
 
 const PrivateRouteRouteChildren: PrivateRouteRouteChildren = {
@@ -689,12 +773,20 @@ const PrivateRouteRouteChildren: PrivateRouteRouteChildren = {
     PrivateEventsRegalTranstradeIndexRoute,
   PrivateEventsRegalTranstradeDepotIndexRoute:
     PrivateEventsRegalTranstradeDepotIndexRoute,
+  PrivateEventsRegalTranstradeDistrictIndexRoute:
+    PrivateEventsRegalTranstradeDistrictIndexRoute,
   PrivateEventsRegalTranstradeDepotIdIndexRoute:
     PrivateEventsRegalTranstradeDepotIdIndexRoute,
   PrivateEventsRegalTranstradeDepotCreateIndexRoute:
     PrivateEventsRegalTranstradeDepotCreateIndexRoute,
+  PrivateEventsRegalTranstradeDistrictIdIndexRoute:
+    PrivateEventsRegalTranstradeDistrictIdIndexRoute,
+  PrivateEventsRegalTranstradeDistrictCreateIndexRoute:
+    PrivateEventsRegalTranstradeDistrictCreateIndexRoute,
   PrivateEventsRegalTranstradeDepotIdEditIndexRoute:
     PrivateEventsRegalTranstradeDepotIdEditIndexRoute,
+  PrivateEventsRegalTranstradeDistrictIdEditIndexRoute:
+    PrivateEventsRegalTranstradeDistrictIdEditIndexRoute,
 }
 
 const PrivateRouteRouteWithChildren = PrivateRouteRoute._addFileChildren(
