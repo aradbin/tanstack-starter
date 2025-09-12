@@ -8,15 +8,12 @@ export const users = pgTable("users", {
   id: table.text().primaryKey(),
   name: table.text().notNull(),
   email: table.text().notNull().unique(),
+  emailVerified: table.boolean("email_verified").default(false).notNull(),
   image: table.text(),
   role: table.text(),
-  banned: table.boolean(),
+  banned: table.boolean("banned").default(false),
   banReason: table.text("ban_reason"),
   banExpires: table.date("ban_expires"),
-  emailVerified: table
-    .boolean("email_verified")
-    .$defaultFn(() => false)
-    .notNull(),
   ...timestamps,
 })
 
@@ -28,6 +25,7 @@ export const sessions = pgTable("sessions", {
   userAgent: table.text("user_agent"),
   impersonatedBy: table.text("impersonated_by"),
   activeOrganizationId: table.text("active_organization_id"),
+  activeTeamId: table.text("active_team_id"),
   userId: table
     .text("user_id")
     .notNull()
@@ -70,6 +68,17 @@ export const organizations = pgTable("organizations", {
   ...timestamps,
 })
 
+export const organizationRoles = pgTable("organization_roles", {
+  id: table.text("id").primaryKey(),
+  role: table.text("role").notNull(),
+  permission: table.text("permission").notNull(),
+  organizationId: table
+    .text("organization_id")
+    .notNull()
+    .references(() => organizations.id, { onDelete: "cascade" }),
+  ...timestamps,
+});
+
 export const teams = pgTable("teams", {
   id: table.text().primaryKey(),
   name: table.text('name').notNull(),
@@ -80,6 +89,17 @@ export const teams = pgTable("teams", {
  ...timestamps,
 });
 
+export const teamMembers = pgTable("team_members", {
+  id: table.text("id").primaryKey(),
+  teamId: table.text("team_id")
+    .notNull()
+    .references(() => teams.id, { onDelete: "cascade" }),
+  userId: table.text("user_id")
+    .notNull()
+    .references(() => users.id, { onDelete: "cascade" }),
+  ...timestamps,
+});
+
 export const members = pgTable("members", {
   id: table.text().primaryKey(),
   role: table.text().default("member").notNull(),
@@ -87,7 +107,6 @@ export const members = pgTable("members", {
     .text("organization_id")
     .notNull()
     .references(() => organizations.id, { onDelete: "cascade" }),
-  teamId: table.text('team_id'),
   userId: table
     .text("user_id")
     .notNull()

@@ -2,6 +2,7 @@ import { betterAuth } from "better-auth"
 import { drizzleAdapter } from "better-auth/adapters/drizzle"
 import { admin, organization } from "better-auth/plugins"
 import { reactStartCookies } from "better-auth/react-start"
+import { ac } from "./permissions"
 
 import { db } from "@/lib/db"
 import {
@@ -13,6 +14,8 @@ import {
   sessions,
   users,
   verifications,
+  organizationRoles,
+  teamMembers,
 } from "@/lib/db/schema"
 
 import "dotenv/config"
@@ -28,16 +31,26 @@ export const auth = betterAuth({
       account: accounts,
       verification: verifications,
       organization: organizations,
-      team: teams,
+      organizationRole: organizationRoles,
       member: members,
       invitation: invitations,
+      team: teams,
+      teamMember: teamMembers,
     },
   }),
   usePlural: true,
   plugins: [admin(), organization({
+    ac,
+    dynamicAccessControl: {
+      enabled: true
+    },
     teams: {
       enabled: true,
-    }
+      defaultTeam: {
+        enabled: false,
+      }
+    },
+    autoCreateOrganizationOnSignUp: true,
   }), reactStartCookies()],
   emailAndPassword: {
     enabled: true,

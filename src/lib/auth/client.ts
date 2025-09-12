@@ -12,6 +12,9 @@ export const authClient = createAuthClient({
   plugins: [
     adminClient(),
     organizationClient({
+      dynamicAccessControl: { 
+        enabled: true, 
+      },
       teams: {
         enabled: true
       }
