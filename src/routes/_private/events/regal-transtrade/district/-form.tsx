@@ -319,7 +319,7 @@ export default function TripForm({ id }: { id?: string }) {
                 }} />
               </div>
             </div>
-            {index > 0 && <Button type="button" size="icon" variant="destructive" onClick={() => setExpenses((prev) => prev.filter((_, i) => i !== index))}><Trash /></Button>}
+            {index > 0 && <Button type="button" size="icon" variant="destructive" onClick={() => setPayments((prev) => prev.filter((_, i) => i !== index))}><Trash /></Button>}
           </div>
         </CardContent>
       </Card>
