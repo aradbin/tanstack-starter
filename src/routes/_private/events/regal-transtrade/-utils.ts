@@ -66,10 +66,16 @@ export const getTrips = createServerFn()
 
     const result = await query
     const count = result?.length
+    const totalTrips = result?.flatMap((trip: AnyType) => trip?.metadata?.items || []).reduce((total: number, item: AnyType) => total + (item.count || 0), 0)
+    const totalFuel = result?.flatMap((trip: AnyType) => trip?.metadata?.items || []).reduce((total: number, item: AnyType) => total + ((item?.route?.expense?.fuel * item.count) || 0), 0)
+    const totalExpenses = result?.flatMap((trip: AnyType) => trip?.metadata?.expenses || []).reduce((total: number, item: AnyType) => total + (item.amount || 0), 0)
 
     return {
       result,
-      count
+      count,
+      totalTrips,
+      totalFuel,
+      totalExpenses,
     }
   })
 
@@ -90,6 +96,7 @@ export const createTrip = createServerFn({ method: "POST" })
           metadata: {
             items: values?.items,
             expenses: values?.expenses,
+            ...values?.routes ? { routes: values?.routes } : {},
             ...values?.fuelPrice ? { fuelPrice: values?.fuelPrice } : {},
             ...values?.payments ? { payments: values?.payments } : {},
             ...values?.customer ? { customer: values?.customer } : {},
@@ -153,6 +160,7 @@ export const updateTrip = createServerFn({ method: "POST" })
           metadata: {
             items: values?.items,
             expenses: values?.expenses,
+            ...values?.routes ? { routes: values?.routes } : {},
             ...values?.fuelPrice ? { fuelPrice: values?.fuelPrice } : {},
             ...values?.payments ? { payments: values?.payments } : {},
             ...values?.customer ? { customer: values?.customer } : {},

@@ -9,6 +9,7 @@ import { createContext, ReactNode, useContext, useEffect } from "react";
 type AuthStateType = {
   user: typeof users.$inferSelect & {
     activeOrganizationId: string,
+    activeOrganization: typeof organizations.$inferSelect | null,
     organizations: typeof organizations.$inferSelect[] | null | undefined
   } | null | undefined,
   refetch: () => Promise<void>

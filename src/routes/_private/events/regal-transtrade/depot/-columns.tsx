@@ -51,7 +51,7 @@ export const tripDepotColumns = ({
           {row?.original?.metadata?.items?.map((item: any, index: number) => {
             total += item.count
             return (
-              <Badge key={index} variant="outline"><span>{item.to === 'PL' ? 'CPA to PL' : item.to}</span> - <span>{item.count}</span></Badge>
+              <Badge key={index} variant="outline"><span>{item?.route?.to === 'PL' ? 'CPA to PL' : item?.route?.to}</span> - <span>{item.count}</span></Badge>
             )
           })}
           <Badge><span>Total</span> - <span>{total}</span></Badge>

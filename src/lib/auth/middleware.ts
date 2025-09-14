@@ -11,7 +11,7 @@ export const authMiddleware = createMiddleware({ type: "function" }).server(asyn
   })
 
   if (!response?.user) {
-    throw new Error("Session Timeout. Please login again")
+    throw new Response("Session Timeout. Please login again", { status: 401 })
   }
   
   return await next({
@@ -23,7 +23,7 @@ export const authOrgMiddleware = createMiddleware({ type: "function" })
   .middleware([authMiddleware])
   .server(async ({ context, next }) => {
     if (!context?.session?.activeOrganizationId) {
-      throw new Error("No active organization found. Please select an organization")
+      throw new Response("No active organization found. Please select an organization", { status: 400 })
     }
 
     return await next({

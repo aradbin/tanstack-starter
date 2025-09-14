@@ -9,7 +9,6 @@ import { tripDepotColumns } from './-columns'
 import { formatDateForInput } from '@/lib/utils'
 import { endOfMonth, isValid, startOfMonth } from 'date-fns'
 import { Card, CardAction, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-import { AnyType } from '@/lib/types'
 import { getTrips } from '../-utils'
 
 export const Route = createFileRoute('/_private/events/regal-transtrade/depot/')({
@@ -96,7 +95,7 @@ function RouteComponent() {
               <CardHeader>
                 <CardDescription>Total Trips</CardDescription>
                 <CardTitle className="text-2xl">
-                  {isLoading ? <Loader2 className="animate-spin size-6 mt-2" /> : tableData?.result?.flatMap((trip: AnyType) => trip?.metadata?.items || []).reduce((total: number, item: AnyType) => total + (item.count || 0), 0)}
+                  {isLoading ? <Loader2 className="animate-spin size-6 mt-2" /> : tableData?.totalTrips || 0}
                 </CardTitle>
                 <CardAction>
                   <BaggageClaim />
@@ -107,7 +106,7 @@ function RouteComponent() {
               <CardHeader>
                 <CardDescription>Total Fuels</CardDescription>
                 <CardTitle className="text-2xl">
-                  {isLoading ? <Loader2 className="animate-spin size-6 mt-2" /> : tableData?.result?.flatMap((trip: AnyType) => trip?.metadata?.items || []).reduce((total: number, item: AnyType) => total + ((item.consumption * item.count) || 0), 0)}
+                  {isLoading ? <Loader2 className="animate-spin size-6 mt-2" /> : tableData?.totalFuel || 0}
                 </CardTitle>
                 <CardAction>
                   <Fuel />
@@ -118,7 +117,7 @@ function RouteComponent() {
               <CardHeader>
                 <CardDescription>Total Expenses</CardDescription>
                 <CardTitle className="text-2xl">
-                  {isLoading ? <Loader2 className="animate-spin size-6 mt-2" /> : tableData?.result?.flatMap((trip: AnyType) => trip?.metadata?.expenses || []).reduce((total: number, item: AnyType) => total + (item.amount || 0), 0)}
+                  {isLoading ? <Loader2 className="animate-spin size-6 mt-2" /> : tableData?.totalExpenses || 0}
                 </CardTitle>
                 <CardAction>
                   <DollarSign />

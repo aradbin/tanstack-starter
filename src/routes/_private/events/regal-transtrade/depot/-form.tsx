@@ -3,7 +3,6 @@ import { useQuery } from "@tanstack/react-query"
 import { getData } from "@/lib/db/functions"
 import { AnyType, FormFieldType } from "@/lib/types"
 import { stringRequiredValidation, stringValidation } from "@/lib/validations"
-import { fuelPrice, tripRoutesDepot } from "@/lib/organizations/regal-transtrade"
 import { useEffect, useState } from "react"
 import { formatDateForInput } from "@/lib/utils"
 import { subDays } from "date-fns"
@@ -16,19 +15,18 @@ import InputField from "@/components/form/input-field"
 import { useNavigate } from "@tanstack/react-router"
 import { useApp } from "@/providers/app-provider"
 import { createTrip, updateTrip } from "../-utils"
+import { useAuth } from "@/providers/auth-provider"
 
 export default function TripForm({ id }: { id?: string }) {
   const navigate = useNavigate()
   const { vehicles, drivers, helpers } = useApp()
-  const [items, setItems] = useState<AnyType[]>([{
-    ...tripRoutesDepot[0],
-    count: 1,
-  }])
-  const [expenses, setExpenses] = useState<AnyType[]>([
-    { description: "Toll", amount: 90 },
-    { description: "Tips", amount: 710 },
-    { description: "Fuel", amount: (tripRoutesDepot[0]?.consumption || 0) * fuelPrice },
-  ])
+  const { user } = useAuth()
+  const [tripRoutesDepot, setTripRoutesDepot] = useState<AnyType[]>([])
+  const [fuelPrice, setFuelPrice] = useState<number>(0)
+  const [items, setItems] = useState<AnyType[]>([])
+  const [fixedExpenses, setFixedExpenses] = useState<AnyType[]>([])
+  const [expenses, setExpenses] = useState<AnyType[]>([])
+
   const { data, isLoading } = useQuery({
     queryKey: ['events', id],
     queryFn: async () => {
@@ -40,21 +38,18 @@ export default function TripForm({ id }: { id?: string }) {
         id
       }})
 
-      setItems(trip?.metadata?.items || [])
-      setExpenses(trip?.metadata?.expenses || [])
-
       return {
         date: formatDateForInput(trip?.from),
         vehicleId: trip?.eventParticipants?.find((participant: AnyType) => participant.participantType === "assets" && participant.role === "vehicle")?.participantId,
         driverId: trip?.eventParticipants?.find((participant: AnyType) => participant.participantType === "employees" && participant.role === "driver")?.participantId,
         helperId: trip?.eventParticipants?.find((participant: AnyType) => participant.participantType === "employees" && participant.role === "helper")?.participantId,
-        fuelPrice: trip?.metadata?.fuelPrice
+        metadata: trip?.metadata || {},
       }
     },
     enabled: !!id
   })
-  
-  useEffect(() => {
+
+  const updateFixedExpense = () => {
     const expenses = {
       toll: 0,
       tips: 0,
@@ -62,46 +57,95 @@ export default function TripForm({ id }: { id?: string }) {
     }
 
     items.forEach((item) => {
-      if (item.to) {
-        expenses.toll += item.toll * item.count
-        expenses.tips += item.tips * item.count
-        expenses.fuel += item.consumption * item.count * (data?.fuelPrice || fuelPrice)
+      if (item.route) {
+        expenses.toll += item.route.expense.toll * item.count
+        expenses.tips += item.route.expense.tips * item.count
+        expenses.fuel += item.route.expense.fuel * item.count * (fuelPrice || 0)
       }
     })
 
-    setExpenses((prev) => {
-      const newExpenses = [...prev]
-      const tollIndex = newExpenses.findIndex((expense) => expense.description === "Toll")
-      const tipsIndex = newExpenses.findIndex((expense) => expense.description === "Tips")
-      const fuelIndex = newExpenses.findIndex((expense) => expense.description === "Fuel")
+    setFixedExpenses((prev) => {
+      const newFixedExpenses = [...prev]
+      const tollIndex = newFixedExpenses.findIndex((expense) => expense.description === "Toll")
+      const tipsIndex = newFixedExpenses.findIndex((expense) => expense.description === "Tips")
+      const fuelIndex = newFixedExpenses.findIndex((expense) => expense.description === "Fuel")
       if(tollIndex > -1) {
-        newExpenses[tollIndex] = {
-          ...newExpenses[tollIndex],
+        newFixedExpenses[tollIndex] = {
+          ...newFixedExpenses[tollIndex],
           amount: expenses.toll
         }
       } else {
-        newExpenses.push({ description: "Toll", amount: expenses.toll })
+        newFixedExpenses.push({ description: "Toll", amount: expenses.toll })
       }
       if(tipsIndex > -1) {
-        newExpenses[tipsIndex] = {
-          ...newExpenses[tipsIndex],
+        newFixedExpenses[tipsIndex] = {
+          ...newFixedExpenses[tipsIndex],
           amount: expenses.tips
         }
       } else {
-        newExpenses.push({ description: "Tips", amount: expenses.tips })
+        newFixedExpenses.push({ description: "Tips", amount: expenses.tips })
       }
       if (fuelIndex > -1) {
-        newExpenses[fuelIndex] = {
-          ...newExpenses[fuelIndex],
+        newFixedExpenses[fuelIndex] = {
+          ...newFixedExpenses[fuelIndex],
           amount: expenses.fuel,
         }
       } else {
-        newExpenses.push({ description: "Fuel", amount: expenses.fuel })
+        newFixedExpenses.push({ description: "Fuel", amount: expenses.fuel })
       }
 
-      return newExpenses
+      return newFixedExpenses
     })
-  }, [items, fuelPrice])
+  }
+  
+  useEffect(() => {
+    if(id && data){
+      const routes = data?.metadata?.routes || []
+      const price = data?.metadata?.fuelPrice || 0
+      if(tripRoutesDepot !== routes){
+        setTripRoutesDepot(routes)
+      }
+      if(fuelPrice !== price){
+        setFuelPrice(price)
+      }
+      if(items.length === 0){
+        setItems(data?.metadata?.items || [])
+      }
+      if(fixedExpenses.length === 0){
+        setFixedExpenses(data?.metadata?.expenses?.filter((expense: AnyType) => ["Toll", "Tips", "Fuel"].some((word) => expense?.description?.includes(word))) || [])
+      }else{
+        updateFixedExpense()
+      }
+      if(expenses.length === 0){
+        setExpenses(data?.metadata?.expenses?.filter((expense: AnyType) => !["Toll", "Tips", "Fuel"].some((word) => expense?.description?.includes(word))) || [])
+      }
+    }
+    if(!id && user){
+      const routes = JSON.parse(user?.activeOrganization?.metadata || "{}")?.tripRoutesDepot || []
+      const price = JSON.parse(user?.activeOrganization?.metadata || "{}")?.fuelPrice || 0
+      if(tripRoutesDepot !== routes){
+        setTripRoutesDepot(routes)
+      }
+      if(fuelPrice !== price){
+        setFuelPrice(price)
+      }
+      if(items.length === 0){
+        setItems([{
+          route: routes?.find((route: AnyType) => route.to === 'PL') || null,
+          count: 1,
+        }])
+      }
+      if(fixedExpenses.length === 0){
+        setFixedExpenses([
+          { description: "Toll", amount: routes?.find((route: AnyType) => route.to === 'PL')?.expense?.toll || 0 },
+          { description: "Tips", amount: routes?.find((route: AnyType) => route.to === 'PL')?.expense?.tips || 0 },
+          { description: "Fuel", amount: (routes?.find((route: AnyType) => route.to === 'PL')?.expense?.fuel || 0) * fuelPrice },
+        ])
+      }else{
+        updateFixedExpense()
+      }
+    }
+  }, [user, id, data, items])
 
   const formFields: FormFieldType[][] = [
     [
@@ -148,21 +192,21 @@ export default function TripForm({ id }: { id?: string }) {
           <div className="flex items-end gap-2">
             <div className="grow grid grid-cols-2 gap-2">
               <div className="flex flex-col gap-2">
-                <Label htmlFor={`to-${index}`}>Depot</Label>
+                <Label htmlFor={`route-${index}`}>Depot</Label>
                 <SelectField field={{
-                  name: `to-${index}`,
+                  name: `route-${index}`,
                   type: "select",
-                  value: items[index]?.to || "",
+                  value: items[index]?.route ? JSON.stringify(items[index]?.route) : "",
                   placeholder: "Select Depot",
                   isValid: true,
                   isRequired: true,
-                  options: tripRoutesDepot.filter((route) => index === 0 ? route.from === 'CPA' : route.from === 'PL')?.map((route) => ({ id: route.to, name: index === 0 ? 'CPA to PL' : route.to })),
+                  options: tripRoutesDepot.filter((route) => index === 0 ? route.from === 'CPA' : route.from === 'PL')?.map((route) => ({ id: JSON.stringify(route), name: index === 0 ? 'CPA to PL' : route.to })),
                   handleChange: (value: AnyType) => {
                     setItems((prev) => {
                       const newItems = [...prev]
                       newItems[index] = {
-                        ...tripRoutesDepot.find((route) => index === 0 ? route.from === 'CPA' : route.from === 'PL' && route.to === value),
-                        count: newItems[index]?.count || 1
+                        ...newItems[index],
+                        route: JSON.parse(value),
                       }
                       return newItems
                     })
@@ -197,7 +241,7 @@ export default function TripForm({ id }: { id?: string }) {
     )
   }
 
-  const renderTripExpenseForm = (index: number) => {
+  const renderTripExpenseForm = (index: number, readonly: boolean = false) => {
     return (
       <Card className="py-4" key={index}>
         <CardContent className="px-4 space-y-4">
@@ -208,21 +252,32 @@ export default function TripForm({ id }: { id?: string }) {
                 <InputField field={{
                   name: `description-${index}`,
                   type: "text",
-                  value: expenses[index]?.description || "",
+                  value: readonly ? fixedExpenses[index]?.description : expenses[index]?.description || "",
                   placeholder: "Enter Description",
                   isValid: true,
                   isRequired: true,
                   handleChange: (value: AnyType) => {
-                    setExpenses((prev) => {
-                      const newExpenses = [...prev]
-                      newExpenses[index] = {
-                        ...newExpenses[index],
-                        description: value,
-                      }
-                      return newExpenses
-                    })
+                    if(readonly){
+                      setFixedExpenses((prev) => {
+                        const newExpenses = [...prev]
+                        newExpenses[index] = {
+                          ...newExpenses[index],
+                          description: value,
+                        }
+                        return newExpenses
+                      })
+                    }else{
+                      setExpenses((prev) => {
+                        const newExpenses = [...prev]
+                        newExpenses[index] = {
+                          ...newExpenses[index],
+                          description: value,
+                        }
+                        return newExpenses
+                      })
+                    }
                   },
-                  readonly: index > 2 ? false : true
+                  readonly: readonly
                 }} />
               </div>
               <div className="flex flex-col gap-2">
@@ -230,24 +285,35 @@ export default function TripForm({ id }: { id?: string }) {
                 <InputField field={{
                   name: `amount-${index}`,
                   type: "number",
-                  value: expenses[index]?.amount,
+                  value: readonly ? fixedExpenses[index]?.amount : expenses[index]?.amount || "",
                   isValid: true,
                   placeholder: "Enter Amount",
                   handleChange: (value: string) => {
-                    setExpenses((prev) => {
-                      const newExpenses = [...prev]
-                      newExpenses[index] = {
-                        ...newExpenses[index],
-                        amount: Number(value),
-                      }
-                      return newExpenses
-                    })
+                    if(readonly){
+                      setFixedExpenses((prev) => {
+                        const newExpenses = [...prev]
+                        newExpenses[index] = {
+                          ...newExpenses[index],
+                          amount: Number(value),
+                        }
+                        return newExpenses
+                      })
+                    }else{
+                      setExpenses((prev) => {
+                        const newExpenses = [...prev]
+                        newExpenses[index] = {
+                          ...newExpenses[index],
+                          amount: Number(value),
+                        }
+                        return newExpenses
+                      })
+                    }
                   },
-                  readonly: index > 2 ? false : true
+                  readonly: readonly
                 }} />
               </div>
             </div>
-            {index > 2 && <Button type="button" size="icon" variant="destructive" onClick={() => setExpenses((prev) => prev.filter((_, i) => i !== index))}><Trash /></Button>}
+            {!readonly && <Button type="button" size="icon" variant="destructive" onClick={() => setExpenses((prev) => prev.filter((_, i) => i !== index))}><Trash /></Button>}
           </div>
         </CardContent>
       </Card>
@@ -261,10 +327,10 @@ export default function TripForm({ id }: { id?: string }) {
         const payload = {
           ...values,
           type: "depot",
-          helperId: values?.helperId || null,
-          expenses: expenses?.filter((expense) => expense?.description && expense?.amount),
-          items: items?.filter((item) => item?.to && item?.count),
-          fuelPrice
+          items: items?.filter((item) => item?.route && item?.count),
+          expenses: [...fixedExpenses?.filter((expense) => expense?.description && expense?.amount), ...expenses?.filter((expense) => expense?.description && expense?.amount)],
+          routes: tripRoutesDepot || [],
+          fuelPrice: fuelPrice || 0,
         }
         if(id){
           return await updateTrip({ data: { id: id, values: payload } })
@@ -296,8 +362,8 @@ export default function TripForm({ id }: { id?: string }) {
               setItems((prev) => {
                 const newItems = [...prev]
                 newItems.push({
-                  to: "",
-                  count: 1,
+                  route: null,
+                  count: "",
                 })
                 return newItems
               })
@@ -305,13 +371,14 @@ export default function TripForm({ id }: { id?: string }) {
           </div>
           <div className="flex flex-col gap-2">
             <Label>Expenses</Label>
+            {fixedExpenses?.map((_, index) => renderTripExpenseForm(index, true))}
             {expenses?.map((_, index) => renderTripExpenseForm(index))}
             <Button type="button" variant="outline" className="w-full" onClick={() => {
               setExpenses((prev) => {
                 const newExpenses = [...prev]
                 newExpenses.push({
                   description: "",
-                  amount: 0,
+                  amount: "",
                 })
                 return newExpenses
               })

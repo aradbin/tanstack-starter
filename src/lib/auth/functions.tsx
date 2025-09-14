@@ -70,6 +70,7 @@ export const getUser = createServerFn()
       return {
         ...context?.user,
         activeOrganizationId: context?.session?.activeOrganizationId,
+        activeOrganization: context?.session?.activeOrganizationId ? organizations.find((org) => org.id === context?.session?.activeOrganizationId) : null,
         organizations,
       }
     }
