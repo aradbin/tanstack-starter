@@ -66,18 +66,34 @@ export const getTrips = createServerFn()
 
     const result = await query
     const count = result?.length
-    const totalTrips = result?.flatMap((trip: AnyType) => trip?.metadata?.items || []).reduce((total: number, item: AnyType) => total + (item.count || 0), 0)
-    const totalFuel = result?.flatMap((trip: AnyType) => trip?.metadata?.items || []).reduce((total: number, item: AnyType) => total + ((item?.route?.expense?.fuel * item.count) || 0), 0)
-    const totalExpenses = result?.flatMap((trip: AnyType) => trip?.metadata?.expenses || []).reduce((total: number, item: AnyType) => total + (item.amount || 0), 0)
+    const tripCalculations = getTripCalculations(result, where?.typeId)
+    
 
     return {
       result,
       count,
-      totalTrips,
-      totalFuel,
-      totalExpenses,
+      ...tripCalculations
     }
   })
+
+export const getTripCalculations = (result: AnyType[], typeId: string) => {
+  if(typeId === "VOVj5e0Qn0lRuF5JXE0QplbVFKLdSbjM"){
+    return {
+      totalTrips: result?.flatMap((trip: AnyType) => trip?.metadata?.items || []).reduce((total: number, item: AnyType) => total + (item.count || 0), 0),
+      totalFuel: result?.flatMap((trip: AnyType) => trip?.metadata?.items || []).reduce((total: number, item: AnyType) => total + ((item?.route?.expense?.fuel * item.count) || 0), 0),
+      totalExpenses: result?.flatMap((trip: AnyType) => trip?.metadata?.expenses || []).reduce((total: number, item: AnyType) => total + (item.amount || 0), 0)
+    }
+  }
+  if(typeId === "zeA6cPLyvfLXMFXOs5fsi4SPpKatGm3I"){
+    return {
+      totalTrips: result?.flatMap((trip: AnyType) => trip?.metadata?.items || [])?.reduce((total: number, _: AnyType) => total + 1, 0),
+      totalFare: result?.flatMap((trip: AnyType) => trip?.metadata?.items || []).reduce((total: number, item: AnyType) => total + (item.amount || 0), 0),
+      totalExpenses: result?.flatMap((trip: AnyType) => trip?.metadata?.expenses || []).reduce((total: number, item: AnyType) => total + (item.amount || 0), 0),
+      totalPayments: result?.flatMap((trip: AnyType) => trip?.metadata?.payments || []).reduce((total: number, item: AnyType) => total + (item.amount || 0), 0),
+      totalBalance: result?.flatMap((trip: AnyType) => trip?.metadata?.items || []).reduce((total: number, item: AnyType) => total + (item.amount || 0), 0) - result?.flatMap((trip: AnyType) => trip?.metadata?.payments || []).reduce((total: number, item: AnyType) => total + (item.amount || 0), 0)
+    }
+  }
+}
 
 export const createTrip = createServerFn({ method: "POST" })
   .middleware([authOrgMiddleware])

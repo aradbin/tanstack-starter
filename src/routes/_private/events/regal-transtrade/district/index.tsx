@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button'
 import { QueryParamType } from '@/lib/db/functions'
 import { defaultSearchParamValidation, stringValidation, validate } from '@/lib/validations'
 import { useApp } from '@/providers/app-provider'
-import { BaggageClaim, BanknoteArrowDown, BanknoteArrowUp, Calendar, DollarSign, Fuel, Loader2, MapPinned, PlusCircle, Scale } from 'lucide-react'
+import { BanknoteArrowDown, BanknoteArrowUp, Calendar, DollarSign, Fuel, Loader2, MapPinned, PlusCircle, Scale } from 'lucide-react'
 import { tripDistrictColumns } from './-columns'
 import { formatDateForInput } from '@/lib/utils'
 import { endOfMonth, isValid, startOfMonth } from 'date-fns'
@@ -96,7 +96,7 @@ function RouteComponent() {
               <CardHeader>
                 <CardDescription>Total Trips</CardDescription>
                 <CardTitle className="text-2xl">
-                  {isLoading ? <Loader2 className="animate-spin size-6 mt-2" /> : tableData?.result?.flatMap((trip: AnyType) => trip?.metadata?.items || [])?.reduce((total: number, _: AnyType) => total + 1, 0)}
+                  {isLoading ? <Loader2 className="animate-spin size-6 mt-2" /> : tableData?.totalTrips || 0}
                 </CardTitle>
                 <CardAction>
                   <MapPinned />
@@ -107,7 +107,7 @@ function RouteComponent() {
               <CardHeader>
                 <CardDescription>Total Fare</CardDescription>
                 <CardTitle className="text-2xl">
-                  {isLoading ? <Loader2 className="animate-spin size-6 mt-2" /> : tableData?.result?.flatMap((trip: AnyType) => trip?.metadata?.items || []).reduce((total: number, item: AnyType) => total + (item.amount || 0), 0)}
+                  {isLoading ? <Loader2 className="animate-spin size-6 mt-2" /> : tableData?.totalFare || 0}
                 </CardTitle>
                 <CardAction>
                   <DollarSign />
@@ -118,7 +118,7 @@ function RouteComponent() {
               <CardHeader>
                 <CardDescription>Total Expenses</CardDescription>
                 <CardTitle className="text-2xl">
-                  {isLoading ? <Loader2 className="animate-spin size-6 mt-2" /> : tableData?.result?.flatMap((trip: AnyType) => trip?.metadata?.expenses || []).reduce((total: number, item: AnyType) => total + (item.amount || 0), 0)}
+                  {isLoading ? <Loader2 className="animate-spin size-6 mt-2" /> : tableData?.totalExpenses || 0}
                 </CardTitle>
                 <CardAction>
                   <BanknoteArrowDown />
@@ -129,7 +129,7 @@ function RouteComponent() {
               <CardHeader>
                 <CardDescription>Total Payments</CardDescription>
                 <CardTitle className="text-2xl">
-                  {isLoading ? <Loader2 className="animate-spin size-6 mt-2" /> : tableData?.result?.flatMap((trip: AnyType) => trip?.metadata?.payments || []).reduce((total: number, item: AnyType) => total + (item.amount || 0), 0)}
+                  {isLoading ? <Loader2 className="animate-spin size-6 mt-2" /> : tableData?.totalPayments || 0}
                 </CardTitle>
                 <CardAction>
                   <BanknoteArrowUp />
@@ -140,7 +140,7 @@ function RouteComponent() {
               <CardHeader>
                 <CardDescription>Total Balance</CardDescription>
                 <CardTitle className="text-2xl">
-                  {isLoading ? <Loader2 className="animate-spin size-6 mt-2" /> : tableData?.result?.flatMap((trip: AnyType) => trip?.metadata?.items || []).reduce((total: number, item: AnyType) => total + (item.amount || 0), 0) - tableData?.result?.flatMap((trip: AnyType) => trip?.metadata?.payments || []).reduce((total: number, item: AnyType) => total + (item.amount || 0), 0)}
+                  {isLoading ? <Loader2 className="animate-spin size-6 mt-2" /> : tableData?.totalBalance || 0}
                 </CardTitle>
                 <CardAction>
                   <Scale />
