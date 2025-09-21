@@ -1,6 +1,8 @@
 import { createServerFn } from "@tanstack/react-start"
 import { db } from "../db"
-import { assets, assetTypes, employees } from "../db/schema"
+import { assets, assetTypes, employees, eventEntities, events } from "../db/schema"
+import { endOfDay } from "date-fns"
+import { generateId } from "better-auth"
 
 export const tripRoutesDepot = [
   { from: "CPA", to: "PL", income: {
@@ -207,37 +209,117 @@ export const fuelPrice = 102
 
 export const syncRegalTranstrade = createServerFn({ method: "POST" })
   .handler(async () => {
-    await db.insert(assetTypes).values({
-      id: "kP47g0lpyblJWVgH0XTHEWh3ftZMhuk0",
-      name: "Vehicle",
-      parent_id: null,
-      organization_id: "HXAVBIRDQcztDzjB99NRVjY6yz6NqAoT",
-    })
+    // await db.insert(assetTypes).values({
+    //   id: "kP47g0lpyblJWVgH0XTHEWh3ftZMhuk0",
+    //   name: "Vehicle",
+    //   parent_id: null,
+    //   organization_id: "HXAVBIRDQcztDzjB99NRVjY6yz6NqAoT",
+    // })
 
-    const assetArray = assetsBackup?.filter((asset) => asset?.deleted_at === null)?.map((asset) => ({
-      id: asset?.id,
-      typeId: "kP47g0lpyblJWVgH0XTHEWh3ftZMhuk0",
-      organizationId: "HXAVBIRDQcztDzjB99NRVjY6yz6NqAoT",
-      metadata: {
-        "registrationDate": asset?.registration_date,
-        "fitnessExpiryDate": "",
-        "registrationNumber": asset?.registration_number,
-        "taxTokenExpiryDate": "",
-        "roadPermitExpiryDate": ""
-      },
-      createdBy: "f1iMUVNmMmKYKMWim0WkxuKYAHSatN3u"
-    }))
-    await db.insert(assets).values(assetArray)
+    // const assetArray = assetsBackup?.filter((asset) => asset?.deleted_at === null)?.map((asset) => ({
+    //   id: asset?.id,
+    //   typeId: "kP47g0lpyblJWVgH0XTHEWh3ftZMhuk0",
+    //   organizationId: "HXAVBIRDQcztDzjB99NRVjY6yz6NqAoT",
+    //   metadata: {
+    //     "registrationDate": asset?.registration_date,
+    //     "fitnessExpiryDate": "",
+    //     "registrationNumber": asset?.registration_number,
+    //     "taxTokenExpiryDate": "",
+    //     "roadPermitExpiryDate": ""
+    //   },
+    //   createdBy: "f1iMUVNmMmKYKMWim0WkxuKYAHSatN3u"
+    // }))
+    // await db.insert(assets).values(assetArray)
 
-    const employeeArray = employeesBackup?.filter((employee) => employee?.deleted_at === null)?.map((employee) => ({
-      id: employee?.id,
-      name: employee?.name,
-      phone: employee?.phone,
-      designationId: employee?.designation === "driver" ? "hB7xWkGlz66r3GjGqDe8C4It7GJkCnQd" : employee?.designation === "helper" ? "YGqSebqvFm4F3eaCWyUrv5BH7yarRt51" : "B7zZasyxzO7qhBzLXy3H5jWwHFmCE2pV",
-      organizationId: "HXAVBIRDQcztDzjB99NRVjY6yz6NqAoT",
-      createdBy: "f1iMUVNmMmKYKMWim0WkxuKYAHSatN3u"
-    }))
-    await db.insert(employees).values(employeeArray)
+    // const employeeArray = employeesBackup?.filter((employee) => employee?.deleted_at === null)?.map((employee) => ({
+    //   id: employee?.id,
+    //   name: employee?.name,
+    //   phone: employee?.phone,
+    //   designationId: employee?.designation === "driver" ? "hB7xWkGlz66r3GjGqDe8C4It7GJkCnQd" : employee?.designation === "helper" ? "YGqSebqvFm4F3eaCWyUrv5BH7yarRt51" : "B7zZasyxzO7qhBzLXy3H5jWwHFmCE2pV",
+    //   organizationId: "HXAVBIRDQcztDzjB99NRVjY6yz6NqAoT",
+    //   createdBy: "f1iMUVNmMmKYKMWim0WkxuKYAHSatN3u"
+    // }))
+    // await db.insert(employees).values(employeeArray)
+
+    // eventsBackup?.filter((event) => event?.deleted_at === null)?.forEach(async (event) => {
+    //   const items = event?.items?.map((item) => {
+    //     return {
+    //       route: tripRoutesDepot.find((route) => route.from === item.from && route.to === item.to),
+    //       count: item.count,
+    //     }
+    //   })
+    //   const expenses = {
+    //     toll: 0,
+    //     tips: 0,
+    //     fuel: 0
+    //   }
+    //   items.forEach((item) => {
+    //     if (item.route) {
+    //       expenses.toll += item.route.expense.toll * item.count
+    //       expenses.tips += item.route.expense.tips * item.count
+    //       expenses.fuel += item.route.expense.fuel * item.count * (fuelPrice || 0)
+    //     }
+    //   })
+    //   const [result] = await db.insert(events).values({
+    //     id: event?.id,
+    //     from: new Date(event?.date),
+    //     to: endOfDay(new Date(event?.date)),
+    //     status: "completed",
+    //     attachments: null,
+    //     typeId: "VOVj5e0Qn0lRuF5JXE0QplbVFKLdSbjM",
+    //     organizationId: "HXAVBIRDQcztDzjB99NRVjY6yz6NqAoT",
+    //     metadata: {
+    //       items: items,
+    //       expenses: [
+    //         { description: "Toll", amount: expenses.toll },
+    //         { description: "Tips", amount: expenses.tips },
+    //         { description: "Fuel", amount: expenses.fuel },
+    //       ],
+    //       routes: tripRoutesDepot,
+    //       fuelPrice: fuelPrice
+    //     },
+    //     createdBy: "f1iMUVNmMmKYKMWim0WkxuKYAHSatN3u",
+    //   }).returning()
+
+    //   await db.insert(eventEntities).values([
+    //     {
+    //       id: generateId(),
+    //       role: "customer",
+    //       status: "attended",
+    //       entityType: "customers",
+    //       entityId: "64g2kKyWEyk7pAMojDhDu5o8nQRWN5qf",
+    //       eventId: result?.id,
+    //       createdBy: "f1iMUVNmMmKYKMWim0WkxuKYAHSatN3u"
+    //     },
+    //     {
+    //       id: generateId(),
+    //       role: "vehicle",
+    //       status: "attended",
+    //       entityType: "assets",
+    //       entityId: event?.vehicle_id,
+    //       eventId: result?.id,
+    //       createdBy: "f1iMUVNmMmKYKMWim0WkxuKYAHSatN3u"
+    //     },
+    //     {
+    //       id: generateId(),
+    //       role: "driver",
+    //       status: "attended",
+    //       entityType: "employees",
+    //       entityId: event?.driver_id,
+    //       eventId: result?.id,
+    //       createdBy: "f1iMUVNmMmKYKMWim0WkxuKYAHSatN3u"
+    //     },
+    //     ...event?.helper_id ? [{
+    //       id: generateId(),
+    //       role: "helper",
+    //       status: "attended",
+    //       entityType: "employees",
+    //       entityId: event?.helper_id,
+    //       eventId: result?.id,
+    //       createdBy: "f1iMUVNmMmKYKMWim0WkxuKYAHSatN3u"
+    //     }] : [],
+    //   ])
+    // })
   })
 
 export const assetTypesBackup = [
@@ -3365,5 +3447,4796 @@ export const eventTypesBackup = [
     "name": "Depot Trip",
     "parent_id": null,
     "organization_id": "HXAVBIRDQcztDzjB99NRVjY6yz6NqAoT"
+  }
+]
+
+export const eventsBackup = [
+  {
+    "id": "0wKPiJJfkRovVrGSn1vIQsAEGKlZDepm",
+    "date": "2025-09-01",
+    "type": "depot",
+    "vehicle_id": "o5f5twfcd6mXXjJT5LVWruDnvOWbga0W",
+    "driver_id": "QdkFfGVxPzlxe8nywMNYTIpW8M3thkIs",
+    "helper_id": null,
+    "created_at": "2025-09-09 14:41:18.651576",
+    "updated_at": "2025-09-09 14:41:18.651576",
+    "deleted_at": null,
+    "created_by": "IRmW1HJdcpSepC3wlcLQyfl4mDtVdQb2",
+    "updated_by": null,
+    "deleted_by": null,
+    "attachments": null,
+    "expenses": [
+      {
+        "amount": 90,
+        "description": "Toll"
+      },
+      {
+        "amount": 710,
+        "description": "Tips"
+      },
+      {
+        "amount": 5760,
+        "description": "Fuel"
+      }
+    ],
+    "items": [
+      {
+        "to": "PL",
+        "cost": 24,
+        "from": "CPA",
+        "fuel": 24,
+        "count": 2
+      }
+    ],
+    "metadata": null,
+    "fuel_price": "120"
+  },
+  {
+    "id": "10qUOvv8UjPbBkb6CBAZyxjtDhaCg2Yx",
+    "date": "2025-08-31",
+    "type": "depot",
+    "vehicle_id": "Vr0vnMA6EVPh8yJTLqZsT62b38qTLsJE",
+    "driver_id": "RCOYMA3u5DRbs7DY1WpZJQSC0dcLq2nO",
+    "helper_id": null,
+    "created_at": "2025-09-09 14:24:02.55072",
+    "updated_at": "2025-09-09 14:24:02.55072",
+    "deleted_at": null,
+    "created_by": "IRmW1HJdcpSepC3wlcLQyfl4mDtVdQb2",
+    "updated_by": null,
+    "deleted_by": null,
+    "attachments": null,
+    "expenses": [
+      {
+        "amount": 90,
+        "description": "Toll"
+      },
+      {
+        "amount": 710,
+        "description": "Tips"
+      },
+      {
+        "amount": 5760,
+        "description": "Fuel"
+      }
+    ],
+    "items": [
+      {
+        "to": "PL",
+        "cost": 24,
+        "from": "CPA",
+        "fuel": 24,
+        "count": 2
+      }
+    ],
+    "metadata": null,
+    "fuel_price": "120"
+  },
+  {
+    "id": "1jWdNgPA5wTSBc6e0d6w7D8wgfsnAsK3",
+    "date": "2025-08-26",
+    "type": "depot",
+    "vehicle_id": "afrbVl48SIbAJ7VyACunxQkTjeRZtCU3",
+    "driver_id": "qcSB3Lk62MwoL4rh5lO7fcv2QZK4SYBd",
+    "helper_id": null,
+    "created_at": "2025-09-06 10:42:07.592387",
+    "updated_at": "2025-09-06 10:42:07.592387",
+    "deleted_at": null,
+    "created_by": "IRmW1HJdcpSepC3wlcLQyfl4mDtVdQb2",
+    "updated_by": null,
+    "deleted_by": null,
+    "attachments": null,
+    "expenses": [
+      {
+        "amount": 90,
+        "description": "Toll"
+      },
+      {
+        "amount": 710,
+        "description": "Tips"
+      },
+      {
+        "amount": 5760,
+        "description": "Fuel"
+      }
+    ],
+    "items": [
+      {
+        "to": "PL",
+        "cost": 24,
+        "from": "CPA",
+        "fuel": 24,
+        "count": 2
+      }
+    ],
+    "metadata": null,
+    "fuel_price": "120"
+  },
+  {
+    "id": "2CVgoNFB19U0OJYH9bQLhRf4TvqfEiSw",
+    "date": "2025-08-30",
+    "type": "depot",
+    "vehicle_id": "OJCphMNY9JyOggKSxKa2YgjKh2hJVU7L",
+    "driver_id": "0LV6ikdVEYl4sY6wP0aBtCK7ItR5Gjtx",
+    "helper_id": null,
+    "created_at": "2025-09-08 11:07:00.487092",
+    "updated_at": "2025-09-08 11:07:00.487092",
+    "deleted_at": null,
+    "created_by": "IRmW1HJdcpSepC3wlcLQyfl4mDtVdQb2",
+    "updated_by": null,
+    "deleted_by": null,
+    "attachments": null,
+    "expenses": [
+      {
+        "amount": 90,
+        "description": "Toll"
+      },
+      {
+        "amount": 710,
+        "description": "Tips"
+      },
+      {
+        "amount": 5760,
+        "description": "Fuel"
+      }
+    ],
+    "items": [
+      {
+        "to": "PL",
+        "cost": 24,
+        "from": "CPA",
+        "fuel": 24,
+        "count": 2
+      }
+    ],
+    "metadata": null,
+    "fuel_price": "120"
+  },
+  {
+    "id": "3UfkCpNIggkKfnO3AvtrmTADHWM5PsoM",
+    "date": "2025-08-27",
+    "type": "depot",
+    "vehicle_id": "3reovR5HM9wWuUFkA4W23bHzTg3hpn5y",
+    "driver_id": "nEUjeKz8BksoYwpno3rzeqFxZhYdNRGQ",
+    "helper_id": null,
+    "created_at": "2025-09-06 14:12:52.823478",
+    "updated_at": "2025-09-06 14:12:52.823478",
+    "deleted_at": null,
+    "created_by": "IRmW1HJdcpSepC3wlcLQyfl4mDtVdQb2",
+    "updated_by": null,
+    "deleted_by": null,
+    "attachments": null,
+    "expenses": [
+      {
+        "amount": 90,
+        "description": "Toll"
+      },
+      {
+        "amount": 710,
+        "description": "Tips"
+      },
+      {
+        "amount": 5760,
+        "description": "Fuel"
+      }
+    ],
+    "items": [
+      {
+        "to": "PL",
+        "cost": 24,
+        "from": "CPA",
+        "fuel": 24,
+        "count": 2
+      }
+    ],
+    "metadata": null,
+    "fuel_price": "120"
+  },
+  {
+    "id": "4FBVrMmbNKnDrWeAmrnj7NzkEmZxJ9A2",
+    "date": "2025-09-01",
+    "type": "depot",
+    "vehicle_id": "Cqf23keKTythCwC74RkPxfSvBf50nrvL",
+    "driver_id": "0EDVFSBMexgDmoUZl38uf6aueW2J5Ode",
+    "helper_id": null,
+    "created_at": "2025-09-09 14:45:55.289776",
+    "updated_at": "2025-09-09 14:45:55.289776",
+    "deleted_at": null,
+    "created_by": "IRmW1HJdcpSepC3wlcLQyfl4mDtVdQb2",
+    "updated_by": null,
+    "deleted_by": null,
+    "attachments": null,
+    "expenses": [
+      {
+        "amount": 90,
+        "description": "Toll"
+      },
+      {
+        "amount": 710,
+        "description": "Tips"
+      },
+      {
+        "amount": 5760,
+        "description": "Fuel"
+      }
+    ],
+    "items": [
+      {
+        "to": "PL",
+        "cost": 24,
+        "from": "CPA",
+        "fuel": 24,
+        "count": 2
+      }
+    ],
+    "metadata": null,
+    "fuel_price": "120"
+  },
+  {
+    "id": "4qd9FMR7Z9XDuGVIROWm7qmkzEfK04BX",
+    "date": "2025-08-31",
+    "type": "depot",
+    "vehicle_id": "sy3GM7ORvYorLMc2utxpHPmJP6vLivzx",
+    "driver_id": "GuVjEMweuHJOT6v6YnRlr25djGOmF03Q",
+    "helper_id": null,
+    "created_at": "2025-09-09 13:47:32.627879",
+    "updated_at": "2025-09-09 13:47:32.627879",
+    "deleted_at": null,
+    "created_by": "IRmW1HJdcpSepC3wlcLQyfl4mDtVdQb2",
+    "updated_by": null,
+    "deleted_by": null,
+    "attachments": null,
+    "expenses": [
+      {
+        "amount": 90,
+        "description": "Toll"
+      },
+      {
+        "amount": 710,
+        "description": "Tips"
+      },
+      {
+        "amount": 5760,
+        "description": "Fuel"
+      }
+    ],
+    "items": [
+      {
+        "to": "PL",
+        "cost": 24,
+        "from": "CPA",
+        "fuel": 24,
+        "count": 2
+      }
+    ],
+    "metadata": null,
+    "fuel_price": "120"
+  },
+  {
+    "id": "4z0zTrY3mwmSeZirBVeys95oL0pZzkbm",
+    "date": "2025-08-28",
+    "type": "depot",
+    "vehicle_id": "Cqf23keKTythCwC74RkPxfSvBf50nrvL",
+    "driver_id": "0EDVFSBMexgDmoUZl38uf6aueW2J5Ode",
+    "helper_id": null,
+    "created_at": "2025-09-08 10:16:21.664449",
+    "updated_at": "2025-09-08 10:16:21.664449",
+    "deleted_at": null,
+    "created_by": "IRmW1HJdcpSepC3wlcLQyfl4mDtVdQb2",
+    "updated_by": null,
+    "deleted_by": null,
+    "attachments": null,
+    "expenses": [
+      {
+        "amount": 90,
+        "description": "Toll"
+      },
+      {
+        "amount": 710,
+        "description": "Tips"
+      },
+      {
+        "amount": 5760,
+        "description": "Fuel"
+      }
+    ],
+    "items": [
+      {
+        "to": "PL",
+        "cost": 24,
+        "from": "CPA",
+        "fuel": 24,
+        "count": 2
+      }
+    ],
+    "metadata": null,
+    "fuel_price": "120"
+  },
+  {
+    "id": "5Lucc3RhlJ0156V9PtJ1coB5LdNyxiCB",
+    "date": "2025-09-01",
+    "type": "depot",
+    "vehicle_id": "t3qJ9R0SF30Zwfm7IzDiClizTjpi8Aqm",
+    "driver_id": "N0tccSqW8sdEEvGm2Abjsp3oZAV4AhYu",
+    "helper_id": null,
+    "created_at": "2025-09-09 14:47:43.226088",
+    "updated_at": "2025-09-09 14:47:43.226088",
+    "deleted_at": null,
+    "created_by": "IRmW1HJdcpSepC3wlcLQyfl4mDtVdQb2",
+    "updated_by": null,
+    "deleted_by": null,
+    "attachments": null,
+    "expenses": [
+      {
+        "amount": 90,
+        "description": "Toll"
+      },
+      {
+        "amount": 710,
+        "description": "Tips"
+      },
+      {
+        "amount": 5760,
+        "description": "Fuel"
+      }
+    ],
+    "items": [
+      {
+        "to": "PL",
+        "cost": 24,
+        "from": "CPA",
+        "fuel": 24,
+        "count": 2
+      }
+    ],
+    "metadata": null,
+    "fuel_price": "120"
+  },
+  {
+    "id": "6REk35hCxnTziWYOsGfcLArskrF9HGj4",
+    "date": "2025-08-31",
+    "type": "depot",
+    "vehicle_id": "YTtsWyOKC2OzoKr8dql7rOOtUx803N08",
+    "driver_id": "0LV6ikdVEYl4sY6wP0aBtCK7ItR5Gjtx",
+    "helper_id": null,
+    "created_at": "2025-09-09 14:12:33.165019",
+    "updated_at": "2025-09-09 14:12:33.165019",
+    "deleted_at": null,
+    "created_by": "IRmW1HJdcpSepC3wlcLQyfl4mDtVdQb2",
+    "updated_by": null,
+    "deleted_by": null,
+    "attachments": null,
+    "expenses": [
+      {
+        "amount": 90,
+        "description": "Toll"
+      },
+      {
+        "amount": 710,
+        "description": "Tips"
+      },
+      {
+        "amount": 5760,
+        "description": "Fuel"
+      }
+    ],
+    "items": [
+      {
+        "to": "PL",
+        "cost": 24,
+        "from": "CPA",
+        "fuel": 24,
+        "count": 2
+      }
+    ],
+    "metadata": null,
+    "fuel_price": "120"
+  },
+  {
+    "id": "6rzNegy5Xr5OLoWoNbrJuTFfpjBPljGW",
+    "date": "2025-08-29",
+    "type": "depot",
+    "vehicle_id": "Vr0vnMA6EVPh8yJTLqZsT62b38qTLsJE",
+    "driver_id": "RCOYMA3u5DRbs7DY1WpZJQSC0dcLq2nO",
+    "helper_id": "UMd3PDf3Woh8hiVNK8qv2z8lRyaLGmNf",
+    "created_at": "2025-09-08 10:37:57.363288",
+    "updated_at": "2025-09-08 10:37:57.363288",
+    "deleted_at": null,
+    "created_by": "IRmW1HJdcpSepC3wlcLQyfl4mDtVdQb2",
+    "updated_by": null,
+    "deleted_by": null,
+    "attachments": null,
+    "expenses": [
+      {
+        "amount": 90,
+        "description": "Toll"
+      },
+      {
+        "amount": 710,
+        "description": "Tips"
+      },
+      {
+        "amount": 5760,
+        "description": "Fuel"
+      }
+    ],
+    "items": [
+      {
+        "to": "PL",
+        "cost": 24,
+        "from": "CPA",
+        "fuel": 24,
+        "count": 2
+      }
+    ],
+    "metadata": null,
+    "fuel_price": "120"
+  },
+  {
+    "id": "79pRR3aUZ7EqEbVNrU7SqIGxyGhbZsgA",
+    "date": "2025-08-26",
+    "type": "depot",
+    "vehicle_id": "38JGlhNUxno3JtkxnbRD10Z2qPaZgUya",
+    "driver_id": "Xa9RR4pYzgkrgYGAzeHWIDzHEDlqQfP9",
+    "helper_id": null,
+    "created_at": "2025-09-06 10:38:16.888863",
+    "updated_at": "2025-09-06 10:38:16.888863",
+    "deleted_at": null,
+    "created_by": "IRmW1HJdcpSepC3wlcLQyfl4mDtVdQb2",
+    "updated_by": null,
+    "deleted_by": null,
+    "attachments": null,
+    "expenses": [
+      {
+        "amount": 90,
+        "description": "Toll"
+      },
+      {
+        "amount": 710,
+        "description": "Tips"
+      },
+      {
+        "amount": 5760,
+        "description": "Fuel"
+      }
+    ],
+    "items": [
+      {
+        "to": "PL",
+        "cost": 24,
+        "from": "CPA",
+        "fuel": 24,
+        "count": 2
+      }
+    ],
+    "metadata": null,
+    "fuel_price": "120"
+  },
+  {
+    "id": "8PLlZdmUfBXV9AJ1bNsJzaMzH7sRXiYO",
+    "date": "2025-08-31",
+    "type": "depot",
+    "vehicle_id": "iUMnHiDIHL93KoPDp0NsMUzWdVgrsLPX",
+    "driver_id": "Aj9saWWqah2BRAd2DzeCruLS0NWc0H1h",
+    "helper_id": null,
+    "created_at": "2025-09-09 14:31:05.062815",
+    "updated_at": "2025-09-09 14:31:05.062815",
+    "deleted_at": null,
+    "created_by": "IRmW1HJdcpSepC3wlcLQyfl4mDtVdQb2",
+    "updated_by": null,
+    "deleted_by": null,
+    "attachments": null,
+    "expenses": [
+      {
+        "amount": 90,
+        "description": "Toll"
+      },
+      {
+        "amount": 710,
+        "description": "Tips"
+      },
+      {
+        "amount": 2880,
+        "description": "Fuel"
+      }
+    ],
+    "items": [
+      {
+        "to": "PL",
+        "cost": 24,
+        "from": "CPA",
+        "fuel": 24,
+        "count": 1
+      }
+    ],
+    "metadata": null,
+    "fuel_price": "120"
+  },
+  {
+    "id": "8XNBFKBWSIZOyicyKouFzmIWR8Kgrj6w",
+    "date": "2025-09-01",
+    "type": "depot",
+    "vehicle_id": "OvMVCrOlnYI2W8N8kUkZBKipreV1XgNW",
+    "driver_id": "yZog0zSrmiw1IbgOf4XXUfdxuaIO0yQB",
+    "helper_id": "0AhoxNtKfTOstfsdP4NXy3NvNaqqOxOV",
+    "created_at": "2025-09-09 14:38:24.929193",
+    "updated_at": "2025-09-09 14:38:24.929193",
+    "deleted_at": null,
+    "created_by": "IRmW1HJdcpSepC3wlcLQyfl4mDtVdQb2",
+    "updated_by": null,
+    "deleted_by": null,
+    "attachments": null,
+    "expenses": [
+      {
+        "amount": 90,
+        "description": "Toll"
+      },
+      {
+        "amount": 710,
+        "description": "Tips"
+      },
+      {
+        "amount": 5760,
+        "description": "Fuel"
+      }
+    ],
+    "items": [
+      {
+        "to": "PL",
+        "cost": 24,
+        "from": "CPA",
+        "fuel": 24,
+        "count": 2
+      }
+    ],
+    "metadata": null,
+    "fuel_price": "120"
+  },
+  {
+    "id": "8bofYsJRh0i5qbMKYxN5bGpOdq5F3IM0",
+    "date": "2025-08-28",
+    "type": "depot",
+    "vehicle_id": "YXsBmaKvhQA4KTN9gm0ZEwU1oubInrY3",
+    "driver_id": "PTUxnNzDV3Xcl8QKe4t5rXN2qAqoPhwi",
+    "helper_id": "UMd3PDf3Woh8hiVNK8qv2z8lRyaLGmNf",
+    "created_at": "2025-09-08 10:00:32.831541",
+    "updated_at": "2025-09-08 10:00:32.831541",
+    "deleted_at": null,
+    "created_by": "IRmW1HJdcpSepC3wlcLQyfl4mDtVdQb2",
+    "updated_by": null,
+    "deleted_by": null,
+    "attachments": null,
+    "expenses": [
+      {
+        "amount": 90,
+        "description": "Toll"
+      },
+      {
+        "amount": 710,
+        "description": "Tips"
+      },
+      {
+        "amount": 8640,
+        "description": "Fuel"
+      }
+    ],
+    "items": [
+      {
+        "to": "PL",
+        "cost": 24,
+        "from": "CPA",
+        "fuel": 24,
+        "count": 3
+      }
+    ],
+    "metadata": null,
+    "fuel_price": "120"
+  },
+  {
+    "id": "8paOPm0koiYbKH7eBITFKfpKJjsoxcmX",
+    "date": "2025-08-27",
+    "type": "depot",
+    "vehicle_id": "YTtsWyOKC2OzoKr8dql7rOOtUx803N08",
+    "driver_id": "0LV6ikdVEYl4sY6wP0aBtCK7ItR5Gjtx",
+    "helper_id": null,
+    "created_at": "2025-09-08 09:48:27.407886",
+    "updated_at": "2025-09-08 09:48:27.407886",
+    "deleted_at": null,
+    "created_by": "IRmW1HJdcpSepC3wlcLQyfl4mDtVdQb2",
+    "updated_by": null,
+    "deleted_by": null,
+    "attachments": null,
+    "expenses": [
+      {
+        "amount": 90,
+        "description": "Toll"
+      },
+      {
+        "amount": 710,
+        "description": "Tips"
+      },
+      {
+        "amount": 2880,
+        "description": "Fuel"
+      }
+    ],
+    "items": [
+      {
+        "to": "PL",
+        "cost": 24,
+        "from": "CPA",
+        "fuel": 24,
+        "count": 1
+      }
+    ],
+    "metadata": null,
+    "fuel_price": "120"
+  },
+  {
+    "id": "8sSVzrXSlVKByU2L3fxFoBuPNPtVgjc3",
+    "date": "2025-08-30",
+    "type": "depot",
+    "vehicle_id": "OvMVCrOlnYI2W8N8kUkZBKipreV1XgNW",
+    "driver_id": "QdkFfGVxPzlxe8nywMNYTIpW8M3thkIs",
+    "helper_id": null,
+    "created_at": "2025-09-08 11:08:23.013751",
+    "updated_at": "2025-09-08 11:08:23.013751",
+    "deleted_at": null,
+    "created_by": "IRmW1HJdcpSepC3wlcLQyfl4mDtVdQb2",
+    "updated_by": null,
+    "deleted_by": null,
+    "attachments": null,
+    "expenses": [
+      {
+        "amount": 90,
+        "description": "Toll"
+      },
+      {
+        "amount": 710,
+        "description": "Tips"
+      },
+      {
+        "amount": 5760,
+        "description": "Fuel"
+      }
+    ],
+    "items": [
+      {
+        "to": "PL",
+        "cost": 24,
+        "from": "CPA",
+        "fuel": 24,
+        "count": 2
+      }
+    ],
+    "metadata": null,
+    "fuel_price": "120"
+  },
+  {
+    "id": "90yrB1wtOuiamR4f4bY9xOpcjSeafSIf",
+    "date": "2025-09-01",
+    "type": "depot",
+    "vehicle_id": "sy3GM7ORvYorLMc2utxpHPmJP6vLivzx",
+    "driver_id": "Gnxyx7CNA6JZXyj3kY1futN3DmT5OMwz",
+    "helper_id": null,
+    "created_at": "2025-09-09 14:44:57.514095",
+    "updated_at": "2025-09-09 14:44:57.514095",
+    "deleted_at": null,
+    "created_by": "IRmW1HJdcpSepC3wlcLQyfl4mDtVdQb2",
+    "updated_by": null,
+    "deleted_by": null,
+    "attachments": null,
+    "expenses": [
+      {
+        "amount": 90,
+        "description": "Toll"
+      },
+      {
+        "amount": 710,
+        "description": "Tips"
+      },
+      {
+        "amount": 5760,
+        "description": "Fuel"
+      }
+    ],
+    "items": [
+      {
+        "to": "PL",
+        "cost": 24,
+        "from": "CPA",
+        "fuel": 24,
+        "count": 2
+      }
+    ],
+    "metadata": null,
+    "fuel_price": "120"
+  },
+  {
+    "id": "9S8LLPeVULqhdhknZSS2Of1GvMMhSwtt",
+    "date": "2025-08-30",
+    "type": "depot",
+    "vehicle_id": "Vr0vnMA6EVPh8yJTLqZsT62b38qTLsJE",
+    "driver_id": "jvhuoR4El96L2mir8RICg3ycWqRW2GpY",
+    "helper_id": null,
+    "created_at": "2025-09-08 11:12:52.894966",
+    "updated_at": "2025-09-08 11:12:52.894966",
+    "deleted_at": null,
+    "created_by": "IRmW1HJdcpSepC3wlcLQyfl4mDtVdQb2",
+    "updated_by": null,
+    "deleted_by": null,
+    "attachments": null,
+    "expenses": [
+      {
+        "amount": 90,
+        "description": "Toll"
+      },
+      {
+        "amount": 710,
+        "description": "Tips"
+      },
+      {
+        "amount": 5760,
+        "description": "Fuel"
+      }
+    ],
+    "items": [
+      {
+        "to": "PL",
+        "cost": 24,
+        "from": "CPA",
+        "fuel": 24,
+        "count": 2
+      }
+    ],
+    "metadata": null,
+    "fuel_price": "120"
+  },
+  {
+    "id": "B2sMkhPsfCQcyC8OujEARpalvcRoXgq1",
+    "date": "2025-08-30",
+    "type": "depot",
+    "vehicle_id": "YTtsWyOKC2OzoKr8dql7rOOtUx803N08",
+    "driver_id": "Y2pURKh3HUqhKf7MXwBy1afjj7fD54zq",
+    "helper_id": null,
+    "created_at": "2025-09-08 10:59:43.125596",
+    "updated_at": "2025-09-08 10:59:43.125596",
+    "deleted_at": null,
+    "created_by": "IRmW1HJdcpSepC3wlcLQyfl4mDtVdQb2",
+    "updated_by": null,
+    "deleted_by": null,
+    "attachments": null,
+    "expenses": [
+      {
+        "amount": 90,
+        "description": "Toll"
+      },
+      {
+        "amount": 710,
+        "description": "Tips"
+      },
+      {
+        "amount": 8640,
+        "description": "Fuel"
+      }
+    ],
+    "items": [
+      {
+        "to": "PL",
+        "cost": 24,
+        "from": "CPA",
+        "fuel": 24,
+        "count": 3
+      }
+    ],
+    "metadata": null,
+    "fuel_price": "120"
+  },
+  {
+    "id": "CFNs6Si8WqQN43vwzxiNebHuiEg7vPQK",
+    "date": "2025-08-29",
+    "type": "depot",
+    "vehicle_id": "38JGlhNUxno3JtkxnbRD10Z2qPaZgUya",
+    "driver_id": "yTQ8ou1hZ2AdOdUJMt4daUkZkW5VUOgV",
+    "helper_id": null,
+    "created_at": "2025-09-08 10:25:32.772804",
+    "updated_at": "2025-09-08 10:25:32.772804",
+    "deleted_at": null,
+    "created_by": "IRmW1HJdcpSepC3wlcLQyfl4mDtVdQb2",
+    "updated_by": null,
+    "deleted_by": null,
+    "attachments": null,
+    "expenses": [
+      {
+        "amount": 90,
+        "description": "Toll"
+      },
+      {
+        "amount": 710,
+        "description": "Tips"
+      },
+      {
+        "amount": 8640,
+        "description": "Fuel"
+      }
+    ],
+    "items": [
+      {
+        "to": "PL",
+        "cost": 24,
+        "from": "CPA",
+        "fuel": 24,
+        "count": 3
+      }
+    ],
+    "metadata": null,
+    "fuel_price": "120"
+  },
+  {
+    "id": "CU7g3wyRX6pDtiH025kVVxcfxgDC4O6I",
+    "date": "2025-08-31",
+    "type": "depot",
+    "vehicle_id": "yiRQnGMXIqmOiVaRxB0MgM8XGxVnCYKO",
+    "driver_id": "hxgNomXIT5NqZI8yvDqqwt5evDIPCaA6",
+    "helper_id": null,
+    "created_at": "2025-09-09 14:14:45.699739",
+    "updated_at": "2025-09-09 14:14:45.699739",
+    "deleted_at": null,
+    "created_by": "IRmW1HJdcpSepC3wlcLQyfl4mDtVdQb2",
+    "updated_by": null,
+    "deleted_by": null,
+    "attachments": null,
+    "expenses": [
+      {
+        "amount": 90,
+        "description": "Toll"
+      },
+      {
+        "amount": 710,
+        "description": "Tips"
+      },
+      {
+        "amount": 2880,
+        "description": "Fuel"
+      }
+    ],
+    "items": [
+      {
+        "to": "PL",
+        "cost": 24,
+        "from": "CPA",
+        "fuel": 24,
+        "count": 1
+      }
+    ],
+    "metadata": null,
+    "fuel_price": "120"
+  },
+  {
+    "id": "DfALuP2DdS6L3Q1F8T31ngP88utkaxt8",
+    "date": "2025-09-01",
+    "type": "depot",
+    "vehicle_id": "YTtsWyOKC2OzoKr8dql7rOOtUx803N08",
+    "driver_id": "Y2pURKh3HUqhKf7MXwBy1afjj7fD54zq",
+    "helper_id": null,
+    "created_at": "2025-09-09 14:53:14.492001",
+    "updated_at": "2025-09-09 14:53:14.492001",
+    "deleted_at": null,
+    "created_by": "IRmW1HJdcpSepC3wlcLQyfl4mDtVdQb2",
+    "updated_by": null,
+    "deleted_by": null,
+    "attachments": null,
+    "expenses": [
+      {
+        "amount": 90,
+        "description": "Toll"
+      },
+      {
+        "amount": 710,
+        "description": "Tips"
+      },
+      {
+        "amount": 8640,
+        "description": "Fuel"
+      }
+    ],
+    "items": [
+      {
+        "to": "PL",
+        "cost": 24,
+        "from": "CPA",
+        "fuel": 24,
+        "count": 3
+      }
+    ],
+    "metadata": null,
+    "fuel_price": "120"
+  },
+  {
+    "id": "EFZEpqJll7Fp2Rh4MhHumMbfNaWFwRAW",
+    "date": "2025-08-29",
+    "type": "depot",
+    "vehicle_id": "OJCphMNY9JyOggKSxKa2YgjKh2hJVU7L",
+    "driver_id": "uTpAVEHgWpwDFnOPHsBNB8dTNjT6kkWX",
+    "helper_id": null,
+    "created_at": "2025-09-08 10:36:36.723546",
+    "updated_at": "2025-09-08 10:36:36.723546",
+    "deleted_at": null,
+    "created_by": "IRmW1HJdcpSepC3wlcLQyfl4mDtVdQb2",
+    "updated_by": null,
+    "deleted_by": null,
+    "attachments": null,
+    "expenses": [
+      {
+        "amount": 90,
+        "description": "Toll"
+      },
+      {
+        "amount": 710,
+        "description": "Tips"
+      },
+      {
+        "amount": 5760,
+        "description": "Fuel"
+      }
+    ],
+    "items": [
+      {
+        "to": "PL",
+        "cost": 24,
+        "from": "CPA",
+        "fuel": 24,
+        "count": 2
+      }
+    ],
+    "metadata": null,
+    "fuel_price": "120"
+  },
+  {
+    "id": "FFFmYpCEP1HreJLNSBkrEolc0nqOuGKy",
+    "date": "2025-08-29",
+    "type": "depot",
+    "vehicle_id": "OHU7XsXysen8v8grlfe7y2EeCQFW0fVn",
+    "driver_id": "xL8N1uWi79QqhfclQszd92HsXtuPOwhm",
+    "helper_id": null,
+    "created_at": "2025-09-08 10:42:13.155439",
+    "updated_at": "2025-09-08 10:42:13.155439",
+    "deleted_at": null,
+    "created_by": "IRmW1HJdcpSepC3wlcLQyfl4mDtVdQb2",
+    "updated_by": null,
+    "deleted_by": null,
+    "attachments": null,
+    "expenses": [
+      {
+        "amount": 90,
+        "description": "Toll"
+      },
+      {
+        "amount": 710,
+        "description": "Tips"
+      },
+      {
+        "amount": 5760,
+        "description": "Fuel"
+      }
+    ],
+    "items": [
+      {
+        "to": "PL",
+        "cost": 24,
+        "from": "CPA",
+        "fuel": 24,
+        "count": 2
+      }
+    ],
+    "metadata": null,
+    "fuel_price": "120"
+  },
+  {
+    "id": "HHPIuz8pL4EZbFLC9yB3SGLYwMZsdTBi",
+    "date": "2025-08-28",
+    "type": "depot",
+    "vehicle_id": "t3qJ9R0SF30Zwfm7IzDiClizTjpi8Aqm",
+    "driver_id": "N0tccSqW8sdEEvGm2Abjsp3oZAV4AhYu",
+    "helper_id": null,
+    "created_at": "2025-09-08 10:10:51.203892",
+    "updated_at": "2025-09-08 10:10:51.203892",
+    "deleted_at": null,
+    "created_by": "IRmW1HJdcpSepC3wlcLQyfl4mDtVdQb2",
+    "updated_by": null,
+    "deleted_by": null,
+    "attachments": null,
+    "expenses": [
+      {
+        "amount": 90,
+        "description": "Toll"
+      },
+      {
+        "amount": 710,
+        "description": "Tips"
+      },
+      {
+        "amount": 7200,
+        "description": "Fuel"
+      }
+    ],
+    "items": [
+      {
+        "to": "PL",
+        "cost": 24,
+        "from": "CPA",
+        "fuel": 24,
+        "count": 2.5
+      }
+    ],
+    "metadata": null,
+    "fuel_price": "120"
+  },
+  {
+    "id": "HPf0Vt2GwLHBHQmcL8Ktqk72vg5AIg4J",
+    "date": "2025-09-01",
+    "type": "depot",
+    "vehicle_id": "yiRQnGMXIqmOiVaRxB0MgM8XGxVnCYKO",
+    "driver_id": "gyk8qtQt17LMpyXxJUsgxPZ7UcJGNGdn",
+    "helper_id": null,
+    "created_at": "2025-09-09 14:34:02.625398",
+    "updated_at": "2025-09-09 14:34:02.625398",
+    "deleted_at": null,
+    "created_by": "IRmW1HJdcpSepC3wlcLQyfl4mDtVdQb2",
+    "updated_by": null,
+    "deleted_by": null,
+    "attachments": null,
+    "expenses": [
+      {
+        "amount": 90,
+        "description": "Toll"
+      },
+      {
+        "amount": 710,
+        "description": "Tips"
+      },
+      {
+        "amount": 5760,
+        "description": "Fuel"
+      }
+    ],
+    "items": [
+      {
+        "to": "PL",
+        "cost": 24,
+        "from": "CPA",
+        "fuel": 24,
+        "count": 2
+      }
+    ],
+    "metadata": null,
+    "fuel_price": "120"
+  },
+  {
+    "id": "HQ9Epf5X5GWhp8HkgzjTgarbTCwMF3Pn",
+    "date": "2025-08-31",
+    "type": "depot",
+    "vehicle_id": "afrbVl48SIbAJ7VyACunxQkTjeRZtCU3",
+    "driver_id": "v7osuBp7myXCPhcW5y7X7VpxXh9e9X5k",
+    "helper_id": null,
+    "created_at": "2025-09-09 13:43:18.087371",
+    "updated_at": "2025-09-09 13:43:18.087371",
+    "deleted_at": null,
+    "created_by": "IRmW1HJdcpSepC3wlcLQyfl4mDtVdQb2",
+    "updated_by": null,
+    "deleted_by": null,
+    "attachments": null,
+    "expenses": [
+      {
+        "amount": 90,
+        "description": "Toll"
+      },
+      {
+        "amount": 710,
+        "description": "Tips"
+      },
+      {
+        "amount": 8640,
+        "description": "Fuel"
+      }
+    ],
+    "items": [
+      {
+        "to": "PL",
+        "cost": 24,
+        "from": "CPA",
+        "fuel": 24,
+        "count": 3
+      }
+    ],
+    "metadata": null,
+    "fuel_price": "120"
+  },
+  {
+    "id": "HYoIv2rFWs9Grpr4XMX5wPpsAwzNZVpz",
+    "date": "2025-08-31",
+    "type": "depot",
+    "vehicle_id": "o5f5twfcd6mXXjJT5LVWruDnvOWbga0W",
+    "driver_id": "yTQ8ou1hZ2AdOdUJMt4daUkZkW5VUOgV",
+    "helper_id": null,
+    "created_at": "2025-09-09 14:20:34.1231",
+    "updated_at": "2025-09-09 14:20:34.1231",
+    "deleted_at": null,
+    "created_by": "IRmW1HJdcpSepC3wlcLQyfl4mDtVdQb2",
+    "updated_by": null,
+    "deleted_by": null,
+    "attachments": null,
+    "expenses": [
+      {
+        "amount": 90,
+        "description": "Toll"
+      },
+      {
+        "amount": 710,
+        "description": "Tips"
+      },
+      {
+        "amount": 2880,
+        "description": "Fuel"
+      }
+    ],
+    "items": [
+      {
+        "to": "PL",
+        "cost": 24,
+        "from": "CPA",
+        "fuel": 24,
+        "count": 1
+      }
+    ],
+    "metadata": null,
+    "fuel_price": "120"
+  },
+  {
+    "id": "I3PYgPWxQnpcERf4fQQygmR30gc4QwML",
+    "date": "2025-08-27",
+    "type": "depot",
+    "vehicle_id": "Vr0vnMA6EVPh8yJTLqZsT62b38qTLsJE",
+    "driver_id": "RCOYMA3u5DRbs7DY1WpZJQSC0dcLq2nO",
+    "helper_id": "UMd3PDf3Woh8hiVNK8qv2z8lRyaLGmNf",
+    "created_at": "2025-09-06 12:25:43.402408",
+    "updated_at": "2025-09-06 12:25:43.402408",
+    "deleted_at": null,
+    "created_by": "IRmW1HJdcpSepC3wlcLQyfl4mDtVdQb2",
+    "updated_by": null,
+    "deleted_by": null,
+    "attachments": null,
+    "expenses": [
+      {
+        "amount": 90,
+        "description": "Toll"
+      },
+      {
+        "amount": 710,
+        "description": "Tips"
+      },
+      {
+        "amount": 5760,
+        "description": "Fuel"
+      }
+    ],
+    "items": [
+      {
+        "to": "PL",
+        "cost": 24,
+        "from": "CPA",
+        "fuel": 24,
+        "count": 2
+      }
+    ],
+    "metadata": null,
+    "fuel_price": "120"
+  },
+  {
+    "id": "IOJFDBqXdw9LjKTAx8Opbv5bVmIbgHzh",
+    "date": "2025-08-31",
+    "type": "depot",
+    "vehicle_id": "3reovR5HM9wWuUFkA4W23bHzTg3hpn5y",
+    "driver_id": "mIunKdxCwzMS5GML4RLuHkgSg7ifHokj",
+    "helper_id": null,
+    "created_at": "2025-09-09 14:18:35.428807",
+    "updated_at": "2025-09-09 14:18:35.428807",
+    "deleted_at": null,
+    "created_by": "IRmW1HJdcpSepC3wlcLQyfl4mDtVdQb2",
+    "updated_by": null,
+    "deleted_by": null,
+    "attachments": null,
+    "expenses": [
+      {
+        "amount": 90,
+        "description": "Toll"
+      },
+      {
+        "amount": 710,
+        "description": "Tips"
+      },
+      {
+        "amount": 5760,
+        "description": "Fuel"
+      }
+    ],
+    "items": [
+      {
+        "to": "PL",
+        "cost": 24,
+        "from": "CPA",
+        "fuel": 24,
+        "count": 2
+      }
+    ],
+    "metadata": null,
+    "fuel_price": "120"
+  },
+  {
+    "id": "JGMTIfs9617IjYiOj1Anx3Zntf9VKuJj",
+    "date": "2025-08-28",
+    "type": "depot",
+    "vehicle_id": "yiRQnGMXIqmOiVaRxB0MgM8XGxVnCYKO",
+    "driver_id": "hxgNomXIT5NqZI8yvDqqwt5evDIPCaA6",
+    "helper_id": null,
+    "created_at": "2025-09-08 10:12:27.285915",
+    "updated_at": "2025-09-08 10:12:27.285915",
+    "deleted_at": null,
+    "created_by": "IRmW1HJdcpSepC3wlcLQyfl4mDtVdQb2",
+    "updated_by": null,
+    "deleted_by": null,
+    "attachments": null,
+    "expenses": [
+      {
+        "amount": 90,
+        "description": "Toll"
+      },
+      {
+        "amount": 710,
+        "description": "Tips"
+      },
+      {
+        "amount": 5760,
+        "description": "Fuel"
+      }
+    ],
+    "items": [
+      {
+        "to": "PL",
+        "cost": 24,
+        "from": "CPA",
+        "fuel": 24,
+        "count": 2
+      }
+    ],
+    "metadata": null,
+    "fuel_price": "120"
+  },
+  {
+    "id": "Jgr9KPZ90vNqeq3gd3GV7zGL3aKT46oq",
+    "date": "2025-08-26",
+    "type": "depot",
+    "vehicle_id": "OvMVCrOlnYI2W8N8kUkZBKipreV1XgNW",
+    "driver_id": "yZog0zSrmiw1IbgOf4XXUfdxuaIO0yQB",
+    "helper_id": "0AhoxNtKfTOstfsdP4NXy3NvNaqqOxOV",
+    "created_at": "2025-09-06 10:22:57.351915",
+    "updated_at": "2025-09-06 10:22:57.351915",
+    "deleted_at": null,
+    "created_by": "IRmW1HJdcpSepC3wlcLQyfl4mDtVdQb2",
+    "updated_by": null,
+    "deleted_by": null,
+    "attachments": null,
+    "expenses": [
+      {
+        "amount": 90,
+        "description": "Toll"
+      },
+      {
+        "amount": 710,
+        "description": "Tips"
+      },
+      {
+        "amount": 5760,
+        "description": "Fuel"
+      }
+    ],
+    "items": [
+      {
+        "to": "PL",
+        "cost": 24,
+        "from": "CPA",
+        "fuel": 24,
+        "count": 2
+      }
+    ],
+    "metadata": null,
+    "fuel_price": "120"
+  },
+  {
+    "id": "LCA2LAkX69xHAMY9O7YkEEZwDUOoK3T0",
+    "date": "2025-08-27",
+    "type": "depot",
+    "vehicle_id": "BzdaaAdZ6pzAbRHQrbTmjOj6DAVqIfSC",
+    "driver_id": "fAGBcLhZfXdMIVOLt0r2fyYGoxomQ8rH",
+    "helper_id": null,
+    "created_at": "2025-09-06 12:28:02.942202",
+    "updated_at": "2025-09-06 12:28:02.942202",
+    "deleted_at": null,
+    "created_by": "IRmW1HJdcpSepC3wlcLQyfl4mDtVdQb2",
+    "updated_by": null,
+    "deleted_by": null,
+    "attachments": null,
+    "expenses": [
+      {
+        "amount": 90,
+        "description": "Toll"
+      },
+      {
+        "amount": 710,
+        "description": "Tips"
+      },
+      {
+        "amount": 2880,
+        "description": "Fuel"
+      }
+    ],
+    "items": [
+      {
+        "to": "PL",
+        "cost": 24,
+        "from": "CPA",
+        "fuel": 24,
+        "count": 1
+      }
+    ],
+    "metadata": null,
+    "fuel_price": "120"
+  },
+  {
+    "id": "MSS1NjXjzj9foOd1QygS5BwMThmGCe2g",
+    "date": "2025-08-28",
+    "type": "depot",
+    "vehicle_id": "sy3GM7ORvYorLMc2utxpHPmJP6vLivzx",
+    "driver_id": "Gnxyx7CNA6JZXyj3kY1futN3DmT5OMwz",
+    "helper_id": null,
+    "created_at": "2025-09-08 10:01:29.180242",
+    "updated_at": "2025-09-08 10:01:29.180242",
+    "deleted_at": null,
+    "created_by": "IRmW1HJdcpSepC3wlcLQyfl4mDtVdQb2",
+    "updated_by": null,
+    "deleted_by": null,
+    "attachments": null,
+    "expenses": [
+      {
+        "amount": 90,
+        "description": "Toll"
+      },
+      {
+        "amount": 710,
+        "description": "Tips"
+      },
+      {
+        "amount": 5760,
+        "description": "Fuel"
+      }
+    ],
+    "items": [
+      {
+        "to": "PL",
+        "cost": 24,
+        "from": "CPA",
+        "fuel": 24,
+        "count": 2
+      }
+    ],
+    "metadata": null,
+    "fuel_price": "120"
+  },
+  {
+    "id": "N1Mr6Pwqz1XHyn0BrbF2WxIq2pNPrd6W",
+    "date": "2025-08-26",
+    "type": "depot",
+    "vehicle_id": "Cqf23keKTythCwC74RkPxfSvBf50nrvL",
+    "driver_id": "AAvbr5hwlUiNaPAoqyZcoo2ERvDwcPzz",
+    "helper_id": null,
+    "created_at": "2025-09-06 08:24:39.010761",
+    "updated_at": "2025-09-06 08:24:39.010761",
+    "deleted_at": "2025-09-06 08:25:29.949",
+    "created_by": "IRmW1HJdcpSepC3wlcLQyfl4mDtVdQb2",
+    "updated_by": null,
+    "deleted_by": "IRmW1HJdcpSepC3wlcLQyfl4mDtVdQb2",
+    "attachments": null,
+    "expenses": [
+      {
+        "amount": 90,
+        "description": "Toll"
+      },
+      {
+        "amount": 710,
+        "description": "Tips"
+      },
+      {
+        "amount": 3300,
+        "description": "Fuel"
+      }
+    ],
+    "items": [
+      {
+        "to": "PL",
+        "cost": 24,
+        "from": "CPA",
+        "fuel": 24,
+        "count": 1
+      },
+      {
+        "to": "K&T",
+        "cost": 3.5,
+        "from": "PL",
+        "fuel": 3,
+        "count": 1
+      }
+    ],
+    "metadata": null,
+    "fuel_price": "120"
+  },
+  {
+    "id": "Nj2SkZI02U693gNSjcEQousUxcNx3xN7",
+    "date": "2025-08-27",
+    "type": "depot",
+    "vehicle_id": "t3qJ9R0SF30Zwfm7IzDiClizTjpi8Aqm",
+    "driver_id": "4SV2QPtXI9s3Q8SEHvRWWzSqlluMhiuS",
+    "helper_id": null,
+    "created_at": "2025-09-06 12:35:55.183749",
+    "updated_at": "2025-09-06 12:35:55.183749",
+    "deleted_at": null,
+    "created_by": "IRmW1HJdcpSepC3wlcLQyfl4mDtVdQb2",
+    "updated_by": null,
+    "deleted_by": null,
+    "attachments": null,
+    "expenses": [
+      {
+        "amount": 90,
+        "description": "Toll"
+      },
+      {
+        "amount": 710,
+        "description": "Tips"
+      },
+      {
+        "amount": 5760,
+        "description": "Fuel"
+      }
+    ],
+    "items": [
+      {
+        "to": "PL",
+        "cost": 24,
+        "from": "CPA",
+        "fuel": 24,
+        "count": 2
+      }
+    ],
+    "metadata": null,
+    "fuel_price": "120"
+  },
+  {
+    "id": "O0Ks8GAPAhB6fwKwxpe2rsSggMFP1MIj",
+    "date": "2025-08-31",
+    "type": "depot",
+    "vehicle_id": "OHU7XsXysen8v8grlfe7y2EeCQFW0fVn",
+    "driver_id": "xL8N1uWi79QqhfclQszd92HsXtuPOwhm",
+    "helper_id": "XayDWmlkjbCu6sTIvi79nnKpMxc2ge7u",
+    "created_at": "2025-09-09 13:49:06.595588",
+    "updated_at": "2025-09-09 13:49:06.595588",
+    "deleted_at": null,
+    "created_by": "IRmW1HJdcpSepC3wlcLQyfl4mDtVdQb2",
+    "updated_by": null,
+    "deleted_by": null,
+    "attachments": null,
+    "expenses": [
+      {
+        "amount": 90,
+        "description": "Toll"
+      },
+      {
+        "amount": 710,
+        "description": "Tips"
+      },
+      {
+        "amount": 5760,
+        "description": "Fuel"
+      }
+    ],
+    "items": [
+      {
+        "to": "PL",
+        "cost": 24,
+        "from": "CPA",
+        "fuel": 24,
+        "count": 2
+      }
+    ],
+    "metadata": null,
+    "fuel_price": "120"
+  },
+  {
+    "id": "ODuoXRWUSViaS35AmGJer8FGJypojxGF",
+    "date": "2025-08-30",
+    "type": "depot",
+    "vehicle_id": "OHU7XsXysen8v8grlfe7y2EeCQFW0fVn",
+    "driver_id": "6ZRNf3t8b2tF4K7zMnhNOJvMGO9LnsrL",
+    "helper_id": null,
+    "created_at": "2025-09-08 11:04:24.792541",
+    "updated_at": "2025-09-08 11:04:24.792541",
+    "deleted_at": null,
+    "created_by": "IRmW1HJdcpSepC3wlcLQyfl4mDtVdQb2",
+    "updated_by": null,
+    "deleted_by": null,
+    "attachments": null,
+    "expenses": [
+      {
+        "amount": 90,
+        "description": "Toll"
+      },
+      {
+        "amount": 710,
+        "description": "Tips"
+      },
+      {
+        "amount": 5760,
+        "description": "Fuel"
+      }
+    ],
+    "items": [
+      {
+        "to": "PL",
+        "cost": 24,
+        "from": "CPA",
+        "fuel": 24,
+        "count": 2
+      }
+    ],
+    "metadata": null,
+    "fuel_price": "120"
+  },
+  {
+    "id": "Ojjgkje2fvt4WVorWycmINjYOPVrrVOd",
+    "date": "2025-08-27",
+    "type": "depot",
+    "vehicle_id": "38JGlhNUxno3JtkxnbRD10Z2qPaZgUya",
+    "driver_id": "yZog0zSrmiw1IbgOf4XXUfdxuaIO0yQB",
+    "helper_id": null,
+    "created_at": "2025-09-08 09:46:34.247799",
+    "updated_at": "2025-09-08 09:46:34.247799",
+    "deleted_at": null,
+    "created_by": "IRmW1HJdcpSepC3wlcLQyfl4mDtVdQb2",
+    "updated_by": null,
+    "deleted_by": null,
+    "attachments": null,
+    "expenses": [
+      {
+        "amount": 90,
+        "description": "Toll"
+      },
+      {
+        "amount": 710,
+        "description": "Tips"
+      },
+      {
+        "amount": 5760,
+        "description": "Fuel"
+      }
+    ],
+    "items": [
+      {
+        "to": "PL",
+        "cost": 24,
+        "from": "CPA",
+        "fuel": 24,
+        "count": 2
+      }
+    ],
+    "metadata": null,
+    "fuel_price": "120"
+  },
+  {
+    "id": "OsbEy6d6NTEhtOKlhrovcwewmDLUuDnh",
+    "date": "2025-08-27",
+    "type": "depot",
+    "vehicle_id": "YXsBmaKvhQA4KTN9gm0ZEwU1oubInrY3",
+    "driver_id": "yTQ8ou1hZ2AdOdUJMt4daUkZkW5VUOgV",
+    "helper_id": null,
+    "created_at": "2025-09-08 09:50:39.338289",
+    "updated_at": "2025-09-08 09:50:39.338289",
+    "deleted_at": null,
+    "created_by": "IRmW1HJdcpSepC3wlcLQyfl4mDtVdQb2",
+    "updated_by": null,
+    "deleted_by": null,
+    "attachments": null,
+    "expenses": [
+      {
+        "amount": 90,
+        "description": "Toll"
+      },
+      {
+        "amount": 710,
+        "description": "Tips"
+      },
+      {
+        "amount": 2880,
+        "description": "Fuel"
+      }
+    ],
+    "items": [
+      {
+        "to": "PL",
+        "cost": 24,
+        "from": "CPA",
+        "fuel": 24,
+        "count": 1
+      }
+    ],
+    "metadata": null,
+    "fuel_price": "120"
+  },
+  {
+    "id": "OvqdVedrM6ABRDSNGaf1NZ76RXfJhnRg",
+    "date": "2025-08-28",
+    "type": "depot",
+    "vehicle_id": "OHU7XsXysen8v8grlfe7y2EeCQFW0fVn",
+    "driver_id": "6ZRNf3t8b2tF4K7zMnhNOJvMGO9LnsrL",
+    "helper_id": null,
+    "created_at": "2025-09-08 10:17:59.51603",
+    "updated_at": "2025-09-08 10:17:59.51603",
+    "deleted_at": null,
+    "created_by": "IRmW1HJdcpSepC3wlcLQyfl4mDtVdQb2",
+    "updated_by": null,
+    "deleted_by": null,
+    "attachments": null,
+    "expenses": [
+      {
+        "amount": 90,
+        "description": "Toll"
+      },
+      {
+        "amount": 710,
+        "description": "Tips"
+      },
+      {
+        "amount": 5760,
+        "description": "Fuel"
+      }
+    ],
+    "items": [
+      {
+        "to": "PL",
+        "cost": 24,
+        "from": "CPA",
+        "fuel": 24,
+        "count": 2
+      }
+    ],
+    "metadata": null,
+    "fuel_price": "120"
+  },
+  {
+    "id": "PR5xiCvM7xq1C3ed2M7tbbfXGtpZGNsJ",
+    "date": "2025-08-29",
+    "type": "depot",
+    "vehicle_id": "3reovR5HM9wWuUFkA4W23bHzTg3hpn5y",
+    "driver_id": "Gnxyx7CNA6JZXyj3kY1futN3DmT5OMwz",
+    "helper_id": null,
+    "created_at": "2025-09-08 10:33:26.168747",
+    "updated_at": "2025-09-08 10:33:26.168747",
+    "deleted_at": null,
+    "created_by": "IRmW1HJdcpSepC3wlcLQyfl4mDtVdQb2",
+    "updated_by": null,
+    "deleted_by": null,
+    "attachments": null,
+    "expenses": [
+      {
+        "amount": 90,
+        "description": "Toll"
+      },
+      {
+        "amount": 710,
+        "description": "Tips"
+      },
+      {
+        "amount": 5760,
+        "description": "Fuel"
+      }
+    ],
+    "items": [
+      {
+        "to": "PL",
+        "cost": 24,
+        "from": "CPA",
+        "fuel": 24,
+        "count": 2
+      }
+    ],
+    "metadata": null,
+    "fuel_price": "120"
+  },
+  {
+    "id": "PptCoW5J0ABdZwA6Iads0Jw6P9hNmkjI",
+    "date": "2025-08-30",
+    "type": "depot",
+    "vehicle_id": "sy3GM7ORvYorLMc2utxpHPmJP6vLivzx",
+    "driver_id": "Gnxyx7CNA6JZXyj3kY1futN3DmT5OMwz",
+    "helper_id": null,
+    "created_at": "2025-09-08 11:14:43.061224",
+    "updated_at": "2025-09-08 11:14:43.061224",
+    "deleted_at": null,
+    "created_by": "IRmW1HJdcpSepC3wlcLQyfl4mDtVdQb2",
+    "updated_by": null,
+    "deleted_by": null,
+    "attachments": null,
+    "expenses": [
+      {
+        "amount": 90,
+        "description": "Toll"
+      },
+      {
+        "amount": 710,
+        "description": "Tips"
+      },
+      {
+        "amount": 5760,
+        "description": "Fuel"
+      }
+    ],
+    "items": [
+      {
+        "to": "PL",
+        "cost": 24,
+        "from": "CPA",
+        "fuel": 24,
+        "count": 2
+      }
+    ],
+    "metadata": null,
+    "fuel_price": "120"
+  },
+  {
+    "id": "Pvnn2ZHgZS3msIL27J8eaQ2U6FgfU4US",
+    "date": "2025-08-27",
+    "type": "depot",
+    "vehicle_id": "Cqf23keKTythCwC74RkPxfSvBf50nrvL",
+    "driver_id": "oa3Krcv1JvZ490I12AUmyXDJmkVRS71C",
+    "helper_id": null,
+    "created_at": "2025-09-06 12:17:52.190858",
+    "updated_at": "2025-09-06 12:17:52.190858",
+    "deleted_at": null,
+    "created_by": "IRmW1HJdcpSepC3wlcLQyfl4mDtVdQb2",
+    "updated_by": null,
+    "deleted_by": null,
+    "attachments": null,
+    "expenses": [
+      {
+        "amount": 90,
+        "description": "Toll"
+      },
+      {
+        "amount": 710,
+        "description": "Tips"
+      },
+      {
+        "amount": 2880,
+        "description": "Fuel"
+      }
+    ],
+    "items": [
+      {
+        "to": "PL",
+        "cost": 24,
+        "from": "CPA",
+        "fuel": 24,
+        "count": 1
+      }
+    ],
+    "metadata": null,
+    "fuel_price": "120"
+  },
+  {
+    "id": "R150fQ3FNKHOx8coNLmmGEtDwldiREud",
+    "date": "2025-08-26",
+    "type": "depot",
+    "vehicle_id": "BzdaaAdZ6pzAbRHQrbTmjOj6DAVqIfSC",
+    "driver_id": "BMtTiYnajl4a8olR8IigCqHhTwoj5rHe",
+    "helper_id": "WZWabKgfYZAwn5Scfe8Is64JvXirwQGJ",
+    "created_at": "2025-09-06 10:27:09.42711",
+    "updated_at": "2025-09-06 10:27:09.42711",
+    "deleted_at": null,
+    "created_by": "IRmW1HJdcpSepC3wlcLQyfl4mDtVdQb2",
+    "updated_by": null,
+    "deleted_by": null,
+    "attachments": null,
+    "expenses": [
+      {
+        "amount": 90,
+        "description": "Toll"
+      },
+      {
+        "amount": 710,
+        "description": "Tips"
+      },
+      {
+        "amount": 2880,
+        "description": "Fuel"
+      }
+    ],
+    "items": [
+      {
+        "to": "PL",
+        "cost": 24,
+        "from": "CPA",
+        "fuel": 24,
+        "count": 1
+      }
+    ],
+    "metadata": null,
+    "fuel_price": "120"
+  },
+  {
+    "id": "R7zAtZDhHSYUPrzvA8NzgQvIxCJ1h8hL",
+    "date": "2025-08-28",
+    "type": "depot",
+    "vehicle_id": "OJCphMNY9JyOggKSxKa2YgjKh2hJVU7L",
+    "driver_id": "uTpAVEHgWpwDFnOPHsBNB8dTNjT6kkWX",
+    "helper_id": null,
+    "created_at": "2025-09-08 09:59:22.700449",
+    "updated_at": "2025-09-08 09:59:22.700449",
+    "deleted_at": null,
+    "created_by": "IRmW1HJdcpSepC3wlcLQyfl4mDtVdQb2",
+    "updated_by": null,
+    "deleted_by": null,
+    "attachments": null,
+    "expenses": [
+      {
+        "amount": 90,
+        "description": "Toll"
+      },
+      {
+        "amount": 710,
+        "description": "Tips"
+      },
+      {
+        "amount": 5760,
+        "description": "Fuel"
+      }
+    ],
+    "items": [
+      {
+        "to": "PL",
+        "cost": 24,
+        "from": "CPA",
+        "fuel": 24,
+        "count": 2
+      }
+    ],
+    "metadata": null,
+    "fuel_price": "120"
+  },
+  {
+    "id": "RCBBaNlEFjWB0YFP1XPgTIvIYniK4n2h",
+    "date": "2025-09-01",
+    "type": "depot",
+    "vehicle_id": "OHU7XsXysen8v8grlfe7y2EeCQFW0fVn",
+    "driver_id": "6ZRNf3t8b2tF4K7zMnhNOJvMGO9LnsrL",
+    "helper_id": null,
+    "created_at": "2025-09-09 14:52:31.963077",
+    "updated_at": "2025-09-09 14:52:31.963077",
+    "deleted_at": null,
+    "created_by": "IRmW1HJdcpSepC3wlcLQyfl4mDtVdQb2",
+    "updated_by": null,
+    "deleted_by": null,
+    "attachments": null,
+    "expenses": [
+      {
+        "amount": 90,
+        "description": "Toll"
+      },
+      {
+        "amount": 710,
+        "description": "Tips"
+      },
+      {
+        "amount": 2880,
+        "description": "Fuel"
+      }
+    ],
+    "items": [
+      {
+        "to": "PL",
+        "cost": 24,
+        "from": "CPA",
+        "fuel": 24,
+        "count": 1
+      }
+    ],
+    "metadata": null,
+    "fuel_price": "120"
+  },
+  {
+    "id": "RNmyK1qf9rDsXi9IsA5HqnxI93WAp6QU",
+    "date": "2025-09-02",
+    "type": "depot",
+    "vehicle_id": "iUMnHiDIHL93KoPDp0NsMUzWdVgrsLPX",
+    "driver_id": "UCoW0hizmhrMf9ZF9uA1qxkkHDJcXBTi",
+    "helper_id": null,
+    "created_at": "2025-09-02 18:55:55.653685",
+    "updated_at": "2025-09-02 18:55:55.653685",
+    "deleted_at": "2025-09-07 11:52:50.585",
+    "created_by": "IRmW1HJdcpSepC3wlcLQyfl4mDtVdQb2",
+    "updated_by": null,
+    "deleted_by": "IRmW1HJdcpSepC3wlcLQyfl4mDtVdQb2",
+    "attachments": null,
+    "expenses": [
+      {
+        "amount": 90,
+        "description": "Toll"
+      },
+      {
+        "amount": 710,
+        "description": "Tips"
+      },
+      {
+        "amount": 3480,
+        "description": "Fuel"
+      }
+    ],
+    "items": [
+      {
+        "to": "PL",
+        "cost": 24,
+        "from": "CPA",
+        "fuel": 24,
+        "count": 1
+      },
+      {
+        "to": "CCTCL",
+        "cost": 5,
+        "from": "PL",
+        "fuel": 5,
+        "count": 1
+      }
+    ],
+    "metadata": null,
+    "fuel_price": "120"
+  },
+  {
+    "id": "SwwUrSM4zY3CfHXw260urS2k9bwqkcEa",
+    "date": "2025-08-30",
+    "type": "depot",
+    "vehicle_id": "BzdaaAdZ6pzAbRHQrbTmjOj6DAVqIfSC",
+    "driver_id": "BMtTiYnajl4a8olR8IigCqHhTwoj5rHe",
+    "helper_id": "WZWabKgfYZAwn5Scfe8Is64JvXirwQGJ",
+    "created_at": "2025-09-08 10:51:44.899765",
+    "updated_at": "2025-09-08 10:51:44.899765",
+    "deleted_at": null,
+    "created_by": "IRmW1HJdcpSepC3wlcLQyfl4mDtVdQb2",
+    "updated_by": null,
+    "deleted_by": null,
+    "attachments": null,
+    "expenses": [
+      {
+        "amount": 90,
+        "description": "Toll"
+      },
+      {
+        "amount": 710,
+        "description": "Tips"
+      },
+      {
+        "amount": 5760,
+        "description": "Fuel"
+      }
+    ],
+    "items": [
+      {
+        "to": "PL",
+        "cost": 24,
+        "from": "CPA",
+        "fuel": 24,
+        "count": 2
+      }
+    ],
+    "metadata": null,
+    "fuel_price": "120"
+  },
+  {
+    "id": "U4rqpx0boIKUQF2n5fLKPUUFT1kNtWU8",
+    "date": "2025-08-30",
+    "type": "depot",
+    "vehicle_id": "YXsBmaKvhQA4KTN9gm0ZEwU1oubInrY3",
+    "driver_id": "PTUxnNzDV3Xcl8QKe4t5rXN2qAqoPhwi",
+    "helper_id": null,
+    "created_at": "2025-09-08 11:11:27.159736",
+    "updated_at": "2025-09-08 11:11:27.159736",
+    "deleted_at": null,
+    "created_by": "IRmW1HJdcpSepC3wlcLQyfl4mDtVdQb2",
+    "updated_by": null,
+    "deleted_by": null,
+    "attachments": null,
+    "expenses": [
+      {
+        "amount": 90,
+        "description": "Toll"
+      },
+      {
+        "amount": 710,
+        "description": "Tips"
+      },
+      {
+        "amount": 5760,
+        "description": "Fuel"
+      }
+    ],
+    "items": [
+      {
+        "to": "PL",
+        "cost": 24,
+        "from": "CPA",
+        "fuel": 24,
+        "count": 2
+      }
+    ],
+    "metadata": null,
+    "fuel_price": "120"
+  },
+  {
+    "id": "UJ4GtZojZAM8dhqIZmSYhgPAkUm5QfxV",
+    "date": "2025-08-30",
+    "type": "depot",
+    "vehicle_id": "1Oy8kuZKJ76rBOLHrUvOO9sfWwPOks42",
+    "driver_id": "85T57qr4E40OKnEECNQqupnMi2qcwVRl",
+    "helper_id": null,
+    "created_at": "2025-09-08 10:56:37.376432",
+    "updated_at": "2025-09-08 10:56:37.376432",
+    "deleted_at": null,
+    "created_by": "IRmW1HJdcpSepC3wlcLQyfl4mDtVdQb2",
+    "updated_by": null,
+    "deleted_by": null,
+    "attachments": null,
+    "expenses": [
+      {
+        "amount": 90,
+        "description": "Toll"
+      },
+      {
+        "amount": 710,
+        "description": "Tips"
+      },
+      {
+        "amount": 2880,
+        "description": "Fuel"
+      }
+    ],
+    "items": [
+      {
+        "to": "PL",
+        "cost": 24,
+        "from": "CPA",
+        "fuel": 24,
+        "count": 1
+      }
+    ],
+    "metadata": null,
+    "fuel_price": "120"
+  },
+  {
+    "id": "UQWz3r5VQK5TbLkhJWpdnX3qFooDp7nY",
+    "date": "2025-08-29",
+    "type": "depot",
+    "vehicle_id": "yiRQnGMXIqmOiVaRxB0MgM8XGxVnCYKO",
+    "driver_id": "v5OK37Li2YY1AhCa3hDlYXeVMZogz5aZ",
+    "helper_id": null,
+    "created_at": "2025-09-08 10:35:30.526964",
+    "updated_at": "2025-09-08 10:35:30.526964",
+    "deleted_at": null,
+    "created_by": "IRmW1HJdcpSepC3wlcLQyfl4mDtVdQb2",
+    "updated_by": null,
+    "deleted_by": null,
+    "attachments": null,
+    "expenses": [
+      {
+        "amount": 90,
+        "description": "Toll"
+      },
+      {
+        "amount": 710,
+        "description": "Tips"
+      },
+      {
+        "amount": 5760,
+        "description": "Fuel"
+      }
+    ],
+    "items": [
+      {
+        "to": "PL",
+        "cost": 24,
+        "from": "CPA",
+        "fuel": 24,
+        "count": 2
+      }
+    ],
+    "metadata": null,
+    "fuel_price": "120"
+  },
+  {
+    "id": "UWkpqbQCBwukkI9Sx20AGOUBkw6u5vRz",
+    "date": "2025-08-27",
+    "type": "depot",
+    "vehicle_id": "OHU7XsXysen8v8grlfe7y2EeCQFW0fVn",
+    "driver_id": "xL8N1uWi79QqhfclQszd92HsXtuPOwhm",
+    "helper_id": null,
+    "created_at": "2025-09-08 09:45:08.089881",
+    "updated_at": "2025-09-08 09:45:08.089881",
+    "deleted_at": null,
+    "created_by": "IRmW1HJdcpSepC3wlcLQyfl4mDtVdQb2",
+    "updated_by": null,
+    "deleted_by": null,
+    "attachments": null,
+    "expenses": [
+      {
+        "amount": 90,
+        "description": "Toll"
+      },
+      {
+        "amount": 710,
+        "description": "Tips"
+      },
+      {
+        "amount": 5760,
+        "description": "Fuel"
+      }
+    ],
+    "items": [
+      {
+        "to": "PL",
+        "cost": 24,
+        "from": "CPA",
+        "fuel": 24,
+        "count": 2
+      }
+    ],
+    "metadata": null,
+    "fuel_price": "120"
+  },
+  {
+    "id": "UZ338n9x0DgmsJLQJEBQDeOmhjOSzq2o",
+    "date": "2025-08-29",
+    "type": "depot",
+    "vehicle_id": "afrbVl48SIbAJ7VyACunxQkTjeRZtCU3",
+    "driver_id": "v7osuBp7myXCPhcW5y7X7VpxXh9e9X5k",
+    "helper_id": "I5uhAqU9UhLeXLWsi4lzNV0nFgcJypvf",
+    "created_at": "2025-09-08 10:49:09.892938",
+    "updated_at": "2025-09-08 10:49:09.892938",
+    "deleted_at": null,
+    "created_by": "IRmW1HJdcpSepC3wlcLQyfl4mDtVdQb2",
+    "updated_by": null,
+    "deleted_by": null,
+    "attachments": null,
+    "expenses": [
+      {
+        "amount": 90,
+        "description": "Toll"
+      },
+      {
+        "amount": 710,
+        "description": "Tips"
+      },
+      {
+        "amount": 5760,
+        "description": "Fuel"
+      }
+    ],
+    "items": [
+      {
+        "to": "PL",
+        "cost": 24,
+        "from": "CPA",
+        "fuel": 24,
+        "count": 2
+      }
+    ],
+    "metadata": null,
+    "fuel_price": "120"
+  },
+  {
+    "id": "VL3gqP4Xs9yO9PLV3yRDxNZ1DYXRq5ke",
+    "date": "2025-08-29",
+    "type": "depot",
+    "vehicle_id": "BzdaaAdZ6pzAbRHQrbTmjOj6DAVqIfSC",
+    "driver_id": "fAGBcLhZfXdMIVOLt0r2fyYGoxomQ8rH",
+    "helper_id": null,
+    "created_at": "2025-09-08 10:44:57.182317",
+    "updated_at": "2025-09-08 10:44:57.182317",
+    "deleted_at": null,
+    "created_by": "IRmW1HJdcpSepC3wlcLQyfl4mDtVdQb2",
+    "updated_by": null,
+    "deleted_by": null,
+    "attachments": null,
+    "expenses": [
+      {
+        "amount": 90,
+        "description": "Toll"
+      },
+      {
+        "amount": 710,
+        "description": "Tips"
+      },
+      {
+        "amount": 5760,
+        "description": "Fuel"
+      }
+    ],
+    "items": [
+      {
+        "to": "PL",
+        "cost": 24,
+        "from": "CPA",
+        "fuel": 24,
+        "count": 2
+      }
+    ],
+    "metadata": null,
+    "fuel_price": "120"
+  },
+  {
+    "id": "VO3Uss9Xb5p7dkmV4B5sxgeqb0SDIked",
+    "date": "2025-08-29",
+    "type": "depot",
+    "vehicle_id": "OvMVCrOlnYI2W8N8kUkZBKipreV1XgNW",
+    "driver_id": "VD18oFhJY2GG5XRwoGA45D6MF7nlvAJB",
+    "helper_id": null,
+    "created_at": "2025-09-08 10:43:24.501586",
+    "updated_at": "2025-09-08 10:43:24.501586",
+    "deleted_at": null,
+    "created_by": "IRmW1HJdcpSepC3wlcLQyfl4mDtVdQb2",
+    "updated_by": null,
+    "deleted_by": null,
+    "attachments": null,
+    "expenses": [
+      {
+        "amount": 90,
+        "description": "Toll"
+      },
+      {
+        "amount": 710,
+        "description": "Tips"
+      },
+      {
+        "amount": 5760,
+        "description": "Fuel"
+      }
+    ],
+    "items": [
+      {
+        "to": "PL",
+        "cost": 24,
+        "from": "CPA",
+        "fuel": 24,
+        "count": 2
+      }
+    ],
+    "metadata": null,
+    "fuel_price": "120"
+  },
+  {
+    "id": "Vws1HolmGWD9cl4YpKfkgKQ6yTZfnzSe",
+    "date": "2025-08-26",
+    "type": "depot",
+    "vehicle_id": "1Oy8kuZKJ76rBOLHrUvOO9sfWwPOks42",
+    "driver_id": "RkOG8MNBcOF26hdGmpVshhr2Rbe6I9ye",
+    "helper_id": null,
+    "created_at": "2025-09-06 10:21:14.815633",
+    "updated_at": "2025-09-06 10:21:14.815633",
+    "deleted_at": null,
+    "created_by": "IRmW1HJdcpSepC3wlcLQyfl4mDtVdQb2",
+    "updated_by": null,
+    "deleted_by": null,
+    "attachments": null,
+    "expenses": [
+      {
+        "amount": 90,
+        "description": "Toll"
+      },
+      {
+        "amount": 710,
+        "description": "Tips"
+      },
+      {
+        "amount": 5760,
+        "description": "Fuel"
+      }
+    ],
+    "items": [
+      {
+        "to": "PL",
+        "cost": 24,
+        "from": "CPA",
+        "fuel": 24,
+        "count": 2
+      }
+    ],
+    "metadata": null,
+    "fuel_price": "120"
+  },
+  {
+    "id": "WwlPxvJrjaL4YOvvxoaUqChe2mfwVidz",
+    "date": "2025-08-29",
+    "type": "depot",
+    "vehicle_id": "iUMnHiDIHL93KoPDp0NsMUzWdVgrsLPX",
+    "driver_id": "Aj9saWWqah2BRAd2DzeCruLS0NWc0H1h",
+    "helper_id": null,
+    "created_at": "2025-09-08 10:24:29.811814",
+    "updated_at": "2025-09-08 10:24:29.811814",
+    "deleted_at": null,
+    "created_by": "IRmW1HJdcpSepC3wlcLQyfl4mDtVdQb2",
+    "updated_by": null,
+    "deleted_by": null,
+    "attachments": null,
+    "expenses": [
+      {
+        "amount": 90,
+        "description": "Toll"
+      },
+      {
+        "amount": 710,
+        "description": "Tips"
+      },
+      {
+        "amount": 2880,
+        "description": "Fuel"
+      }
+    ],
+    "items": [
+      {
+        "to": "PL",
+        "cost": 24,
+        "from": "CPA",
+        "fuel": 24,
+        "count": 1
+      }
+    ],
+    "metadata": null,
+    "fuel_price": "120"
+  },
+  {
+    "id": "XO29vYFGr4LEyWu8t1FmbYTXo6AfUovX",
+    "date": "2025-08-26",
+    "type": "depot",
+    "vehicle_id": "Cqf23keKTythCwC74RkPxfSvBf50nrvL",
+    "driver_id": "0EDVFSBMexgDmoUZl38uf6aueW2J5Ode",
+    "helper_id": null,
+    "created_at": "2025-09-06 07:21:08.233765",
+    "updated_at": "2025-09-06 07:21:08.233765",
+    "deleted_at": "2025-09-06 08:25:25.656",
+    "created_by": "IRmW1HJdcpSepC3wlcLQyfl4mDtVdQb2",
+    "updated_by": "IRmW1HJdcpSepC3wlcLQyfl4mDtVdQb2",
+    "deleted_by": "IRmW1HJdcpSepC3wlcLQyfl4mDtVdQb2",
+    "attachments": null,
+    "expenses": [
+      {
+        "amount": 90,
+        "description": "Toll"
+      },
+      {
+        "amount": 710,
+        "description": "Tips"
+      },
+      {
+        "amount": 3300,
+        "description": "Fuel"
+      }
+    ],
+    "items": [
+      {
+        "to": "PL",
+        "cost": 24,
+        "from": "CPA",
+        "fuel": 24,
+        "count": 1
+      },
+      {
+        "to": "K&T",
+        "cost": 3.5,
+        "from": "PL",
+        "fuel": 3,
+        "count": 1
+      }
+    ],
+    "metadata": null,
+    "fuel_price": "120"
+  },
+  {
+    "id": "XkChHE6K47yPDASjjChp5qEAgx5ymYTw",
+    "date": "2025-08-26",
+    "type": "depot",
+    "vehicle_id": "Cqf23keKTythCwC74RkPxfSvBf50nrvL",
+    "driver_id": "0EDVFSBMexgDmoUZl38uf6aueW2J5Ode",
+    "helper_id": null,
+    "created_at": "2025-09-06 10:17:54.781415",
+    "updated_at": "2025-09-06 10:17:54.781415",
+    "deleted_at": null,
+    "created_by": "IRmW1HJdcpSepC3wlcLQyfl4mDtVdQb2",
+    "updated_by": null,
+    "deleted_by": null,
+    "attachments": null,
+    "expenses": [
+      {
+        "amount": 90,
+        "description": "Toll"
+      },
+      {
+        "amount": 710,
+        "description": "Tips"
+      },
+      {
+        "amount": 2880,
+        "description": "Fuel"
+      }
+    ],
+    "items": [
+      {
+        "to": "PL",
+        "cost": 24,
+        "from": "CPA",
+        "fuel": 24,
+        "count": 1
+      }
+    ],
+    "metadata": null,
+    "fuel_price": "120"
+  },
+  {
+    "id": "YAul1dSojO8RXFSmyFIeybrIxilRIc94",
+    "date": "2025-08-31",
+    "type": "depot",
+    "vehicle_id": "Cqf23keKTythCwC74RkPxfSvBf50nrvL",
+    "driver_id": "oa3Krcv1JvZ490I12AUmyXDJmkVRS71C",
+    "helper_id": null,
+    "created_at": "2025-09-09 14:32:09.292334",
+    "updated_at": "2025-09-09 14:32:09.292334",
+    "deleted_at": null,
+    "created_by": "IRmW1HJdcpSepC3wlcLQyfl4mDtVdQb2",
+    "updated_by": null,
+    "deleted_by": null,
+    "attachments": null,
+    "expenses": [
+      {
+        "amount": 90,
+        "description": "Toll"
+      },
+      {
+        "amount": 710,
+        "description": "Tips"
+      },
+      {
+        "amount": 2880,
+        "description": "Fuel"
+      }
+    ],
+    "items": [
+      {
+        "to": "PL",
+        "cost": 24,
+        "from": "CPA",
+        "fuel": 24,
+        "count": 1
+      }
+    ],
+    "metadata": null,
+    "fuel_price": "120"
+  },
+  {
+    "id": "YRCRwqCqR6EFYtxLjaGSr82Sq8othVJh",
+    "date": "2025-08-30",
+    "type": "depot",
+    "vehicle_id": "o5f5twfcd6mXXjJT5LVWruDnvOWbga0W",
+    "driver_id": "1OarhNxXAUa87yRtpJeE5vnPq34v381a",
+    "helper_id": null,
+    "created_at": "2025-09-08 10:58:38.212077",
+    "updated_at": "2025-09-08 10:58:38.212077",
+    "deleted_at": null,
+    "created_by": "IRmW1HJdcpSepC3wlcLQyfl4mDtVdQb2",
+    "updated_by": null,
+    "deleted_by": null,
+    "attachments": null,
+    "expenses": [
+      {
+        "amount": 90,
+        "description": "Toll"
+      },
+      {
+        "amount": 710,
+        "description": "Tips"
+      },
+      {
+        "amount": 5760,
+        "description": "Fuel"
+      }
+    ],
+    "items": [
+      {
+        "to": "PL",
+        "cost": 24,
+        "from": "CPA",
+        "fuel": 24,
+        "count": 2
+      }
+    ],
+    "metadata": null,
+    "fuel_price": "120"
+  },
+  {
+    "id": "YjpM7ZlcEgaqAauVMI6Spbu9C9rrFkpE",
+    "date": "2025-08-30",
+    "type": "depot",
+    "vehicle_id": "yiRQnGMXIqmOiVaRxB0MgM8XGxVnCYKO",
+    "driver_id": "w8RKTSup3qhho7AJzMDkqq35FJy6zd7u",
+    "helper_id": null,
+    "created_at": "2025-09-08 10:57:40.948118",
+    "updated_at": "2025-09-08 10:57:40.948118",
+    "deleted_at": null,
+    "created_by": "IRmW1HJdcpSepC3wlcLQyfl4mDtVdQb2",
+    "updated_by": null,
+    "deleted_by": null,
+    "attachments": null,
+    "expenses": [
+      {
+        "amount": 90,
+        "description": "Toll"
+      },
+      {
+        "amount": 710,
+        "description": "Tips"
+      },
+      {
+        "amount": 5760,
+        "description": "Fuel"
+      }
+    ],
+    "items": [
+      {
+        "to": "PL",
+        "cost": 24,
+        "from": "CPA",
+        "fuel": 24,
+        "count": 2
+      }
+    ],
+    "metadata": null,
+    "fuel_price": "120"
+  },
+  {
+    "id": "aMYB7RqgMKtbzA8gi2Hrdt9PdfCC5S9y",
+    "date": "2025-09-01",
+    "type": "depot",
+    "vehicle_id": "iUMnHiDIHL93KoPDp0NsMUzWdVgrsLPX",
+    "driver_id": "2DP98UlTnnX41UqdDZHVogFcpdB5jbQS",
+    "helper_id": null,
+    "created_at": "2025-09-09 14:53:59.483882",
+    "updated_at": "2025-09-09 14:53:59.483882",
+    "deleted_at": null,
+    "created_by": "IRmW1HJdcpSepC3wlcLQyfl4mDtVdQb2",
+    "updated_by": null,
+    "deleted_by": null,
+    "attachments": null,
+    "expenses": [
+      {
+        "amount": 90,
+        "description": "Toll"
+      },
+      {
+        "amount": 710,
+        "description": "Tips"
+      },
+      {
+        "amount": 2880,
+        "description": "Fuel"
+      }
+    ],
+    "items": [
+      {
+        "to": "PL",
+        "cost": 24,
+        "from": "CPA",
+        "fuel": 24,
+        "count": 1
+      }
+    ],
+    "metadata": null,
+    "fuel_price": "120"
+  },
+  {
+    "id": "aa1MHSnd5hSHWJ5HosEtoSqFnRW9gcpO",
+    "date": "2025-08-28",
+    "type": "depot",
+    "vehicle_id": "Vr0vnMA6EVPh8yJTLqZsT62b38qTLsJE",
+    "driver_id": "jvhuoR4El96L2mir8RICg3ycWqRW2GpY",
+    "helper_id": null,
+    "created_at": "2025-09-08 09:57:50.351779",
+    "updated_at": "2025-09-08 09:57:50.351779",
+    "deleted_at": null,
+    "created_by": "IRmW1HJdcpSepC3wlcLQyfl4mDtVdQb2",
+    "updated_by": null,
+    "deleted_by": null,
+    "attachments": null,
+    "expenses": [
+      {
+        "amount": 90,
+        "description": "Toll"
+      },
+      {
+        "amount": 710,
+        "description": "Tips"
+      },
+      {
+        "amount": 7200,
+        "description": "Fuel"
+      }
+    ],
+    "items": [
+      {
+        "to": "PL",
+        "cost": 24,
+        "from": "CPA",
+        "fuel": 24,
+        "count": 2.5
+      }
+    ],
+    "metadata": null,
+    "fuel_price": "120"
+  },
+  {
+    "id": "bPg5ygefokDBQjJswrSyBDvdaEW2xK4r",
+    "date": "2025-08-31",
+    "type": "depot",
+    "vehicle_id": "OvMVCrOlnYI2W8N8kUkZBKipreV1XgNW",
+    "driver_id": "VD18oFhJY2GG5XRwoGA45D6MF7nlvAJB",
+    "helper_id": null,
+    "created_at": "2025-09-09 14:29:07.668602",
+    "updated_at": "2025-09-09 14:29:07.668602",
+    "deleted_at": null,
+    "created_by": "IRmW1HJdcpSepC3wlcLQyfl4mDtVdQb2",
+    "updated_by": null,
+    "deleted_by": null,
+    "attachments": null,
+    "expenses": [
+      {
+        "amount": 90,
+        "description": "Toll"
+      },
+      {
+        "amount": 710,
+        "description": "Tips"
+      },
+      {
+        "amount": 5760,
+        "description": "Fuel"
+      }
+    ],
+    "items": [
+      {
+        "to": "PL",
+        "cost": 24,
+        "from": "CPA",
+        "fuel": 24,
+        "count": 2
+      }
+    ],
+    "metadata": null,
+    "fuel_price": "120"
+  },
+  {
+    "id": "bkEMl48HIDmxmpLhppRhuvZXZulmgLlp",
+    "date": "2025-08-30",
+    "type": "depot",
+    "vehicle_id": "Cqf23keKTythCwC74RkPxfSvBf50nrvL",
+    "driver_id": "DZIdu4g4AGWEKV57J8TGrFBE1JulRYQh",
+    "helper_id": null,
+    "created_at": "2025-09-08 10:54:15.909499",
+    "updated_at": "2025-09-08 10:54:15.909499",
+    "deleted_at": null,
+    "created_by": "IRmW1HJdcpSepC3wlcLQyfl4mDtVdQb2",
+    "updated_by": null,
+    "deleted_by": null,
+    "attachments": null,
+    "expenses": [
+      {
+        "amount": 90,
+        "description": "Toll"
+      },
+      {
+        "amount": 710,
+        "description": "Tips"
+      },
+      {
+        "amount": 2880,
+        "description": "Fuel"
+      }
+    ],
+    "items": [
+      {
+        "to": "PL",
+        "cost": 24,
+        "from": "CPA",
+        "fuel": 24,
+        "count": 1
+      }
+    ],
+    "metadata": null,
+    "fuel_price": "120"
+  },
+  {
+    "id": "bqdRHyszN3dToFBn8V3DxD4JcivGs9CZ",
+    "date": "2025-08-26",
+    "type": "depot",
+    "vehicle_id": "sy3GM7ORvYorLMc2utxpHPmJP6vLivzx",
+    "driver_id": "Gnxyx7CNA6JZXyj3kY1futN3DmT5OMwz",
+    "helper_id": null,
+    "created_at": "2025-09-06 10:40:21.296019",
+    "updated_at": "2025-09-06 10:40:21.296019",
+    "deleted_at": null,
+    "created_by": "IRmW1HJdcpSepC3wlcLQyfl4mDtVdQb2",
+    "updated_by": null,
+    "deleted_by": null,
+    "attachments": null,
+    "expenses": [
+      {
+        "amount": 90,
+        "description": "Toll"
+      },
+      {
+        "amount": 710,
+        "description": "Tips"
+      },
+      {
+        "amount": 2880,
+        "description": "Fuel"
+      }
+    ],
+    "items": [
+      {
+        "to": "PL",
+        "cost": 24,
+        "from": "CPA",
+        "fuel": 24,
+        "count": 1
+      }
+    ],
+    "metadata": null,
+    "fuel_price": "120"
+  },
+  {
+    "id": "c6bwYieZvzkirgtOllJOnMZkAgKilpF1",
+    "date": "2025-08-26",
+    "type": "depot",
+    "vehicle_id": "OHU7XsXysen8v8grlfe7y2EeCQFW0fVn",
+    "driver_id": "6ZRNf3t8b2tF4K7zMnhNOJvMGO9LnsrL",
+    "helper_id": null,
+    "created_at": "2025-09-06 10:39:20.183636",
+    "updated_at": "2025-09-06 10:39:20.183636",
+    "deleted_at": null,
+    "created_by": "IRmW1HJdcpSepC3wlcLQyfl4mDtVdQb2",
+    "updated_by": null,
+    "deleted_by": null,
+    "attachments": null,
+    "expenses": [
+      {
+        "amount": 90,
+        "description": "Toll"
+      },
+      {
+        "amount": 710,
+        "description": "Tips"
+      },
+      {
+        "amount": 5760,
+        "description": "Fuel"
+      }
+    ],
+    "items": [
+      {
+        "to": "PL",
+        "cost": 24,
+        "from": "CPA",
+        "fuel": 24,
+        "count": 2
+      }
+    ],
+    "metadata": null,
+    "fuel_price": "120"
+  },
+  {
+    "id": "dOz1zvu4VIMXHyFLw487pym4iJp6Lp9F",
+    "date": "2025-09-01",
+    "type": "depot",
+    "vehicle_id": "OJCphMNY9JyOggKSxKa2YgjKh2hJVU7L",
+    "driver_id": "0LV6ikdVEYl4sY6wP0aBtCK7ItR5Gjtx",
+    "helper_id": null,
+    "created_at": "2025-09-09 14:49:48.190293",
+    "updated_at": "2025-09-09 14:49:48.190293",
+    "deleted_at": null,
+    "created_by": "IRmW1HJdcpSepC3wlcLQyfl4mDtVdQb2",
+    "updated_by": null,
+    "deleted_by": null,
+    "attachments": null,
+    "expenses": [
+      {
+        "amount": 90,
+        "description": "Toll"
+      },
+      {
+        "amount": 710,
+        "description": "Tips"
+      },
+      {
+        "amount": 5760,
+        "description": "Fuel"
+      }
+    ],
+    "items": [
+      {
+        "to": "PL",
+        "cost": 24,
+        "from": "CPA",
+        "fuel": 24,
+        "count": 2
+      }
+    ],
+    "metadata": null,
+    "fuel_price": "120"
+  },
+  {
+    "id": "dYP7kpKz6HOM0pdLXW11AA2m5FtfFZQb",
+    "date": "2025-08-26",
+    "type": "depot",
+    "vehicle_id": "YTtsWyOKC2OzoKr8dql7rOOtUx803N08",
+    "driver_id": "Y2pURKh3HUqhKf7MXwBy1afjj7fD54zq",
+    "helper_id": null,
+    "created_at": "2025-09-06 10:36:53.197454",
+    "updated_at": "2025-09-06 10:36:53.197454",
+    "deleted_at": null,
+    "created_by": "IRmW1HJdcpSepC3wlcLQyfl4mDtVdQb2",
+    "updated_by": null,
+    "deleted_by": null,
+    "attachments": null,
+    "expenses": [
+      {
+        "amount": 90,
+        "description": "Toll"
+      },
+      {
+        "amount": 710,
+        "description": "Tips"
+      },
+      {
+        "amount": 5760,
+        "description": "Fuel"
+      }
+    ],
+    "items": [
+      {
+        "to": "PL",
+        "cost": 24,
+        "from": "CPA",
+        "fuel": 24,
+        "count": 2
+      }
+    ],
+    "metadata": null,
+    "fuel_price": "120"
+  },
+  {
+    "id": "deBDEeflH0Z9UWr2NbsS96IfYGYBKTju",
+    "date": "2025-08-31",
+    "type": "depot",
+    "vehicle_id": "OJCphMNY9JyOggKSxKa2YgjKh2hJVU7L",
+    "driver_id": "Wk2uXw2AJdIBuW228DwOVHMP7i0TuMMq",
+    "helper_id": null,
+    "created_at": "2025-09-09 14:21:59.157527",
+    "updated_at": "2025-09-09 14:21:59.157527",
+    "deleted_at": null,
+    "created_by": "IRmW1HJdcpSepC3wlcLQyfl4mDtVdQb2",
+    "updated_by": null,
+    "deleted_by": null,
+    "attachments": null,
+    "expenses": [
+      {
+        "amount": 90,
+        "description": "Toll"
+      },
+      {
+        "amount": 710,
+        "description": "Tips"
+      },
+      {
+        "amount": 2880,
+        "description": "Fuel"
+      }
+    ],
+    "items": [
+      {
+        "to": "PL",
+        "cost": 24,
+        "from": "CPA",
+        "fuel": 24,
+        "count": 1
+      }
+    ],
+    "metadata": null,
+    "fuel_price": "120"
+  },
+  {
+    "id": "ef6ZtPeSgiiQJvRX4LBTdQrnoRNnycFd",
+    "date": "2025-08-28",
+    "type": "depot",
+    "vehicle_id": "3reovR5HM9wWuUFkA4W23bHzTg3hpn5y",
+    "driver_id": "GuVjEMweuHJOT6v6YnRlr25djGOmF03Q",
+    "helper_id": "ffbRRb6BqfEtRzmkSPJEtrZVZ5qQRacb",
+    "created_at": "2025-09-08 10:14:53.918673",
+    "updated_at": "2025-09-08 10:14:53.918673",
+    "deleted_at": null,
+    "created_by": "IRmW1HJdcpSepC3wlcLQyfl4mDtVdQb2",
+    "updated_by": null,
+    "deleted_by": null,
+    "attachments": null,
+    "expenses": [
+      {
+        "amount": 90,
+        "description": "Toll"
+      },
+      {
+        "amount": 710,
+        "description": "Tips"
+      },
+      {
+        "amount": 4320,
+        "description": "Fuel"
+      }
+    ],
+    "items": [
+      {
+        "to": "PL",
+        "cost": 24,
+        "from": "CPA",
+        "fuel": 24,
+        "count": 1.5
+      }
+    ],
+    "metadata": null,
+    "fuel_price": "120"
+  },
+  {
+    "id": "f4fLeAgG7WMMeNeC6Bshdi2pJur7EO3V",
+    "date": "2025-08-31",
+    "type": "depot",
+    "vehicle_id": "1Oy8kuZKJ76rBOLHrUvOO9sfWwPOks42",
+    "driver_id": "8InOQATmmj7ljkiGJumTKu2HPmpJzw3J",
+    "helper_id": null,
+    "created_at": "2025-09-09 14:30:19.810951",
+    "updated_at": "2025-09-09 14:30:19.810951",
+    "deleted_at": null,
+    "created_by": "IRmW1HJdcpSepC3wlcLQyfl4mDtVdQb2",
+    "updated_by": null,
+    "deleted_by": null,
+    "attachments": null,
+    "expenses": [
+      {
+        "amount": 90,
+        "description": "Toll"
+      },
+      {
+        "amount": 710,
+        "description": "Tips"
+      },
+      {
+        "amount": 5760,
+        "description": "Fuel"
+      }
+    ],
+    "items": [
+      {
+        "to": "PL",
+        "cost": 24,
+        "from": "CPA",
+        "fuel": 24,
+        "count": 2
+      }
+    ],
+    "metadata": null,
+    "fuel_price": "120"
+  },
+  {
+    "id": "f9jgNKqZyFIi6P6se6SPwZSOhjhXjeI4",
+    "date": "2025-08-26",
+    "type": "depot",
+    "vehicle_id": "3reovR5HM9wWuUFkA4W23bHzTg3hpn5y",
+    "driver_id": "GuVjEMweuHJOT6v6YnRlr25djGOmF03Q",
+    "helper_id": "ffbRRb6BqfEtRzmkSPJEtrZVZ5qQRacb",
+    "created_at": "2025-09-06 10:31:04.722448",
+    "updated_at": "2025-09-06 10:31:04.722448",
+    "deleted_at": null,
+    "created_by": "IRmW1HJdcpSepC3wlcLQyfl4mDtVdQb2",
+    "updated_by": null,
+    "deleted_by": null,
+    "attachments": null,
+    "expenses": [
+      {
+        "amount": 90,
+        "description": "Toll"
+      },
+      {
+        "amount": 710,
+        "description": "Tips"
+      },
+      {
+        "amount": 2880,
+        "description": "Fuel"
+      }
+    ],
+    "items": [
+      {
+        "to": "PL",
+        "cost": 24,
+        "from": "CPA",
+        "fuel": 24,
+        "count": 1
+      }
+    ],
+    "metadata": null,
+    "fuel_price": "120"
+  },
+  {
+    "id": "gQZMIwmXrMofcGh8k8zBYwYT2PLx498T",
+    "date": "2025-08-29",
+    "type": "depot",
+    "vehicle_id": "t3qJ9R0SF30Zwfm7IzDiClizTjpi8Aqm",
+    "driver_id": "sgNDtVQownSMV2O9sNnNHiq5OeD2EXQd",
+    "helper_id": null,
+    "created_at": "2025-09-08 10:46:12.884167",
+    "updated_at": "2025-09-08 10:46:12.884167",
+    "deleted_at": null,
+    "created_by": "IRmW1HJdcpSepC3wlcLQyfl4mDtVdQb2",
+    "updated_by": null,
+    "deleted_by": null,
+    "attachments": null,
+    "expenses": [
+      {
+        "amount": 90,
+        "description": "Toll"
+      },
+      {
+        "amount": 710,
+        "description": "Tips"
+      },
+      {
+        "amount": 5760,
+        "description": "Fuel"
+      }
+    ],
+    "items": [
+      {
+        "to": "PL",
+        "cost": 24,
+        "from": "CPA",
+        "fuel": 24,
+        "count": 2
+      }
+    ],
+    "metadata": null,
+    "fuel_price": "120"
+  },
+  {
+    "id": "gYVbdOcFdZqwvZwOmRu8FesK4i7GWOJb",
+    "date": "2025-08-26",
+    "type": "depot",
+    "vehicle_id": "iUMnHiDIHL93KoPDp0NsMUzWdVgrsLPX",
+    "driver_id": "2DP98UlTnnX41UqdDZHVogFcpdB5jbQS",
+    "helper_id": null,
+    "created_at": "2025-09-06 10:43:49.02986",
+    "updated_at": "2025-09-06 10:43:49.02986",
+    "deleted_at": null,
+    "created_by": "IRmW1HJdcpSepC3wlcLQyfl4mDtVdQb2",
+    "updated_by": "IRmW1HJdcpSepC3wlcLQyfl4mDtVdQb2",
+    "deleted_by": null,
+    "attachments": null,
+    "expenses": [
+      {
+        "amount": 90,
+        "description": "Toll"
+      },
+      {
+        "amount": 710,
+        "description": "Tips"
+      },
+      {
+        "amount": 5760,
+        "description": "Fuel"
+      }
+    ],
+    "items": [
+      {
+        "to": "PL",
+        "cost": 24,
+        "from": "CPA",
+        "fuel": 24,
+        "count": 2
+      }
+    ],
+    "metadata": null,
+    "fuel_price": "120"
+  },
+  {
+    "id": "hbSwapaqNZAagqR9Qx634RvfCrVvl0ha",
+    "date": "2025-08-28",
+    "type": "depot",
+    "vehicle_id": "1Oy8kuZKJ76rBOLHrUvOO9sfWwPOks42",
+    "driver_id": "85T57qr4E40OKnEECNQqupnMi2qcwVRl",
+    "helper_id": null,
+    "created_at": "2025-09-08 09:56:23.488305",
+    "updated_at": "2025-09-08 09:56:23.488305",
+    "deleted_at": null,
+    "created_by": "IRmW1HJdcpSepC3wlcLQyfl4mDtVdQb2",
+    "updated_by": null,
+    "deleted_by": null,
+    "attachments": null,
+    "expenses": [
+      {
+        "amount": 90,
+        "description": "Toll"
+      },
+      {
+        "amount": 710,
+        "description": "Tips"
+      },
+      {
+        "amount": 7200,
+        "description": "Fuel"
+      }
+    ],
+    "items": [
+      {
+        "to": "PL",
+        "cost": 24,
+        "from": "CPA",
+        "fuel": 24,
+        "count": 2.5
+      }
+    ],
+    "metadata": null,
+    "fuel_price": "120"
+  },
+  {
+    "id": "hrZPfPAxBIbkzNxkM123lJethFMhqP3P",
+    "date": "2025-09-01",
+    "type": "depot",
+    "vehicle_id": "Vr0vnMA6EVPh8yJTLqZsT62b38qTLsJE",
+    "driver_id": "jvhuoR4El96L2mir8RICg3ycWqRW2GpY",
+    "helper_id": null,
+    "created_at": "2025-09-09 14:50:35.704181",
+    "updated_at": "2025-09-09 14:50:35.704181",
+    "deleted_at": null,
+    "created_by": "IRmW1HJdcpSepC3wlcLQyfl4mDtVdQb2",
+    "updated_by": null,
+    "deleted_by": null,
+    "attachments": null,
+    "expenses": [
+      {
+        "amount": 90,
+        "description": "Toll"
+      },
+      {
+        "amount": 710,
+        "description": "Tips"
+      },
+      {
+        "amount": 5760,
+        "description": "Fuel"
+      }
+    ],
+    "items": [
+      {
+        "to": "PL",
+        "cost": 24,
+        "from": "CPA",
+        "fuel": 24,
+        "count": 2
+      }
+    ],
+    "metadata": null,
+    "fuel_price": "120"
+  },
+  {
+    "id": "i4Vz0eC19qVgpsk8LcQKzmfqnbPA9yiV",
+    "date": "2025-08-31",
+    "type": "depot",
+    "vehicle_id": "BzdaaAdZ6pzAbRHQrbTmjOj6DAVqIfSC",
+    "driver_id": "fAGBcLhZfXdMIVOLt0r2fyYGoxomQ8rH",
+    "helper_id": null,
+    "created_at": "2025-09-09 14:22:54.843742",
+    "updated_at": "2025-09-09 14:22:54.843742",
+    "deleted_at": null,
+    "created_by": "IRmW1HJdcpSepC3wlcLQyfl4mDtVdQb2",
+    "updated_by": null,
+    "deleted_by": null,
+    "attachments": null,
+    "expenses": [
+      {
+        "amount": 90,
+        "description": "Toll"
+      },
+      {
+        "amount": 710,
+        "description": "Tips"
+      },
+      {
+        "amount": 5760,
+        "description": "Fuel"
+      }
+    ],
+    "items": [
+      {
+        "to": "PL",
+        "cost": 24,
+        "from": "CPA",
+        "fuel": 24,
+        "count": 2
+      }
+    ],
+    "metadata": null,
+    "fuel_price": "120"
+  },
+  {
+    "id": "iCYx6QBTQkAPN75HDhpKX1BZA7gHGaqT",
+    "date": "2025-09-01",
+    "type": "depot",
+    "vehicle_id": "1Oy8kuZKJ76rBOLHrUvOO9sfWwPOks42",
+    "driver_id": "DZIdu4g4AGWEKV57J8TGrFBE1JulRYQh",
+    "helper_id": null,
+    "created_at": "2025-09-09 14:36:17.633665",
+    "updated_at": "2025-09-09 14:36:17.633665",
+    "deleted_at": null,
+    "created_by": "IRmW1HJdcpSepC3wlcLQyfl4mDtVdQb2",
+    "updated_by": null,
+    "deleted_by": null,
+    "attachments": null,
+    "expenses": [
+      {
+        "amount": 90,
+        "description": "Toll"
+      },
+      {
+        "amount": 710,
+        "description": "Tips"
+      },
+      {
+        "amount": 5760,
+        "description": "Fuel"
+      }
+    ],
+    "items": [
+      {
+        "to": "PL",
+        "cost": 24,
+        "from": "CPA",
+        "fuel": 24,
+        "count": 2
+      }
+    ],
+    "metadata": null,
+    "fuel_price": "120"
+  },
+  {
+    "id": "iK8G16Mvco14h6V7EBM09oSTR7lC8OYQ",
+    "date": "2025-08-26",
+    "type": "depot",
+    "vehicle_id": "yiRQnGMXIqmOiVaRxB0MgM8XGxVnCYKO",
+    "driver_id": "hxgNomXIT5NqZI8yvDqqwt5evDIPCaA6",
+    "helper_id": null,
+    "created_at": "2025-09-06 10:32:28.55765",
+    "updated_at": "2025-09-06 10:32:28.55765",
+    "deleted_at": null,
+    "created_by": "IRmW1HJdcpSepC3wlcLQyfl4mDtVdQb2",
+    "updated_by": null,
+    "deleted_by": null,
+    "attachments": null,
+    "expenses": [
+      {
+        "amount": 90,
+        "description": "Toll"
+      },
+      {
+        "amount": 710,
+        "description": "Tips"
+      },
+      {
+        "amount": 5760,
+        "description": "Fuel"
+      }
+    ],
+    "items": [
+      {
+        "to": "PL",
+        "cost": 24,
+        "from": "CPA",
+        "fuel": 24,
+        "count": 2
+      }
+    ],
+    "metadata": null,
+    "fuel_price": "120"
+  },
+  {
+    "id": "iRiYMwk09PJGvdt7EaHT1tjJJ86U5ORm",
+    "date": "2025-08-26",
+    "type": "depot",
+    "vehicle_id": "iUMnHiDIHL93KoPDp0NsMUzWdVgrsLPX",
+    "driver_id": "2DP98UlTnnX41UqdDZHVogFcpdB5jbQS",
+    "helper_id": null,
+    "created_at": "2025-09-06 06:56:20.466176",
+    "updated_at": "2025-09-06 06:56:20.466176",
+    "deleted_at": "2025-09-06 08:25:20.856",
+    "created_by": "IRmW1HJdcpSepC3wlcLQyfl4mDtVdQb2",
+    "updated_by": "IRmW1HJdcpSepC3wlcLQyfl4mDtVdQb2",
+    "deleted_by": "IRmW1HJdcpSepC3wlcLQyfl4mDtVdQb2",
+    "attachments": null,
+    "expenses": [
+      {
+        "amount": 90,
+        "description": "Toll"
+      },
+      {
+        "amount": 710,
+        "description": "Tips"
+      },
+      {
+        "amount": 4080,
+        "description": "Fuel"
+      }
+    ],
+    "items": [
+      {
+        "to": "PL",
+        "cost": 24,
+        "from": "CPA",
+        "fuel": 24,
+        "count": 1
+      },
+      {
+        "to": "KDS",
+        "cost": 10,
+        "from": "PL",
+        "fuel": 14,
+        "count": 1
+      }
+    ],
+    "metadata": null,
+    "fuel_price": "120"
+  },
+  {
+    "id": "ilVzsPLEmbzZgGVcndc5kTOXk2IautCM",
+    "date": "2025-08-26",
+    "type": "depot",
+    "vehicle_id": "OJCphMNY9JyOggKSxKa2YgjKh2hJVU7L",
+    "driver_id": "0LV6ikdVEYl4sY6wP0aBtCK7ItR5Gjtx",
+    "helper_id": null,
+    "created_at": "2025-09-06 10:50:45.837518",
+    "updated_at": "2025-09-06 10:50:45.837518",
+    "deleted_at": null,
+    "created_by": "IRmW1HJdcpSepC3wlcLQyfl4mDtVdQb2",
+    "updated_by": null,
+    "deleted_by": null,
+    "attachments": null,
+    "expenses": [
+      {
+        "amount": 90,
+        "description": "Toll"
+      },
+      {
+        "amount": 710,
+        "description": "Tips"
+      },
+      {
+        "amount": 2880,
+        "description": "Fuel"
+      }
+    ],
+    "items": [
+      {
+        "to": "PL",
+        "cost": 24,
+        "from": "CPA",
+        "fuel": 24,
+        "count": 1
+      }
+    ],
+    "metadata": null,
+    "fuel_price": "120"
+  },
+  {
+    "id": "jZq2WRe6yuDI5hMuFpMDoLa1whBIYnfU",
+    "date": "2025-08-27",
+    "type": "depot",
+    "vehicle_id": "OJCphMNY9JyOggKSxKa2YgjKh2hJVU7L",
+    "driver_id": "Wk2uXw2AJdIBuW228DwOVHMP7i0TuMMq",
+    "helper_id": null,
+    "created_at": "2025-09-06 12:34:02.136372",
+    "updated_at": "2025-09-06 12:34:02.136372",
+    "deleted_at": null,
+    "created_by": "IRmW1HJdcpSepC3wlcLQyfl4mDtVdQb2",
+    "updated_by": null,
+    "deleted_by": null,
+    "attachments": null,
+    "expenses": [
+      {
+        "amount": 90,
+        "description": "Toll"
+      },
+      {
+        "amount": 710,
+        "description": "Tips"
+      },
+      {
+        "amount": 5760,
+        "description": "Fuel"
+      }
+    ],
+    "items": [
+      {
+        "to": "PL",
+        "cost": 24,
+        "from": "CPA",
+        "fuel": 24,
+        "count": 2
+      }
+    ],
+    "metadata": null,
+    "fuel_price": "120"
+  },
+  {
+    "id": "jj65bGblBSm7P2Cag8bZ6vxh5LC4AMBf",
+    "date": "2025-08-28",
+    "type": "depot",
+    "vehicle_id": "OvMVCrOlnYI2W8N8kUkZBKipreV1XgNW",
+    "driver_id": "VD18oFhJY2GG5XRwoGA45D6MF7nlvAJB",
+    "helper_id": null,
+    "created_at": "2025-09-08 10:09:13.529807",
+    "updated_at": "2025-09-08 10:09:13.529807",
+    "deleted_at": null,
+    "created_by": "IRmW1HJdcpSepC3wlcLQyfl4mDtVdQb2",
+    "updated_by": null,
+    "deleted_by": null,
+    "attachments": null,
+    "expenses": [
+      {
+        "amount": 90,
+        "description": "Toll"
+      },
+      {
+        "amount": 710,
+        "description": "Tips"
+      },
+      {
+        "amount": 7200,
+        "description": "Fuel"
+      }
+    ],
+    "items": [
+      {
+        "to": "PL",
+        "cost": 24,
+        "from": "CPA",
+        "fuel": 24,
+        "count": 2.5
+      }
+    ],
+    "metadata": null,
+    "fuel_price": "120"
+  },
+  {
+    "id": "jkex1e5ICtmu3jGBI6tRf7pcOHsAEj5Z",
+    "date": "2025-08-29",
+    "type": "depot",
+    "vehicle_id": "YXsBmaKvhQA4KTN9gm0ZEwU1oubInrY3",
+    "driver_id": "4SV2QPtXI9s3Q8SEHvRWWzSqlluMhiuS",
+    "helper_id": null,
+    "created_at": "2025-09-08 10:23:42.643064",
+    "updated_at": "2025-09-08 10:23:42.643064",
+    "deleted_at": null,
+    "created_by": "IRmW1HJdcpSepC3wlcLQyfl4mDtVdQb2",
+    "updated_by": null,
+    "deleted_by": null,
+    "attachments": null,
+    "expenses": [
+      {
+        "amount": 90,
+        "description": "Toll"
+      },
+      {
+        "amount": 710,
+        "description": "Tips"
+      },
+      {
+        "amount": 2880,
+        "description": "Fuel"
+      }
+    ],
+    "items": [
+      {
+        "to": "PL",
+        "cost": 24,
+        "from": "CPA",
+        "fuel": 24,
+        "count": 1
+      }
+    ],
+    "metadata": null,
+    "fuel_price": "120"
+  },
+  {
+    "id": "kbq49sDmUPJvpAdOvVo6oBeF7a34AMkb",
+    "date": "2025-08-30",
+    "type": "depot",
+    "vehicle_id": "38JGlhNUxno3JtkxnbRD10Z2qPaZgUya",
+    "driver_id": "fAGBcLhZfXdMIVOLt0r2fyYGoxomQ8rH",
+    "helper_id": null,
+    "created_at": "2025-09-08 11:06:01.089501",
+    "updated_at": "2025-09-08 11:06:01.089501",
+    "deleted_at": null,
+    "created_by": "IRmW1HJdcpSepC3wlcLQyfl4mDtVdQb2",
+    "updated_by": null,
+    "deleted_by": null,
+    "attachments": null,
+    "expenses": [
+      {
+        "amount": 90,
+        "description": "Toll"
+      },
+      {
+        "amount": 710,
+        "description": "Tips"
+      },
+      {
+        "amount": 5760,
+        "description": "Fuel"
+      }
+    ],
+    "items": [
+      {
+        "to": "PL",
+        "cost": 24,
+        "from": "CPA",
+        "fuel": 24,
+        "count": 2
+      }
+    ],
+    "metadata": null,
+    "fuel_price": "120"
+  },
+  {
+    "id": "l6IcQaxKtVO8Vadtm9oC6nDE3FOuJi3e",
+    "date": "2025-09-01",
+    "type": "depot",
+    "vehicle_id": "afrbVl48SIbAJ7VyACunxQkTjeRZtCU3",
+    "driver_id": "qcSB3Lk62MwoL4rh5lO7fcv2QZK4SYBd",
+    "helper_id": null,
+    "created_at": "2025-09-09 14:48:59.394642",
+    "updated_at": "2025-09-09 14:48:59.394642",
+    "deleted_at": null,
+    "created_by": "IRmW1HJdcpSepC3wlcLQyfl4mDtVdQb2",
+    "updated_by": null,
+    "deleted_by": null,
+    "attachments": null,
+    "expenses": [
+      {
+        "amount": 90,
+        "description": "Toll"
+      },
+      {
+        "amount": 710,
+        "description": "Tips"
+      },
+      {
+        "amount": 5760,
+        "description": "Fuel"
+      }
+    ],
+    "items": [
+      {
+        "to": "PL",
+        "cost": 24,
+        "from": "CPA",
+        "fuel": 24,
+        "count": 2
+      }
+    ],
+    "metadata": null,
+    "fuel_price": "120"
+  },
+  {
+    "id": "l8ZGMpk4lCfb2xXLUugqfwz0xZK4AxKZ",
+    "date": "2025-08-28",
+    "type": "depot",
+    "vehicle_id": "BzdaaAdZ6pzAbRHQrbTmjOj6DAVqIfSC",
+    "driver_id": "w8RKTSup3qhho7AJzMDkqq35FJy6zd7u",
+    "helper_id": null,
+    "created_at": "2025-09-08 10:20:03.937201",
+    "updated_at": "2025-09-08 10:20:03.937201",
+    "deleted_at": null,
+    "created_by": "IRmW1HJdcpSepC3wlcLQyfl4mDtVdQb2",
+    "updated_by": null,
+    "deleted_by": null,
+    "attachments": null,
+    "expenses": [
+      {
+        "amount": 90,
+        "description": "Toll"
+      },
+      {
+        "amount": 710,
+        "description": "Tips"
+      },
+      {
+        "amount": 2880,
+        "description": "Fuel"
+      }
+    ],
+    "items": [
+      {
+        "to": "PL",
+        "cost": 24,
+        "from": "CPA",
+        "fuel": 24,
+        "count": 1
+      }
+    ],
+    "metadata": null,
+    "fuel_price": "120"
+  },
+  {
+    "id": "lGtYd6lBExXGflcdmMwG0kH2VaBBXmyT",
+    "date": "2025-08-26",
+    "type": "depot",
+    "vehicle_id": "t3qJ9R0SF30Zwfm7IzDiClizTjpi8Aqm",
+    "driver_id": "N0tccSqW8sdEEvGm2Abjsp3oZAV4AhYu",
+    "helper_id": null,
+    "created_at": "2025-09-06 10:29:22.376783",
+    "updated_at": "2025-09-06 10:29:22.376783",
+    "deleted_at": null,
+    "created_by": "IRmW1HJdcpSepC3wlcLQyfl4mDtVdQb2",
+    "updated_by": null,
+    "deleted_by": null,
+    "attachments": null,
+    "expenses": [
+      {
+        "amount": 90,
+        "description": "Toll"
+      },
+      {
+        "amount": 710,
+        "description": "Tips"
+      },
+      {
+        "amount": 5760,
+        "description": "Fuel"
+      }
+    ],
+    "items": [
+      {
+        "to": "PL",
+        "cost": 24,
+        "from": "CPA",
+        "fuel": 24,
+        "count": 2
+      }
+    ],
+    "metadata": null,
+    "fuel_price": "120"
+  },
+  {
+    "id": "lR98tYyC023N24wThUlnqjAlic21afWx",
+    "date": "2025-08-27",
+    "type": "depot",
+    "vehicle_id": "sy3GM7ORvYorLMc2utxpHPmJP6vLivzx",
+    "driver_id": "GuVjEMweuHJOT6v6YnRlr25djGOmF03Q",
+    "helper_id": null,
+    "created_at": "2025-09-08 09:43:08.064977",
+    "updated_at": "2025-09-08 09:43:08.064977",
+    "deleted_at": null,
+    "created_by": "IRmW1HJdcpSepC3wlcLQyfl4mDtVdQb2",
+    "updated_by": null,
+    "deleted_by": null,
+    "attachments": null,
+    "expenses": [
+      {
+        "amount": 90,
+        "description": "Toll"
+      },
+      {
+        "amount": 710,
+        "description": "Tips"
+      },
+      {
+        "amount": 5760,
+        "description": "Fuel"
+      }
+    ],
+    "items": [
+      {
+        "to": "PL",
+        "cost": 24,
+        "from": "CPA",
+        "fuel": 24,
+        "count": 2
+      }
+    ],
+    "metadata": null,
+    "fuel_price": "120"
+  },
+  {
+    "id": "llgxyv0fYW8ldisX4ymfXeRKWadDcEKq",
+    "date": "2025-08-27",
+    "type": "depot",
+    "vehicle_id": "1Oy8kuZKJ76rBOLHrUvOO9sfWwPOks42",
+    "driver_id": "8InOQATmmj7ljkiGJumTKu2HPmpJzw3J",
+    "helper_id": null,
+    "created_at": "2025-09-06 12:19:12.778468",
+    "updated_at": "2025-09-06 12:19:12.778468",
+    "deleted_at": null,
+    "created_by": "IRmW1HJdcpSepC3wlcLQyfl4mDtVdQb2",
+    "updated_by": null,
+    "deleted_by": null,
+    "attachments": null,
+    "expenses": [
+      {
+        "amount": 90,
+        "description": "Toll"
+      },
+      {
+        "amount": 710,
+        "description": "Tips"
+      },
+      {
+        "amount": 5760,
+        "description": "Fuel"
+      }
+    ],
+    "items": [
+      {
+        "to": "PL",
+        "cost": 24,
+        "from": "CPA",
+        "fuel": 24,
+        "count": 2
+      }
+    ],
+    "metadata": null,
+    "fuel_price": "120"
+  },
+  {
+    "id": "mfaTSdPkJ6Ma9MiMqnqB0OQeCjvq0Vlk",
+    "date": "2025-08-29",
+    "type": "depot",
+    "vehicle_id": "sy3GM7ORvYorLMc2utxpHPmJP6vLivzx",
+    "driver_id": "vopFQ2gwq7V44kMnzjkHVUy9F4vzbso9",
+    "helper_id": null,
+    "created_at": "2025-09-08 10:40:56.913154",
+    "updated_at": "2025-09-08 10:40:56.913154",
+    "deleted_at": null,
+    "created_by": "IRmW1HJdcpSepC3wlcLQyfl4mDtVdQb2",
+    "updated_by": null,
+    "deleted_by": null,
+    "attachments": null,
+    "expenses": [
+      {
+        "amount": 90,
+        "description": "Toll"
+      },
+      {
+        "amount": 710,
+        "description": "Tips"
+      },
+      {
+        "amount": 8640,
+        "description": "Fuel"
+      }
+    ],
+    "items": [
+      {
+        "to": "PL",
+        "cost": 24,
+        "from": "CPA",
+        "fuel": 24,
+        "count": 3
+      }
+    ],
+    "metadata": null,
+    "fuel_price": "120"
+  },
+  {
+    "id": "mhNrJQKPmzWGGrYwcuso23bKFgTmFW5c",
+    "date": "2025-08-26",
+    "type": "depot",
+    "vehicle_id": "38JGlhNUxno3JtkxnbRD10Z2qPaZgUya",
+    "driver_id": "AAvbr5hwlUiNaPAoqyZcoo2ERvDwcPzz",
+    "helper_id": null,
+    "created_at": "2025-09-06 08:26:17.01262",
+    "updated_at": "2025-09-06 08:26:17.01262",
+    "deleted_at": null,
+    "created_by": "IRmW1HJdcpSepC3wlcLQyfl4mDtVdQb2",
+    "updated_by": "IRmW1HJdcpSepC3wlcLQyfl4mDtVdQb2",
+    "deleted_by": null,
+    "attachments": null,
+    "expenses": [
+      {
+        "amount": 90,
+        "description": "Toll"
+      },
+      {
+        "amount": 710,
+        "description": "Tips"
+      },
+      {
+        "amount": 2880,
+        "description": "Fuel"
+      }
+    ],
+    "items": [
+      {
+        "to": "PL",
+        "cost": 24,
+        "from": "CPA",
+        "fuel": 24,
+        "count": 1
+      }
+    ],
+    "metadata": null,
+    "fuel_price": "120"
+  },
+  {
+    "id": "n0vnRvqQ3cFmsCeB5nqeqrKQRbxAm0qf",
+    "date": "2025-09-01",
+    "type": "depot",
+    "vehicle_id": "38JGlhNUxno3JtkxnbRD10Z2qPaZgUya",
+    "driver_id": "Xa9RR4pYzgkrgYGAzeHWIDzHEDlqQfP9",
+    "helper_id": null,
+    "created_at": "2025-09-09 14:34:57.921331",
+    "updated_at": "2025-09-09 14:34:57.921331",
+    "deleted_at": null,
+    "created_by": "IRmW1HJdcpSepC3wlcLQyfl4mDtVdQb2",
+    "updated_by": null,
+    "deleted_by": null,
+    "attachments": null,
+    "expenses": [
+      {
+        "amount": 90,
+        "description": "Toll"
+      },
+      {
+        "amount": 710,
+        "description": "Tips"
+      },
+      {
+        "amount": 5760,
+        "description": "Fuel"
+      }
+    ],
+    "items": [
+      {
+        "to": "PL",
+        "cost": 24,
+        "from": "CPA",
+        "fuel": 24,
+        "count": 2
+      }
+    ],
+    "metadata": null,
+    "fuel_price": "120"
+  },
+  {
+    "id": "nYdhlH3Fww1ohCPDJ0qU6GifaWKtECGU",
+    "date": "2025-08-31",
+    "type": "depot",
+    "vehicle_id": "YXsBmaKvhQA4KTN9gm0ZEwU1oubInrY3",
+    "driver_id": "4SV2QPtXI9s3Q8SEHvRWWzSqlluMhiuS",
+    "helper_id": null,
+    "created_at": "2025-09-09 14:13:47.600258",
+    "updated_at": "2025-09-09 14:13:47.600258",
+    "deleted_at": null,
+    "created_by": "IRmW1HJdcpSepC3wlcLQyfl4mDtVdQb2",
+    "updated_by": null,
+    "deleted_by": null,
+    "attachments": null,
+    "expenses": [
+      {
+        "amount": 90,
+        "description": "Toll"
+      },
+      {
+        "amount": 710,
+        "description": "Tips"
+      },
+      {
+        "amount": 5760,
+        "description": "Fuel"
+      }
+    ],
+    "items": [
+      {
+        "to": "PL",
+        "cost": 24,
+        "from": "CPA",
+        "fuel": 24,
+        "count": 2
+      }
+    ],
+    "metadata": null,
+    "fuel_price": "120"
+  },
+  {
+    "id": "nrYRMsfibtwdjIfxWUpq6c3eAQ6p76je",
+    "date": "2025-09-01",
+    "type": "depot",
+    "vehicle_id": "iUMnHiDIHL93KoPDp0NsMUzWdVgrsLPX",
+    "driver_id": "UCoW0hizmhrMf9ZF9uA1qxkkHDJcXBTi",
+    "helper_id": null,
+    "created_at": "2025-09-01 21:04:23.206277",
+    "updated_at": "2025-09-01 21:04:23.206277",
+    "deleted_at": null,
+    "created_by": "IRmW1HJdcpSepC3wlcLQyfl4mDtVdQb2",
+    "updated_by": "IRmW1HJdcpSepC3wlcLQyfl4mDtVdQb2",
+    "deleted_by": null,
+    "attachments": null,
+    "expenses": [
+      {
+        "amount": 90,
+        "description": "Toll"
+      },
+      {
+        "amount": 710,
+        "description": "Tips"
+      },
+      {
+        "amount": 2448,
+        "description": "Fuel"
+      }
+    ],
+    "items": [
+      {
+        "to": "PL",
+        "cost": 24,
+        "from": "CPA",
+        "fuel": 24,
+        "count": 1
+      }
+    ],
+    "metadata": null,
+    "fuel_price": "102"
+  },
+  {
+    "id": "pWXRzzYq4R7oRXl2hsiprBmv4xftORXG",
+    "date": "2025-08-28",
+    "type": "depot",
+    "vehicle_id": "iUMnHiDIHL93KoPDp0NsMUzWdVgrsLPX",
+    "driver_id": "2DP98UlTnnX41UqdDZHVogFcpdB5jbQS",
+    "helper_id": null,
+    "created_at": "2025-09-08 09:54:53.540909",
+    "updated_at": "2025-09-08 09:54:53.540909",
+    "deleted_at": null,
+    "created_by": "IRmW1HJdcpSepC3wlcLQyfl4mDtVdQb2",
+    "updated_by": null,
+    "deleted_by": null,
+    "attachments": null,
+    "expenses": [
+      {
+        "amount": 90,
+        "description": "Toll"
+      },
+      {
+        "amount": 710,
+        "description": "Tips"
+      },
+      {
+        "amount": 7200,
+        "description": "Fuel"
+      }
+    ],
+    "items": [
+      {
+        "to": "PL",
+        "cost": 24,
+        "from": "CPA",
+        "fuel": 24,
+        "count": 2.5
+      }
+    ],
+    "metadata": null,
+    "fuel_price": "120"
+  },
+  {
+    "id": "pbJx6vBlSRBTHgFyaca6PjWiLXHzHcF7",
+    "date": "2025-08-29",
+    "type": "depot",
+    "vehicle_id": "YTtsWyOKC2OzoKr8dql7rOOtUx803N08",
+    "driver_id": "0LV6ikdVEYl4sY6wP0aBtCK7ItR5Gjtx",
+    "helper_id": null,
+    "created_at": "2025-09-08 10:39:26.616891",
+    "updated_at": "2025-09-08 10:39:26.616891",
+    "deleted_at": null,
+    "created_by": "IRmW1HJdcpSepC3wlcLQyfl4mDtVdQb2",
+    "updated_by": null,
+    "deleted_by": null,
+    "attachments": null,
+    "expenses": [
+      {
+        "amount": 90,
+        "description": "Toll"
+      },
+      {
+        "amount": 710,
+        "description": "Tips"
+      },
+      {
+        "amount": 5760,
+        "description": "Fuel"
+      }
+    ],
+    "items": [
+      {
+        "to": "PL",
+        "cost": 24,
+        "from": "CPA",
+        "fuel": 24,
+        "count": 2
+      }
+    ],
+    "metadata": null,
+    "fuel_price": "120"
+  },
+  {
+    "id": "q5kok3FSEBP9w8MlUuYH86iRRzR2EVCY",
+    "date": "2025-08-26",
+    "type": "depot",
+    "vehicle_id": "Vr0vnMA6EVPh8yJTLqZsT62b38qTLsJE",
+    "driver_id": "jvhuoR4El96L2mir8RICg3ycWqRW2GpY",
+    "helper_id": null,
+    "created_at": "2025-09-06 10:24:43.902154",
+    "updated_at": "2025-09-06 10:24:43.902154",
+    "deleted_at": null,
+    "created_by": "IRmW1HJdcpSepC3wlcLQyfl4mDtVdQb2",
+    "updated_by": null,
+    "deleted_by": null,
+    "attachments": null,
+    "expenses": [
+      {
+        "amount": 90,
+        "description": "Toll"
+      },
+      {
+        "amount": 710,
+        "description": "Tips"
+      },
+      {
+        "amount": 5760,
+        "description": "Fuel"
+      }
+    ],
+    "items": [
+      {
+        "to": "PL",
+        "cost": 24,
+        "from": "CPA",
+        "fuel": 24,
+        "count": 2
+      }
+    ],
+    "metadata": null,
+    "fuel_price": "120"
+  },
+  {
+    "id": "qR2ZiucJPoBEwklIf2CC3DTWoPtP00wQ",
+    "date": "2025-08-28",
+    "type": "depot",
+    "vehicle_id": "afrbVl48SIbAJ7VyACunxQkTjeRZtCU3",
+    "driver_id": "qcSB3Lk62MwoL4rh5lO7fcv2QZK4SYBd",
+    "helper_id": null,
+    "created_at": "2025-09-08 10:04:58.167781",
+    "updated_at": "2025-09-08 10:04:58.167781",
+    "deleted_at": null,
+    "created_by": "IRmW1HJdcpSepC3wlcLQyfl4mDtVdQb2",
+    "updated_by": null,
+    "deleted_by": null,
+    "attachments": null,
+    "expenses": [
+      {
+        "amount": 90,
+        "description": "Toll"
+      },
+      {
+        "amount": 710,
+        "description": "Tips"
+      },
+      {
+        "amount": 1440,
+        "description": "Fuel"
+      }
+    ],
+    "items": [
+      {
+        "to": "PL",
+        "cost": 24,
+        "from": "CPA",
+        "fuel": 24,
+        "count": 0.5
+      }
+    ],
+    "metadata": null,
+    "fuel_price": "120"
+  },
+  {
+    "id": "rEmCvVhdguZ6Wy4YXYZ5r5ukjxB5vcqO",
+    "date": "2025-08-28",
+    "type": "depot",
+    "vehicle_id": "38JGlhNUxno3JtkxnbRD10Z2qPaZgUya",
+    "driver_id": "gyk8qtQt17LMpyXxJUsgxPZ7UcJGNGdn",
+    "helper_id": null,
+    "created_at": "2025-09-08 10:21:38.803113",
+    "updated_at": "2025-09-08 10:21:38.803113",
+    "deleted_at": null,
+    "created_by": "IRmW1HJdcpSepC3wlcLQyfl4mDtVdQb2",
+    "updated_by": null,
+    "deleted_by": null,
+    "attachments": null,
+    "expenses": [
+      {
+        "amount": 90,
+        "description": "Toll"
+      },
+      {
+        "amount": 710,
+        "description": "Tips"
+      },
+      {
+        "amount": 5760,
+        "description": "Fuel"
+      }
+    ],
+    "items": [
+      {
+        "to": "PL",
+        "cost": 24,
+        "from": "CPA",
+        "fuel": 24,
+        "count": 2
+      }
+    ],
+    "metadata": null,
+    "fuel_price": "120"
+  },
+  {
+    "id": "s9a1cQ91C70dXxeirSt3BdK9OUL88NIT",
+    "date": "2025-08-30",
+    "type": "depot",
+    "vehicle_id": "t3qJ9R0SF30Zwfm7IzDiClizTjpi8Aqm",
+    "driver_id": "N0tccSqW8sdEEvGm2Abjsp3oZAV4AhYu",
+    "helper_id": null,
+    "created_at": "2025-09-08 11:09:38.421166",
+    "updated_at": "2025-09-08 11:09:38.421166",
+    "deleted_at": null,
+    "created_by": "IRmW1HJdcpSepC3wlcLQyfl4mDtVdQb2",
+    "updated_by": null,
+    "deleted_by": null,
+    "attachments": null,
+    "expenses": [
+      {
+        "amount": 90,
+        "description": "Toll"
+      },
+      {
+        "amount": 710,
+        "description": "Tips"
+      },
+      {
+        "amount": 8640,
+        "description": "Fuel"
+      }
+    ],
+    "items": [
+      {
+        "to": "PL",
+        "cost": 24,
+        "from": "CPA",
+        "fuel": 24,
+        "count": 3
+      }
+    ],
+    "metadata": null,
+    "fuel_price": "120"
+  },
+  {
+    "id": "sdCVNY7ccGpkqJthyUOibOVglKv1JXGc",
+    "date": "2025-08-29",
+    "type": "depot",
+    "vehicle_id": "o5f5twfcd6mXXjJT5LVWruDnvOWbga0W",
+    "driver_id": "8InOQATmmj7ljkiGJumTKu2HPmpJzw3J",
+    "helper_id": null,
+    "created_at": "2025-09-08 10:47:38.357028",
+    "updated_at": "2025-09-08 10:47:38.357028",
+    "deleted_at": null,
+    "created_by": "IRmW1HJdcpSepC3wlcLQyfl4mDtVdQb2",
+    "updated_by": null,
+    "deleted_by": null,
+    "attachments": null,
+    "expenses": [
+      {
+        "amount": 90,
+        "description": "Toll"
+      },
+      {
+        "amount": 710,
+        "description": "Tips"
+      },
+      {
+        "amount": 5760,
+        "description": "Fuel"
+      }
+    ],
+    "items": [
+      {
+        "to": "PL",
+        "cost": 24,
+        "from": "CPA",
+        "fuel": 24,
+        "count": 2
+      }
+    ],
+    "metadata": null,
+    "fuel_price": "120"
+  },
+  {
+    "id": "stmpsfkhvOWJwkMFe8N8sveg5hCpbtF5",
+    "date": "2025-09-01",
+    "type": "depot",
+    "vehicle_id": "iUMnHiDIHL93KoPDp0NsMUzWdVgrsLPX",
+    "driver_id": "UCoW0hizmhrMf9ZF9uA1qxkkHDJcXBTi",
+    "helper_id": null,
+    "created_at": "2025-09-01 21:05:05.919437",
+    "updated_at": "2025-09-01 21:05:05.919437",
+    "deleted_at": null,
+    "created_by": "IRmW1HJdcpSepC3wlcLQyfl4mDtVdQb2",
+    "updated_by": null,
+    "deleted_by": null,
+    "attachments": null,
+    "expenses": [
+      {
+        "amount": 90,
+        "description": "Toll"
+      },
+      {
+        "amount": 710,
+        "description": "Tips"
+      },
+      {
+        "amount": 2880,
+        "description": "Fuel"
+      }
+    ],
+    "items": [
+      {
+        "to": "PL",
+        "cost": 24,
+        "from": "CPA",
+        "fuel": 24,
+        "count": 1
+      }
+    ],
+    "metadata": null,
+    "fuel_price": "120"
+  },
+  {
+    "id": "tOIKSnJbTcYTJAvGluJxQxnOrwr0Ho11",
+    "date": "2025-08-27",
+    "type": "depot",
+    "vehicle_id": "yiRQnGMXIqmOiVaRxB0MgM8XGxVnCYKO",
+    "driver_id": "v5OK37Li2YY1AhCa3hDlYXeVMZogz5aZ",
+    "helper_id": null,
+    "created_at": "2025-09-08 09:52:25.49529",
+    "updated_at": "2025-09-08 09:52:25.49529",
+    "deleted_at": null,
+    "created_by": "IRmW1HJdcpSepC3wlcLQyfl4mDtVdQb2",
+    "updated_by": null,
+    "deleted_by": null,
+    "attachments": null,
+    "expenses": [
+      {
+        "amount": 90,
+        "description": "Toll"
+      },
+      {
+        "amount": 710,
+        "description": "Tips"
+      },
+      {
+        "amount": 5760,
+        "description": "Fuel"
+      }
+    ],
+    "items": [
+      {
+        "to": "PL",
+        "cost": 24,
+        "from": "CPA",
+        "fuel": 24,
+        "count": 2
+      }
+    ],
+    "metadata": null,
+    "fuel_price": "120"
+  },
+  {
+    "id": "u6XxaqRgXNJr4d9i4I2AVLx6MeidRdSE",
+    "date": "2025-08-30",
+    "type": "depot",
+    "vehicle_id": "afrbVl48SIbAJ7VyACunxQkTjeRZtCU3",
+    "driver_id": "qcSB3Lk62MwoL4rh5lO7fcv2QZK4SYBd",
+    "helper_id": null,
+    "created_at": "2025-09-08 10:55:41.17502",
+    "updated_at": "2025-09-08 10:55:41.17502",
+    "deleted_at": null,
+    "created_by": "IRmW1HJdcpSepC3wlcLQyfl4mDtVdQb2",
+    "updated_by": null,
+    "deleted_by": null,
+    "attachments": null,
+    "expenses": [
+      {
+        "amount": 90,
+        "description": "Toll"
+      },
+      {
+        "amount": 710,
+        "description": "Tips"
+      },
+      {
+        "amount": 5760,
+        "description": "Fuel"
+      }
+    ],
+    "items": [
+      {
+        "to": "PL",
+        "cost": 24,
+        "from": "CPA",
+        "fuel": 24,
+        "count": 2
+      }
+    ],
+    "metadata": null,
+    "fuel_price": "120"
+  },
+  {
+    "id": "vQOM3etTqXvRc1Zx6l4LMCNl8VYTyHO2",
+    "date": "2025-09-01",
+    "type": "depot",
+    "vehicle_id": "3reovR5HM9wWuUFkA4W23bHzTg3hpn5y",
+    "driver_id": "vopFQ2gwq7V44kMnzjkHVUy9F4vzbso9",
+    "helper_id": null,
+    "created_at": "2025-09-09 14:46:51.28841",
+    "updated_at": "2025-09-09 14:46:51.28841",
+    "deleted_at": null,
+    "created_by": "IRmW1HJdcpSepC3wlcLQyfl4mDtVdQb2",
+    "updated_by": null,
+    "deleted_by": null,
+    "attachments": null,
+    "expenses": [
+      {
+        "amount": 90,
+        "description": "Toll"
+      },
+      {
+        "amount": 710,
+        "description": "Tips"
+      },
+      {
+        "amount": 5760,
+        "description": "Fuel"
+      }
+    ],
+    "items": [
+      {
+        "to": "PL",
+        "cost": 24,
+        "from": "CPA",
+        "fuel": 24,
+        "count": 2
+      }
+    ],
+    "metadata": null,
+    "fuel_price": "120"
+  },
+  {
+    "id": "wS70qWvF6tOIeCEYCQE7kubiIlQ5K5cD",
+    "date": "2025-08-30",
+    "type": "depot",
+    "vehicle_id": "3reovR5HM9wWuUFkA4W23bHzTg3hpn5y",
+    "driver_id": "GuVjEMweuHJOT6v6YnRlr25djGOmF03Q",
+    "helper_id": "ffbRRb6BqfEtRzmkSPJEtrZVZ5qQRacb",
+    "created_at": "2025-09-08 11:01:00.462116",
+    "updated_at": "2025-09-08 11:01:00.462116",
+    "deleted_at": null,
+    "created_by": "IRmW1HJdcpSepC3wlcLQyfl4mDtVdQb2",
+    "updated_by": null,
+    "deleted_by": null,
+    "attachments": null,
+    "expenses": [
+      {
+        "amount": 90,
+        "description": "Toll"
+      },
+      {
+        "amount": 710,
+        "description": "Tips"
+      },
+      {
+        "amount": 2880,
+        "description": "Fuel"
+      }
+    ],
+    "items": [
+      {
+        "to": "PL",
+        "cost": 24,
+        "from": "CPA",
+        "fuel": 24,
+        "count": 1
+      }
+    ],
+    "metadata": null,
+    "fuel_price": "120"
+  },
+  {
+    "id": "xI5bGlTC4LOF15hseHRlm7jEfOM3N6tP",
+    "date": "2025-08-31",
+    "type": "depot",
+    "vehicle_id": "t3qJ9R0SF30Zwfm7IzDiClizTjpi8Aqm",
+    "driver_id": "uVIrWmymQJDh9m73jQMQJjmKtBXqsmIo",
+    "helper_id": null,
+    "created_at": "2025-09-09 14:19:35.970966",
+    "updated_at": "2025-09-09 14:19:35.970966",
+    "deleted_at": null,
+    "created_by": "IRmW1HJdcpSepC3wlcLQyfl4mDtVdQb2",
+    "updated_by": null,
+    "deleted_by": null,
+    "attachments": null,
+    "expenses": [
+      {
+        "amount": 90,
+        "description": "Toll"
+      },
+      {
+        "amount": 710,
+        "description": "Tips"
+      },
+      {
+        "amount": 5760,
+        "description": "Fuel"
+      }
+    ],
+    "items": [
+      {
+        "to": "PL",
+        "cost": 24,
+        "from": "CPA",
+        "fuel": 24,
+        "count": 2
+      }
+    ],
+    "metadata": null,
+    "fuel_price": "120"
+  },
+  {
+    "id": "xPKCwYbD9fCqGE8TWZ1glTBDKVUYgCU0",
+    "date": "2025-09-01",
+    "type": "depot",
+    "vehicle_id": "BzdaaAdZ6pzAbRHQrbTmjOj6DAVqIfSC",
+    "driver_id": "6vLgHfQF6twgfRei3rBYDZL3Y4WhkabI",
+    "helper_id": "WZWabKgfYZAwn5Scfe8Is64JvXirwQGJ",
+    "created_at": "2025-09-09 14:51:42.358955",
+    "updated_at": "2025-09-09 14:51:42.358955",
+    "deleted_at": null,
+    "created_by": "IRmW1HJdcpSepC3wlcLQyfl4mDtVdQb2",
+    "updated_by": null,
+    "deleted_by": null,
+    "attachments": null,
+    "expenses": [
+      {
+        "amount": 90,
+        "description": "Toll"
+      },
+      {
+        "amount": 710,
+        "description": "Tips"
+      },
+      {
+        "amount": 5760,
+        "description": "Fuel"
+      }
+    ],
+    "items": [
+      {
+        "to": "PL",
+        "cost": 24,
+        "from": "CPA",
+        "fuel": 24,
+        "count": 2
+      }
+    ],
+    "metadata": null,
+    "fuel_price": "120"
+  },
+  {
+    "id": "xfHKpcfc822sQYtlODssqCdFDnEmqKYa",
+    "date": "2025-08-27",
+    "type": "depot",
+    "vehicle_id": "iUMnHiDIHL93KoPDp0NsMUzWdVgrsLPX",
+    "driver_id": "Aj9saWWqah2BRAd2DzeCruLS0NWc0H1h",
+    "helper_id": null,
+    "created_at": "2025-09-06 12:16:43.210146",
+    "updated_at": "2025-09-06 12:16:43.210146",
+    "deleted_at": null,
+    "created_by": "IRmW1HJdcpSepC3wlcLQyfl4mDtVdQb2",
+    "updated_by": null,
+    "deleted_by": null,
+    "attachments": null,
+    "expenses": [
+      {
+        "amount": 90,
+        "description": "Toll"
+      },
+      {
+        "amount": 710,
+        "description": "Tips"
+      },
+      {
+        "amount": 2880,
+        "description": "Fuel"
+      }
+    ],
+    "items": [
+      {
+        "to": "PL",
+        "cost": 24,
+        "from": "CPA",
+        "fuel": 24,
+        "count": 1
+      }
+    ],
+    "metadata": null,
+    "fuel_price": "120"
+  },
+  {
+    "id": "yjVfDwlI2g5QS4ckiE8lAMTuieNvO7Mt",
+    "date": "2025-08-26",
+    "type": "depot",
+    "vehicle_id": "YXsBmaKvhQA4KTN9gm0ZEwU1oubInrY3",
+    "driver_id": "PTUxnNzDV3Xcl8QKe4t5rXN2qAqoPhwi",
+    "helper_id": "UMd3PDf3Woh8hiVNK8qv2z8lRyaLGmNf",
+    "created_at": "2025-09-06 10:35:42.535328",
+    "updated_at": "2025-09-06 10:35:42.535328",
+    "deleted_at": null,
+    "created_by": "IRmW1HJdcpSepC3wlcLQyfl4mDtVdQb2",
+    "updated_by": "IRmW1HJdcpSepC3wlcLQyfl4mDtVdQb2",
+    "deleted_by": null,
+    "attachments": null,
+    "expenses": [
+      {
+        "amount": 90,
+        "description": "Toll"
+      },
+      {
+        "amount": 710,
+        "description": "Tips"
+      },
+      {
+        "amount": 8640,
+        "description": "Fuel"
+      }
+    ],
+    "items": [
+      {
+        "to": "PL",
+        "cost": 24,
+        "from": "CPA",
+        "fuel": 24,
+        "count": 3
+      }
+    ],
+    "metadata": null,
+    "fuel_price": "120"
+  },
+  {
+    "id": "zEKuFalaZ5GUvFjIwo008FB71iyj2bep",
+    "date": "2025-08-27",
+    "type": "depot",
+    "vehicle_id": "afrbVl48SIbAJ7VyACunxQkTjeRZtCU3",
+    "driver_id": "v7osuBp7myXCPhcW5y7X7VpxXh9e9X5k",
+    "helper_id": null,
+    "created_at": "2025-09-08 09:40:35.575337",
+    "updated_at": "2025-09-08 09:40:35.575337",
+    "deleted_at": null,
+    "created_by": "IRmW1HJdcpSepC3wlcLQyfl4mDtVdQb2",
+    "updated_by": null,
+    "deleted_by": null,
+    "attachments": null,
+    "expenses": [
+      {
+        "amount": 90,
+        "description": "Toll"
+      },
+      {
+        "amount": 710,
+        "description": "Tips"
+      },
+      {
+        "amount": 5760,
+        "description": "Fuel"
+      }
+    ],
+    "items": [
+      {
+        "to": "PL",
+        "cost": 24,
+        "from": "CPA",
+        "fuel": 24,
+        "count": 2
+      }
+    ],
+    "metadata": null,
+    "fuel_price": "120"
+  },
+  {
+    "id": "zPZPFbOIlRBW5jAKpxcMnw0PImQVhfOa",
+    "date": "2025-08-27",
+    "type": "depot",
+    "vehicle_id": "OvMVCrOlnYI2W8N8kUkZBKipreV1XgNW",
+    "driver_id": "VD18oFhJY2GG5XRwoGA45D6MF7nlvAJB",
+    "helper_id": null,
+    "created_at": "2025-09-06 12:21:01.200337",
+    "updated_at": "2025-09-06 12:21:01.200337",
+    "deleted_at": null,
+    "created_by": "IRmW1HJdcpSepC3wlcLQyfl4mDtVdQb2",
+    "updated_by": "IRmW1HJdcpSepC3wlcLQyfl4mDtVdQb2",
+    "deleted_by": null,
+    "attachments": null,
+    "expenses": [
+      {
+        "amount": 90,
+        "description": "Toll"
+      },
+      {
+        "amount": 710,
+        "description": "Tips"
+      },
+      {
+        "amount": 5760,
+        "description": "Fuel"
+      }
+    ],
+    "items": [
+      {
+        "to": "PL",
+        "cost": 24,
+        "from": "CPA",
+        "fuel": 24,
+        "count": 2
+      }
+    ],
+    "metadata": null,
+    "fuel_price": "120"
+  },
+  {
+    "id": "zVPZTvMhFKDHu3hJA4Bag8OTPipDUjpd",
+    "date": "2025-08-31",
+    "type": "depot",
+    "vehicle_id": "38JGlhNUxno3JtkxnbRD10Z2qPaZgUya",
+    "driver_id": "uTpAVEHgWpwDFnOPHsBNB8dTNjT6kkWX",
+    "helper_id": null,
+    "created_at": "2025-09-09 14:11:27.914871",
+    "updated_at": "2025-09-09 14:11:27.914871",
+    "deleted_at": null,
+    "created_by": "IRmW1HJdcpSepC3wlcLQyfl4mDtVdQb2",
+    "updated_by": null,
+    "deleted_by": null,
+    "attachments": null,
+    "expenses": [
+      {
+        "amount": 90,
+        "description": "Toll"
+      },
+      {
+        "amount": 710,
+        "description": "Tips"
+      },
+      {
+        "amount": 2880,
+        "description": "Fuel"
+      }
+    ],
+    "items": [
+      {
+        "to": "PL",
+        "cost": 24,
+        "from": "CPA",
+        "fuel": 24,
+        "count": 1
+      }
+    ],
+    "metadata": null,
+    "fuel_price": "120"
+  },
+  {
+    "id": "zZHcwmOUDyCWJKDjk9R3ktGdqQiSxw8y",
+    "date": "2025-08-28",
+    "type": "depot",
+    "vehicle_id": "YTtsWyOKC2OzoKr8dql7rOOtUx803N08",
+    "driver_id": "Y2pURKh3HUqhKf7MXwBy1afjj7fD54zq",
+    "helper_id": null,
+    "created_at": "2025-09-08 10:06:00.440014",
+    "updated_at": "2025-09-08 10:06:00.440014",
+    "deleted_at": null,
+    "created_by": "IRmW1HJdcpSepC3wlcLQyfl4mDtVdQb2",
+    "updated_by": null,
+    "deleted_by": null,
+    "attachments": null,
+    "expenses": [
+      {
+        "amount": 90,
+        "description": "Toll"
+      },
+      {
+        "amount": 710,
+        "description": "Tips"
+      },
+      {
+        "amount": 8640,
+        "description": "Fuel"
+      }
+    ],
+    "items": [
+      {
+        "to": "PL",
+        "cost": 24,
+        "from": "CPA",
+        "fuel": 24,
+        "count": 3
+      }
+    ],
+    "metadata": null,
+    "fuel_price": "120"
   }
 ]
