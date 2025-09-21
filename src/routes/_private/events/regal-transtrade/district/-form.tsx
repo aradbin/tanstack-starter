@@ -3,7 +3,6 @@ import { useQuery } from "@tanstack/react-query"
 import { getData } from "@/lib/db/functions"
 import { AnyType, FormFieldType } from "@/lib/types"
 import { stringRequiredValidation, stringValidation } from "@/lib/validations"
-import { fuelPrice } from "@/lib/organizations/regal-transtrade"
 import { useState } from "react"
 import { formatDateForInput } from "@/lib/utils"
 import { subDays } from "date-fns"
@@ -25,19 +24,19 @@ export default function TripForm({ id }: { id?: string }) {
   const [items, setItems] = useState<AnyType[]>([
     {
       destination: "",
-      amount: 0
+      amount: ""
     }
   ])
   const [expenses, setExpenses] = useState<AnyType[]>([
     {
       description: "Driver Allowance",
-      amount: 0
+      amount: ""
     }
   ])
   const [payments, setPayments] = useState<AnyType[]>([
     {
       date: formatDateForInput(new Date()),
-      amount: 0,
+      amount: "",
       method: "cash",
       note: ""
     }
@@ -48,7 +47,7 @@ export default function TripForm({ id }: { id?: string }) {
       const trip = await getData({ data: {
         table: "events",
         relation: {
-          eventParticipants: true
+          eventEntities: true
         },
         id
       }})
@@ -59,10 +58,11 @@ export default function TripForm({ id }: { id?: string }) {
 
       return {
         date: formatDateForInput(trip?.from),
-        vehicleId: trip?.eventParticipants?.find((participant: AnyType) => participant.participantType === "assets" && participant.role === "vehicle")?.participantId,
-        driverId: trip?.eventParticipants?.find((participant: AnyType) => participant.participantType === "employees" && participant.role === "driver")?.participantId,
-        helperId: trip?.eventParticipants?.find((participant: AnyType) => participant.participantType === "employees" && participant.role === "helper")?.participantId,
+        vehicleId: trip?.eventEntities?.find((entity: AnyType) => entity.entityType === "assets" && entity.role === "vehicle")?.entityId,
+        driverId: trip?.eventEntities?.find((entity: AnyType) => entity.entityType === "employees" && entity.role === "driver")?.entityId,
+        helperId: trip?.eventEntities?.find((entity: AnyType) => entity.entityType === "employees" && entity.role === "helper")?.entityId,
         customer: trip?.metadata?.customer || "",
+        phone: trip?.metadata?.phone || "",
         reference: trip?.metadata?.reference || "",
       }
     },
@@ -113,6 +113,12 @@ export default function TripForm({ id }: { id?: string }) {
         isRequired: true,
       },
       {
+        name: "phone",
+        validationOnSubmit: stringRequiredValidation("Customer Phone Number"),
+        placeholder: "Enter Customer Phone Number",
+        isRequired: true,
+      },
+      {
         name: "reference",
         label: "Reference By",
         validationOnSubmit: stringValidation("Reference By"),
@@ -152,7 +158,7 @@ export default function TripForm({ id }: { id?: string }) {
                 <InputField field={{
                   name: `amount-${index}`,
                   type: "number",
-                  value: items[index]?.amount || 0,
+                  value: items[index]?.amount || "",
                   isValid: true,
                   placeholder: "Enter Fare",
                   handleChange: (value: string) => {
@@ -370,7 +376,7 @@ export default function TripForm({ id }: { id?: string }) {
                   const newItems = [...prev]
                   newItems.push({
                     destination: "",
-                    amount: 0
+                    amount: ""
                   })
                   return newItems
                 })
@@ -384,7 +390,7 @@ export default function TripForm({ id }: { id?: string }) {
                   const newExpenses = [...prev]
                   newExpenses.push({
                     description: "",
-                    amount: 0,
+                    amount: "",
                   })
                   return newExpenses
                 })
@@ -399,7 +405,7 @@ export default function TripForm({ id }: { id?: string }) {
                 const newPayments = [...prev]
                 newPayments.push({
                   date: formatDateForInput(new Date()),
-                  amount: 0,
+                  amount: "",
                   method: "cash",
                   note: "",
                 })

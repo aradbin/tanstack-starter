@@ -1,7 +1,7 @@
 import { authOrgMiddleware } from "@/lib/auth/middleware"
 import { db } from "@/lib/db"
 import { addOrder, addPagination, addWhere, QueryParamBaseType } from "@/lib/db/functions"
-import { assets, employees, eventParticipants, events } from "@/lib/db/schema"
+import { assets, customers, employees, eventEntities, events } from "@/lib/db/schema"
 import { AnyType } from "@/lib/types"
 import { createServerFn } from "@tanstack/react-start"
 import { generateId } from "better-auth"
@@ -15,11 +15,11 @@ export const getTrips = createServerFn()
   .handler(async ({ context, data }): Promise<AnyType> => {
     const { sort, pagination, where, search } = data
 
-    const vehicleEventParticipant = alias(eventParticipants, 'vehicle_event_participant')
+    const vehicleEventEntity = alias(eventEntities, 'vehicle_event_entity')
     const vehicleAsset = alias(assets, 'vehicle_asset')
-    const driverEventParticipant = alias(eventParticipants, 'driver_event_participant')
+    const driverEventEntity = alias(eventEntities, 'driver_event_entity')
     const driverEmployee = alias(employees, 'driver_employee')
-    const helperEventParticipant = alias(eventParticipants, 'helper_event_participant')
+    const helperEventEntity = alias(eventEntities, 'helper_event_entity')
     const helperEmployee = alias(employees, 'helper_employee')
     
     let query = db.select({
@@ -29,36 +29,36 @@ export const getTrips = createServerFn()
       helper: getTableColumns(helperEmployee),
     }).from(events)
 
-    query.innerJoin(vehicleEventParticipant, and(...[
-      eq(events.id, vehicleEventParticipant.eventId),
-      eq(vehicleEventParticipant.role, 'vehicle'),
-      eq(vehicleEventParticipant.participantType, 'assets'),
-      ...where?.vehicleId ? [eq(vehicleEventParticipant.participantId, where?.vehicleId)] : [],
+    query.innerJoin(vehicleEventEntity, and(...[
+      eq(events.id, vehicleEventEntity.eventId),
+      eq(vehicleEventEntity.role, 'vehicle'),
+      eq(vehicleEventEntity.entityType, 'assets'),
+      ...where?.vehicleId ? [eq(vehicleEventEntity.entityId, where?.vehicleId)] : [],
     ]))
-    query.innerJoin(driverEventParticipant, and(...[
-      eq(events.id, driverEventParticipant.eventId),
-      eq(driverEventParticipant.role, 'driver'),
-      eq(driverEventParticipant.participantType, 'employees'),
-      ...where?.driverId ? [eq(driverEventParticipant.participantId, where?.driverId)] : [],
+    query.innerJoin(driverEventEntity, and(...[
+      eq(events.id, driverEventEntity.eventId),
+      eq(driverEventEntity.role, 'driver'),
+      eq(driverEventEntity.entityType, 'employees'),
+      ...where?.driverId ? [eq(driverEventEntity.entityId, where?.driverId)] : [],
     ]))
     if(where?.helperId){
-      query.innerJoin(helperEventParticipant, and(...[
-        eq(events.id, helperEventParticipant.eventId),
-        eq(helperEventParticipant.role, 'helper'),
-        eq(helperEventParticipant.participantType, 'employees'),
-        eq(helperEventParticipant.participantId, where?.helperId)
+      query.innerJoin(helperEventEntity, and(...[
+        eq(events.id, helperEventEntity.eventId),
+        eq(helperEventEntity.role, 'helper'),
+        eq(helperEventEntity.entityType, 'employees'),
+        eq(helperEventEntity.entityId, where?.helperId)
       ]))
     }else{
-      query.leftJoin(helperEventParticipant, and(...[
-        eq(events.id, helperEventParticipant.eventId),
-        eq(helperEventParticipant.role, 'helper'),
-        eq(helperEventParticipant.participantType, 'employees'),
+      query.leftJoin(helperEventEntity, and(...[
+        eq(events.id, helperEventEntity.eventId),
+        eq(helperEventEntity.role, 'helper'),
+        eq(helperEventEntity.entityType, 'employees'),
       ]))
     }
 
-    query.leftJoin(vehicleAsset, eq(vehicleEventParticipant?.participantId, vehicleAsset?.id))
-    query.leftJoin(driverEmployee, eq(driverEventParticipant?.participantId, driverEmployee?.id))
-    query.leftJoin(helperEmployee, eq(helperEventParticipant?.participantId, helperEmployee?.id))
+    query.leftJoin(vehicleAsset, eq(vehicleEventEntity?.entityId, vehicleAsset?.id))
+    query.leftJoin(driverEmployee, eq(driverEventEntity?.entityId, driverEmployee?.id))
+    query.leftJoin(helperEmployee, eq(helperEventEntity?.entityId, helperEmployee?.id))
 
     query = addWhere(query, context?.session?.activeOrganizationId, events, where, search)
     query = addOrder(query, events, sort)
@@ -109,6 +109,7 @@ export const createTrip = createServerFn({ method: "POST" })
           id: generateId(),
           from: new Date(values?.date),
           to: endOfDay(new Date(values?.date)),
+          status: "completed",
           metadata: {
             items: values?.items,
             expenses: values?.expenses,
@@ -116,6 +117,7 @@ export const createTrip = createServerFn({ method: "POST" })
             ...values?.fuelPrice ? { fuelPrice: values?.fuelPrice } : {},
             ...values?.payments ? { payments: values?.payments } : {},
             ...values?.customer ? { customer: values?.customer } : {},
+            ...values?.phone ? { phone: values?.phone } : {},
             ...values?.reference ? { reference: values?.reference } : {},
           },
           typeId: values?.type === "depot" ? "VOVj5e0Qn0lRuF5JXE0QplbVFKLdSbjM" : "zeA6cPLyvfLXMFXOs5fsi4SPpKatGm3I",
@@ -123,28 +125,63 @@ export const createTrip = createServerFn({ method: "POST" })
           createdBy: context?.user?.id,
         }).returning()
 
-        await tx.insert(eventParticipants).values([
+        let customerId: string | undefined = "64g2kKyWEyk7pAMojDhDu5o8nQRWN5qf" // depot
+        
+        if(values?.type === "district"){
+          let hasCustomer = await tx.query.customers.findMany({
+            where: and(
+              eq(customers.organizationId, context?.session?.activeOrganizationId),
+              eq(customers.name, values?.customer),
+              eq(customers.phone, values?.phone),
+            )
+          })
+          if(!hasCustomer?.length){
+            hasCustomer = await tx.insert(customers).values({
+              id: generateId(),
+              name: values?.customer,
+              phone: values?.phone,
+              businessType: "individual",
+              organizationId: context?.session?.activeOrganizationId,
+              createdBy: context?.user?.id,
+            }).returning()
+          }
+          customerId = hasCustomer?.[0]?.id
+        }
+
+        await tx.insert(eventEntities).values([
+          {
+            id: generateId(),
+            role: "customer",
+            status: "attended",
+            entityType: "customers",
+            entityId: customerId,
+            eventId: result?.id,
+            createdBy: context?.user?.id
+          },
           ...values?.vehicleId ? [{
             id: generateId(),
             role: "vehicle",
-            participantType: "assets",
-            participantId: values?.vehicleId,
+            status: "attended",
+            entityType: "assets",
+            entityId: values?.vehicleId,
             eventId: result?.id,
             createdBy: context?.user?.id
           }] : [],
           ...values?.driverId ? [{
             id: generateId(),
             role: "driver",
-            participantType: "employees",
-            participantId: values?.driverId,
+            status: "attended",
+            entityType: "employees",
+            entityId: values?.driverId,
             eventId: result?.id,
             createdBy: context?.user?.id
           }] : [],
           ...values?.helperId ? [{
             id: generateId(),
             role: "helper",
-            participantType: "employees",
-            participantId: values?.helperId,
+            status: "attended",
+            entityType: "employees",
+            entityId: values?.helperId,
             eventId: result?.id,
             createdBy: context?.user?.id
           }] : [],
@@ -180,77 +217,127 @@ export const updateTrip = createServerFn({ method: "POST" })
             ...values?.fuelPrice ? { fuelPrice: values?.fuelPrice } : {},
             ...values?.payments ? { payments: values?.payments } : {},
             ...values?.customer ? { customer: values?.customer } : {},
+            ...values?.phone ? { phone: values?.phone } : {},
             ...values?.reference ? { reference: values?.reference } : {},
           },
           updatedBy: context?.user?.id,
         }).where(eq(events.id, id)).returning()
 
-        const existing = await tx.query.eventParticipants.findMany({
-          where: eq(eventParticipants.eventId, id)
+        const existing = await tx.query.eventEntities.findMany({
+          where: eq(eventEntities.eventId, id)
         })
 
-        const vehicle = existing?.find((participant) => participant?.role === 'vehicle' && participant?.participantType === 'assets')
-        const driver = existing?.find((participant) => participant?.role === 'driver' && participant?.participantType === 'employees')
-        const helper = existing?.find((participant) => participant?.role === 'helper' && participant?.participantType === 'employees')
+        const vehicle = existing?.find((entity) => entity?.role === 'vehicle' && entity?.entityType === 'assets')
+        const driver = existing?.find((entity) => entity?.role === 'driver' && entity?.entityType === 'employees')
+        const helper = existing?.find((entity) => entity?.role === 'helper' && entity?.entityType === 'employees')
+        const customer = existing?.find((entity) => entity?.role === 'customer' && entity?.entityType === 'customers')
 
         if(!vehicle && values?.vehicleId){
-          await tx.insert(eventParticipants).values({
+          await tx.insert(eventEntities).values({
             id: generateId(),
             role: "vehicle",
-            participantType: "assets",
-            participantId: values?.vehicleId,
+            status: "attended",
+            entityType: "assets",
+            entityId: values?.vehicleId,
             eventId: id,
             createdBy: context?.user?.id
           })
         }
-        if(vehicle && values?.vehicleId && vehicle?.participantId !== values?.vehicleId){
-          await tx.update(eventParticipants).set({
-            participantId: values?.vehicleId,
+        if(vehicle && values?.vehicleId && vehicle?.entityId !== values?.vehicleId){
+          await tx.update(eventEntities).set({
+            entityId: values?.vehicleId,
             updatedBy: context?.user?.id,
-          }).where(eq(eventParticipants.id, vehicle?.id))
+          }).where(eq(eventEntities.id, vehicle?.id))
         }
         if(vehicle && !values?.vehicleId){
-          await tx.delete(eventParticipants).where(eq(eventParticipants.id, vehicle?.id))
+          await tx.delete(eventEntities).where(eq(eventEntities.id, vehicle?.id))
         }
 
         if(!driver && values?.driverId){
-          await tx.insert(eventParticipants).values({
+          await tx.insert(eventEntities).values({
             id: generateId(),
             role: "driver",
-            participantType: "employees",
-            participantId: values?.driverId,
+            status: "attended",
+            entityType: "employees",
+            entityId: values?.driverId,
             eventId: id,
             createdBy: context?.user?.id
           })
         }
-        if(driver && values?.driverId && driver?.participantId !== values?.driverId){
-          await tx.update(eventParticipants).set({
-            participantId: values?.driverId,
+        if(driver && values?.driverId && driver?.entityId !== values?.driverId){
+          await tx.update(eventEntities).set({
+            entityId: values?.driverId,
             updatedBy: context?.user?.id,
-          }).where(eq(eventParticipants.id, driver?.id))
+          }).where(eq(eventEntities.id, driver?.id))
         }
         if(driver && !values?.driverId){
-          await tx.delete(eventParticipants).where(eq(eventParticipants.id, driver?.id))
+          await tx.delete(eventEntities).where(eq(eventEntities.id, driver?.id))
         }
 
         if(!helper && values?.helperId){
-          await tx.insert(eventParticipants).values({
+          await tx.insert(eventEntities).values({
             id: generateId(),
             role: "helper",
-            participantType: "employees",
-            participantId: values?.helperId,
+            status: "attended",
+            entityType: "employees",
+            entityId: values?.helperId,
             eventId: id,
             createdBy: context?.user?.id
           })
         }
-        if(helper && values?.helperId && helper?.participantId !== values?.helperId){
-          await tx.update(eventParticipants).set({
-            participantId: values?.helperId,
+        if(helper && values?.helperId && helper?.entityId !== values?.helperId){
+          await tx.update(eventEntities).set({
+            entityId: values?.helperId,
             updatedBy: context?.user?.id,
-          }).where(eq(eventParticipants.id, helper?.id))
+          }).where(eq(eventEntities.id, helper?.id))
         }
         if(helper && !values?.helperId){
-          await tx.delete(eventParticipants).where(eq(eventParticipants.id, helper?.id))
+          await tx.delete(eventEntities).where(eq(eventEntities.id, helper?.id))
+        }
+
+        if(values?.customer){
+          let customerId: string | undefined = "64g2kKyWEyk7pAMojDhDu5o8nQRWN5qf" // depot
+        
+          if(values?.type === "district"){
+            let hasCustomer = await tx.query.customers.findMany({
+              where: and(
+                eq(customers.organizationId, context?.session?.activeOrganizationId),
+                eq(customers.name, values?.customer),
+                eq(customers.phone, values?.phone),
+              )
+            })
+            if(!hasCustomer?.length){
+              hasCustomer = await tx.insert(customers).values({
+                id: generateId(),
+                name: values?.customer,
+                phone: values?.phone,
+                businessType: "individual",
+                organizationId: context?.session?.activeOrganizationId,
+                createdBy: context?.user?.id,
+              }).returning()
+            }
+            customerId = hasCustomer?.[0]?.id
+          }
+          if(!customer){
+            await tx.insert(eventEntities).values({
+              id: generateId(),
+              role: "customer",
+              status: "attended",
+              entityType: "customers",
+              entityId: customerId,
+              eventId: id,
+              createdBy: context?.user?.id
+            })
+          }
+          if(customer && customer?.entityId !== customerId){
+            await tx.update(eventEntities).set({
+              entityId: customerId,
+              updatedBy: context?.user?.id,
+            }).where(eq(eventEntities.id, customer?.id))
+          }
+        }
+        if(customer && !values?.customer){
+          await tx.delete(eventEntities).where(eq(eventEntities.id, customer?.id))
         }
 
         return {

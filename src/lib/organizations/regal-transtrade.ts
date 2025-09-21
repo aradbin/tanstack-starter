@@ -1,6 +1,6 @@
 import { createServerFn } from "@tanstack/react-start"
 import { db } from "../db"
-import { assets, employees } from "../db/schema"
+import { assets, assetTypes, employees } from "../db/schema"
 
 export const tripRoutesDepot = [
   { from: "CPA", to: "PL", income: {
@@ -207,6 +207,13 @@ export const fuelPrice = 102
 
 export const syncRegalTranstrade = createServerFn({ method: "POST" })
   .handler(async () => {
+    await db.insert(assetTypes).values({
+      id: "kP47g0lpyblJWVgH0XTHEWh3ftZMhuk0",
+      name: "Vehicle",
+      parent_id: null,
+      organization_id: "HXAVBIRDQcztDzjB99NRVjY6yz6NqAoT",
+    })
+
     const assetArray = assetsBackup?.filter((asset) => asset?.deleted_at === null)?.map((asset) => ({
       id: asset?.id,
       typeId: "kP47g0lpyblJWVgH0XTHEWh3ftZMhuk0",

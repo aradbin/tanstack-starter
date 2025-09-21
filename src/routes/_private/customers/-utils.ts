@@ -6,13 +6,13 @@ import { createServerFn } from "@tanstack/react-start"
 import { generateId } from "better-auth"
 import { and, eq, inArray } from "drizzle-orm"
 
-export const businessTypes = ['Limited', 'Partnership', 'LLC', 'Corporation', 'Individual']
+export const businessTypes = ['limited', 'partnership', 'llc', 'corporation', 'individual']
 export const businessTypeOptions: OptionType[] = [
-  { name: "Limited", id: "Limited" },
-  { name: "Partnership", id: "Partnership" },
-  { name: "LLC", id: "LLC" },
-  { name: "Corporation", id: "Corporation" },
-  { name: "Individual", id: "Individual" },
+  { name: "Limited", id: "limited" },
+  { name: "Partnership", id: "partnership" },
+  { name: "LLC", id: "llc" },
+  { name: "Corporation", id: "corporation" },
+  { name: "Individual", id: "individual" },
 ]
 
 export const createCustomer = createServerFn({ method: "POST" })
@@ -47,7 +47,9 @@ export const createCustomer = createServerFn({ method: "POST" })
               })
             }
           })
-          await tx.insert(customerContacts).values(newCustomerContacts)
+          if(newCustomerContacts.length > 0){
+            await tx.insert(customerContacts).values(newCustomerContacts)
+          }
         }
 
         return {
@@ -88,7 +90,7 @@ export const updateCustomer = createServerFn({ method: "POST" })
           )
         }
 
-        for (const contact of values?.contacts || []) {
+        for (const contact of values?.contacts?.filter(contact => contact?.id) || []) {
           const existingContact = existing.find(c => c.contactId === contact.id)
 
           if (existingContact) {

@@ -24,6 +24,7 @@ export const events = pgTable("events", {
   from: table.timestamp().notNull(),
   to: table.timestamp().notNull(),
   location: table.text(),
+  status: table.text(), // scheduled, completed, canceled, postponed
   attachments: table.text(),
   metadata: table.jsonb(),
   typeId: table
@@ -37,11 +38,12 @@ export const events = pgTable("events", {
   ...timestamps,
 })
 
-export const eventParticipants = pgTable("event_participants", {
+export const eventEntities = pgTable("event_entities", {
   id: table.text().primaryKey(),
-  role: table.text(), // organizer, attendee
-  participantType: table.text("participant_type").notNull(), // employee, guest, customer, contact, asset
-  participantId: table.text("participant_id").notNull(),
+  role: table.text(), // organizer, attendee, speaker, driver, vehicle
+  status: table.text(), // invited, confirmed, declined, attended, absent
+  entityType: table.text("entity_type").notNull(), // table name: employees, customers, assets
+  entityId: table.text("entity_id").notNull(),
   eventId: table
     .text("event_id")
     .notNull()
@@ -50,7 +52,7 @@ export const eventParticipants = pgTable("event_participants", {
 })
 
 export const eventRelations = relations(events, ({ one, many }) => ({
-  eventParticipants: many(eventParticipants),
+  eventEntities: many(eventEntities),
   type: one(eventsTypes, {
     fields: [events.typeId],
     references: [eventsTypes.id],
@@ -61,11 +63,11 @@ export const eventRelations = relations(events, ({ one, many }) => ({
   }),
 }))
 
-export const eventParticipantRelations = relations(
-  eventParticipants,
+export const eventEntityRelations = relations(
+  eventEntities,
   ({ one }) => ({
     event: one(events, {
-      fields: [eventParticipants.eventId],
+      fields: [eventEntities.eventId],
       references: [events.id],
     }),
   })

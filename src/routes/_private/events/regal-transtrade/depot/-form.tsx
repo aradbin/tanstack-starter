@@ -33,16 +33,16 @@ export default function TripForm({ id }: { id?: string }) {
       const trip = await getData({ data: {
         table: "events",
         relation: {
-          eventParticipants: true
+          eventEntities: true
         },
         id
       }})
 
       return {
         date: formatDateForInput(trip?.from),
-        vehicleId: trip?.eventParticipants?.find((participant: AnyType) => participant.participantType === "assets" && participant.role === "vehicle")?.participantId,
-        driverId: trip?.eventParticipants?.find((participant: AnyType) => participant.participantType === "employees" && participant.role === "driver")?.participantId,
-        helperId: trip?.eventParticipants?.find((participant: AnyType) => participant.participantType === "employees" && participant.role === "helper")?.participantId,
+        vehicleId: trip?.eventEntities?.find((entity: AnyType) => entity.entityType === "assets" && entity.role === "vehicle")?.entityId,
+        driverId: trip?.eventEntities?.find((entity: AnyType) => entity.entityType === "employees" && entity.role === "driver")?.entityId,
+        helperId: trip?.eventEntities?.find((entity: AnyType) => entity.entityType === "employees" && entity.role === "helper")?.entityId,
         metadata: trip?.metadata || {},
       }
     },

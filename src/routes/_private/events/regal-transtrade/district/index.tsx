@@ -9,7 +9,6 @@ import { tripDistrictColumns } from './-columns'
 import { formatDateForInput } from '@/lib/utils'
 import { endOfMonth, isValid, startOfMonth } from 'date-fns'
 import { Card, CardAction, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-import { AnyType } from '@/lib/types'
 import { getTrips } from '../-utils'
 
 export const Route = createFileRoute('/_private/events/regal-transtrade/district/')({
