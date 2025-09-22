@@ -23,7 +23,6 @@ export const services = pgTable("services", {
   description: table.text(),
   from: table.timestamp().notNull(),
   to: table.timestamp().notNull(),
-  location: table.text(),
   status: table.text(), // scheduled, completed, canceled, postponed
   attachments: table.text(),
   metadata: table.jsonb(),
