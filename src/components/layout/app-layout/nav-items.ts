@@ -26,12 +26,12 @@ export const mainNavItems: NavigationType[] = [
     items: [
       {
         title: "Depot Trips",
-        href: "/events/regal-transtrade/depot",
+        href: "/services/regal-transtrade/depot",
         icon: BaggageClaim,
       },
       {
         title: "District Trips",
-        href: "/events/regal-transtrade/district",
+        href: "/services/regal-transtrade/district",
         icon: MapPinned,
       },
     ]

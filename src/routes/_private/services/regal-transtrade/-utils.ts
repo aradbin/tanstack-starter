@@ -1,7 +1,7 @@
 import { authOrgMiddleware } from "@/lib/auth/middleware"
 import { db } from "@/lib/db"
 import { addOrder, addPagination, addWhere, QueryParamBaseType } from "@/lib/db/functions"
-import { assets, customers, employees, eventEntities, events } from "@/lib/db/schema"
+import { assets, customers, employees, serviceEntities, services } from "@/lib/db/schema"
 import { AnyType } from "@/lib/types"
 import { createServerFn } from "@tanstack/react-start"
 import { generateId } from "better-auth"
@@ -15,53 +15,53 @@ export const getTrips = createServerFn()
   .handler(async ({ context, data }): Promise<AnyType> => {
     const { sort, pagination, where, search } = data
 
-    const vehicleEventEntity = alias(eventEntities, 'vehicle_event_entity')
+    const vehicleServiceEntity = alias(serviceEntities, 'vehicle_service_entity')
     const vehicleAsset = alias(assets, 'vehicle_asset')
-    const driverEventEntity = alias(eventEntities, 'driver_event_entity')
+    const driverServiceEntity = alias(serviceEntities, 'driver_service_entity')
     const driverEmployee = alias(employees, 'driver_employee')
-    const helperEventEntity = alias(eventEntities, 'helper_event_entity')
+    const helperServiceEntity = alias(serviceEntities, 'helper_service_entity')
     const helperEmployee = alias(employees, 'helper_employee')
     
     let query = db.select({
-      ...getTableColumns(events),
+      ...getTableColumns(services),
       vehicle: getTableColumns(vehicleAsset),
       driver: getTableColumns(driverEmployee),
       helper: getTableColumns(helperEmployee),
-    }).from(events)
+    }).from(services)
 
-    query.innerJoin(vehicleEventEntity, and(...[
-      eq(events.id, vehicleEventEntity.eventId),
-      eq(vehicleEventEntity.role, 'vehicle'),
-      eq(vehicleEventEntity.entityType, 'assets'),
-      ...where?.vehicleId ? [eq(vehicleEventEntity.entityId, where?.vehicleId)] : [],
+    query.innerJoin(vehicleServiceEntity, and(...[
+      eq(services.id, vehicleServiceEntity.serviceId),
+      eq(vehicleServiceEntity.role, 'vehicle'),
+      eq(vehicleServiceEntity.entityType, 'assets'),
+      ...where?.vehicleId ? [eq(vehicleServiceEntity.entityId, where?.vehicleId)] : [],
     ]))
-    query.innerJoin(driverEventEntity, and(...[
-      eq(events.id, driverEventEntity.eventId),
-      eq(driverEventEntity.role, 'driver'),
-      eq(driverEventEntity.entityType, 'employees'),
-      ...where?.driverId ? [eq(driverEventEntity.entityId, where?.driverId)] : [],
+    query.innerJoin(driverServiceEntity, and(...[
+      eq(services.id, driverServiceEntity.serviceId),
+      eq(driverServiceEntity.role, 'driver'),
+      eq(driverServiceEntity.entityType, 'employees'),
+      ...where?.driverId ? [eq(driverServiceEntity.entityId, where?.driverId)] : [],
     ]))
     if(where?.helperId){
-      query.innerJoin(helperEventEntity, and(...[
-        eq(events.id, helperEventEntity.eventId),
-        eq(helperEventEntity.role, 'helper'),
-        eq(helperEventEntity.entityType, 'employees'),
-        eq(helperEventEntity.entityId, where?.helperId)
+      query.innerJoin(helperServiceEntity, and(...[
+        eq(services.id, helperServiceEntity.serviceId),
+        eq(helperServiceEntity.role, 'helper'),
+        eq(helperServiceEntity.entityType, 'employees'),
+        eq(helperServiceEntity.entityId, where?.helperId)
       ]))
     }else{
-      query.leftJoin(helperEventEntity, and(...[
-        eq(events.id, helperEventEntity.eventId),
-        eq(helperEventEntity.role, 'helper'),
-        eq(helperEventEntity.entityType, 'employees'),
+      query.leftJoin(helperServiceEntity, and(...[
+        eq(services.id, helperServiceEntity.serviceId),
+        eq(helperServiceEntity.role, 'helper'),
+        eq(helperServiceEntity.entityType, 'employees'),
       ]))
     }
 
-    query.leftJoin(vehicleAsset, eq(vehicleEventEntity?.entityId, vehicleAsset?.id))
-    query.leftJoin(driverEmployee, eq(driverEventEntity?.entityId, driverEmployee?.id))
-    query.leftJoin(helperEmployee, eq(helperEventEntity?.entityId, helperEmployee?.id))
+    query.leftJoin(vehicleAsset, eq(vehicleServiceEntity?.entityId, vehicleAsset?.id))
+    query.leftJoin(driverEmployee, eq(driverServiceEntity?.entityId, driverEmployee?.id))
+    query.leftJoin(helperEmployee, eq(helperServiceEntity?.entityId, helperEmployee?.id))
 
-    query = addWhere(query, context?.session?.activeOrganizationId, events, where, search)
-    query = addOrder(query, events, sort)
+    query = addWhere(query, context?.session?.activeOrganizationId, services, where, search)
+    query = addOrder(query, services, sort)
     query = addPagination(query, pagination)
 
     const result = await query
@@ -81,6 +81,7 @@ export const getTripCalculations = (result: AnyType[], typeId: string) => {
     return {
       totalTrips: result?.flatMap((trip: AnyType) => trip?.metadata?.items || []).reduce((total: number, item: AnyType) => total + (item.count || 0), 0),
       totalFuel: result?.flatMap((trip: AnyType) => trip?.metadata?.items || []).reduce((total: number, item: AnyType) => total + ((item?.route?.expense?.fuel * item.count) || 0), 0),
+      totalFuelExpense: result?.flatMap((trip: AnyType) => trip?.metadata?.expenses?.find((expense: AnyType) => expense.description === "Fuel") || []).reduce((total: number, item: AnyType) => total + (item.amount || 0), 0),
       totalExpenses: result?.flatMap((trip: AnyType) => trip?.metadata?.expenses || []).reduce((total: number, item: AnyType) => total + (item.amount || 0), 0)
     }
   }
@@ -105,7 +106,7 @@ export const createTrip = createServerFn({ method: "POST" })
 
     try {
       return await db.transaction(async (tx) => {
-        const [result] = await tx.insert(events).values({
+        const [result] = await tx.insert(services).values({
           id: generateId(),
           from: new Date(values?.date),
           to: endOfDay(new Date(values?.date)),
@@ -148,14 +149,14 @@ export const createTrip = createServerFn({ method: "POST" })
           customerId = hasCustomer?.[0]?.id
         }
 
-        await tx.insert(eventEntities).values([
+        await tx.insert(serviceEntities).values([
           {
             id: generateId(),
             role: "customer",
             status: "attended",
             entityType: "customers",
             entityId: customerId,
-            eventId: result?.id,
+            serviceId: result?.id,
             createdBy: context?.user?.id
           },
           ...values?.vehicleId ? [{
@@ -164,7 +165,7 @@ export const createTrip = createServerFn({ method: "POST" })
             status: "attended",
             entityType: "assets",
             entityId: values?.vehicleId,
-            eventId: result?.id,
+            serviceId: result?.id,
             createdBy: context?.user?.id
           }] : [],
           ...values?.driverId ? [{
@@ -173,7 +174,7 @@ export const createTrip = createServerFn({ method: "POST" })
             status: "attended",
             entityType: "employees",
             entityId: values?.driverId,
-            eventId: result?.id,
+            serviceId: result?.id,
             createdBy: context?.user?.id
           }] : [],
           ...values?.helperId ? [{
@@ -182,7 +183,7 @@ export const createTrip = createServerFn({ method: "POST" })
             status: "attended",
             entityType: "employees",
             entityId: values?.helperId,
-            eventId: result?.id,
+            serviceId: result?.id,
             createdBy: context?.user?.id
           }] : [],
         ])
@@ -207,7 +208,7 @@ export const updateTrip = createServerFn({ method: "POST" })
     const { values, id } = data
     try {
       return await db.transaction(async (tx) => {
-        const [result] = await tx.update(events).set({
+        const [result] = await tx.update(services).set({
           from: new Date(values?.date),
           to: endOfDay(new Date(values?.date)),
           metadata: {
@@ -221,10 +222,10 @@ export const updateTrip = createServerFn({ method: "POST" })
             ...values?.reference ? { reference: values?.reference } : {},
           },
           updatedBy: context?.user?.id,
-        }).where(eq(events.id, id)).returning()
+        }).where(eq(services.id, id)).returning()
 
-        const existing = await tx.query.eventEntities.findMany({
-          where: eq(eventEntities.eventId, id)
+        const existing = await tx.query.serviceEntities.findMany({
+          where: eq(serviceEntities.serviceId, id)
         })
 
         const vehicle = existing?.find((entity) => entity?.role === 'vehicle' && entity?.entityType === 'assets')
@@ -233,66 +234,66 @@ export const updateTrip = createServerFn({ method: "POST" })
         const customer = existing?.find((entity) => entity?.role === 'customer' && entity?.entityType === 'customers')
 
         if(!vehicle && values?.vehicleId){
-          await tx.insert(eventEntities).values({
+          await tx.insert(serviceEntities).values({
             id: generateId(),
             role: "vehicle",
             status: "attended",
             entityType: "assets",
             entityId: values?.vehicleId,
-            eventId: id,
+            serviceId: id,
             createdBy: context?.user?.id
           })
         }
         if(vehicle && values?.vehicleId && vehicle?.entityId !== values?.vehicleId){
-          await tx.update(eventEntities).set({
+          await tx.update(serviceEntities).set({
             entityId: values?.vehicleId,
             updatedBy: context?.user?.id,
-          }).where(eq(eventEntities.id, vehicle?.id))
+          }).where(eq(serviceEntities.id, vehicle?.id))
         }
         if(vehicle && !values?.vehicleId){
-          await tx.delete(eventEntities).where(eq(eventEntities.id, vehicle?.id))
+          await tx.delete(serviceEntities).where(eq(serviceEntities.id, vehicle?.id))
         }
 
         if(!driver && values?.driverId){
-          await tx.insert(eventEntities).values({
+          await tx.insert(serviceEntities).values({
             id: generateId(),
             role: "driver",
             status: "attended",
             entityType: "employees",
             entityId: values?.driverId,
-            eventId: id,
+            serviceId: id,
             createdBy: context?.user?.id
           })
         }
         if(driver && values?.driverId && driver?.entityId !== values?.driverId){
-          await tx.update(eventEntities).set({
+          await tx.update(serviceEntities).set({
             entityId: values?.driverId,
             updatedBy: context?.user?.id,
-          }).where(eq(eventEntities.id, driver?.id))
+          }).where(eq(serviceEntities.id, driver?.id))
         }
         if(driver && !values?.driverId){
-          await tx.delete(eventEntities).where(eq(eventEntities.id, driver?.id))
+          await tx.delete(serviceEntities).where(eq(serviceEntities.id, driver?.id))
         }
 
         if(!helper && values?.helperId){
-          await tx.insert(eventEntities).values({
+          await tx.insert(serviceEntities).values({
             id: generateId(),
             role: "helper",
             status: "attended",
             entityType: "employees",
             entityId: values?.helperId,
-            eventId: id,
+            serviceId: id,
             createdBy: context?.user?.id
           })
         }
         if(helper && values?.helperId && helper?.entityId !== values?.helperId){
-          await tx.update(eventEntities).set({
+          await tx.update(serviceEntities).set({
             entityId: values?.helperId,
             updatedBy: context?.user?.id,
-          }).where(eq(eventEntities.id, helper?.id))
+          }).where(eq(serviceEntities.id, helper?.id))
         }
         if(helper && !values?.helperId){
-          await tx.delete(eventEntities).where(eq(eventEntities.id, helper?.id))
+          await tx.delete(serviceEntities).where(eq(serviceEntities.id, helper?.id))
         }
 
         if(values?.customer){
@@ -319,25 +320,25 @@ export const updateTrip = createServerFn({ method: "POST" })
             customerId = hasCustomer?.[0]?.id
           }
           if(!customer){
-            await tx.insert(eventEntities).values({
+            await tx.insert(serviceEntities).values({
               id: generateId(),
               role: "customer",
               status: "attended",
               entityType: "customers",
               entityId: customerId,
-              eventId: id,
+              serviceId: id,
               createdBy: context?.user?.id
             })
           }
           if(customer && customer?.entityId !== customerId){
-            await tx.update(eventEntities).set({
+            await tx.update(serviceEntities).set({
               entityId: customerId,
               updatedBy: context?.user?.id,
-            }).where(eq(eventEntities.id, customer?.id))
+            }).where(eq(serviceEntities.id, customer?.id))
           }
         }
         if(customer && !values?.customer){
-          await tx.delete(eventEntities).where(eq(eventEntities.id, customer?.id))
+          await tx.delete(serviceEntities).where(eq(serviceEntities.id, customer?.id))
         }
 
         return {

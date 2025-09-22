@@ -91,3 +91,10 @@ export const isUrl = (string: string) => {
 
   return false
 }
+
+export const formatCurrency = (amount: AnyType, currency?: string) => {
+  if (amount === null || amount === undefined || isNaN(amount)) return ""
+  if(currency) return new Intl.NumberFormat('en-US', { style: 'currency', currency: currency, minimumFractionDigits: 0 }).format(amount)
+
+  return amount.toLocaleString()
+}

@@ -2,7 +2,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { createFileRoute } from '@tanstack/react-router'
 import TripForm from '../../-form'
 
-export const Route = createFileRoute('/_private/events/regal-transtrade/depot/$id/edit/')({
+export const Route = createFileRoute('/_private/services/regal-transtrade/depot/$id/edit/')({
   component: RouteComponent,
 })
 

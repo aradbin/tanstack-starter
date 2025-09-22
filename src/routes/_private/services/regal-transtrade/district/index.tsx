@@ -4,14 +4,14 @@ import { Button } from '@/components/ui/button'
 import { QueryParamType } from '@/lib/db/functions'
 import { defaultSearchParamValidation, stringValidation, validate } from '@/lib/validations'
 import { useApp } from '@/providers/app-provider'
-import { BaggageClaim, Calendar, DollarSign, Fuel, Loader2, PlusCircle } from 'lucide-react'
-import { tripDepotColumns } from './-columns'
-import { formatDateForInput } from '@/lib/utils'
+import { BanknoteArrowDown, BanknoteArrowUp, Calendar, DollarSign, Fuel, Loader2, MapPinned, PlusCircle, Scale } from 'lucide-react'
+import { tripDistrictColumns } from './-columns'
+import { formatCurrency, formatDateForInput } from '@/lib/utils'
 import { endOfMonth, isValid, startOfMonth } from 'date-fns'
 import { Card, CardAction, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { getTrips } from '../-utils'
 
-export const Route = createFileRoute('/_private/events/regal-transtrade/depot/')({
+export const Route = createFileRoute('/_private/services/regal-transtrade/district/')({
   validateSearch: validate({
     ...defaultSearchParamValidation,
     from: stringValidation('From Date').catch(undefined),
@@ -29,7 +29,7 @@ function RouteComponent() {
   const { vehicles, drivers, helpers, setDeleteModal } = useApp()
 
   const query: QueryParamType = {
-    table: "events",
+    table: "services",
     sort: {
       field: params.sort || "from",
       order: params.order
@@ -38,7 +38,7 @@ function RouteComponent() {
       hasPagination: false
     },
     where: {
-      typeId: "VOVj5e0Qn0lRuF5JXE0QplbVFKLdSbjM",
+      typeId: "zeA6cPLyvfLXMFXOs5fsi4SPpKatGm3I",
       from: {
         gte: params.from && isValid(new Date(params.from)) ? new Date(params.from) : new Date(startOfMonth(new Date())),
         lte: params.to && isValid(new Date(params.to)) ? new Date(params.to) : new Date(endOfMonth(new Date())),
@@ -50,23 +50,23 @@ function RouteComponent() {
   }
 
   return (
-    <TableComponent columns={tripDepotColumns({
+    <TableComponent columns={tripDistrictColumns({
       actions: {
         // view: (id) => {
         //   navigate({
-        //     to: `/events/regal-transtrade/depot/${id}`
+        //     to: `/services/regal-transtrade/district/${id}`
         //   })
         // },
         edit: (id) => {
           navigate({
-            to: `/events/regal-transtrade/depot/${id}/edit`
+            to: `/services/regal-transtrade/district/${id}/edit`
           })
         },
         delete: (id) => {
           setDeleteModal({
             id,
             title: "Trip",
-            table: "events"
+            table: "services"
           })
         }
       }
@@ -84,13 +84,13 @@ function RouteComponent() {
     ]} query={query} queryFn={getTrips} options={{}} toolbar={(
       <Button size="sm" variant="outline" onClick={() => {
         navigate({
-          to: `/events/regal-transtrade/depot/create`
+          to: `/services/regal-transtrade/district/create`
         })
       }}><PlusCircle /> Create</Button>
     )} children={{
       childrenBefore: (tableData, isLoading) => {
         return (
-          <div className='grid grid-cols-2 md:grid-cols-4 gap-4'>
+          <div className='grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4'>
             <Card>
               <CardHeader>
                 <CardDescription>Total Trips</CardDescription>
@@ -98,18 +98,18 @@ function RouteComponent() {
                   {isLoading ? <Loader2 className="animate-spin size-6 mt-2" /> : tableData?.totalTrips || 0}
                 </CardTitle>
                 <CardAction>
-                  <BaggageClaim />
+                  <MapPinned />
                 </CardAction>
               </CardHeader>
             </Card>
             <Card>
               <CardHeader>
-                <CardDescription>Total Fuels</CardDescription>
+                <CardDescription>Total Fare</CardDescription>
                 <CardTitle className="text-2xl">
-                  {isLoading ? <Loader2 className="animate-spin size-6 mt-2" /> : tableData?.totalFuel || 0}
+                  {isLoading ? <Loader2 className="animate-spin size-6 mt-2" /> : formatCurrency(tableData?.totalFare || 0)}
                 </CardTitle>
                 <CardAction>
-                  <Fuel />
+                  <DollarSign />
                 </CardAction>
               </CardHeader>
             </Card>
@@ -117,10 +117,32 @@ function RouteComponent() {
               <CardHeader>
                 <CardDescription>Total Expenses</CardDescription>
                 <CardTitle className="text-2xl">
-                  {isLoading ? <Loader2 className="animate-spin size-6 mt-2" /> : tableData?.totalExpenses || 0}
+                  {isLoading ? <Loader2 className="animate-spin size-6 mt-2" /> : formatCurrency(tableData?.totalExpenses || 0)}
                 </CardTitle>
                 <CardAction>
-                  <DollarSign />
+                  <BanknoteArrowDown />
+                </CardAction>
+              </CardHeader>
+            </Card>
+            <Card>
+              <CardHeader>
+                <CardDescription>Total Payments</CardDescription>
+                <CardTitle className="text-2xl">
+                  {isLoading ? <Loader2 className="animate-spin size-6 mt-2" /> : formatCurrency(tableData?.totalPayments || 0)}
+                </CardTitle>
+                <CardAction>
+                  <BanknoteArrowUp />
+                </CardAction>
+              </CardHeader>
+            </Card>
+            <Card>
+              <CardHeader>
+                <CardDescription>Total Balance</CardDescription>
+                <CardTitle className="text-2xl">
+                  {isLoading ? <Loader2 className="animate-spin size-6 mt-2" /> : formatCurrency(tableData?.totalBalance || 0)}
+                </CardTitle>
+                <CardAction>
+                  <Scale />
                 </CardAction>
               </CardHeader>
             </Card>

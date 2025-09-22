@@ -9,7 +9,7 @@ import { useQuery } from '@tanstack/react-query'
 import { createFileRoute, Link } from '@tanstack/react-router'
 import { ArrowLeft, Edit, Trash } from 'lucide-react'
 
-export const Route = createFileRoute('/_private/events/regal-transtrade/district/$id/')({
+export const Route = createFileRoute('/_private/services/regal-transtrade/depot/$id/')({
   component: RouteComponent,
 })
 
@@ -19,9 +19,9 @@ function RouteComponent() {
   const { setDeleteModal } = useApp()
 
   const { data, isLoading } = useQuery({
-    queryKey: ['trips', params?.id],
+    queryKey: ['services', params?.id],
     queryFn: () => getData({ data: {
-      table: "trips",
+      table: "services",
       relation: {
         vehicle: true,
         driver: true,
@@ -41,24 +41,24 @@ function RouteComponent() {
         <CardHeader>
           <CardTitle className='flex justify-between items-center'>
             <div className='flex justify-start items-center gap-4'>
-              <Link to='/trips/depot'>
+              <Link to='/services/depot'>
                 <Button size="icon" variant="outline"><ArrowLeft /></Button>
               </Link>
               Trip Details
             </div>
             {params?.id && (
               <div className='flex justify-end items-center gap-2'>
-                <Link to='/trips/depot/$id/edit' params={{ id: params?.id }}>
+                <Link to='/services/depot/$id/edit' params={{ id: params?.id }}>
                   <Button size="icon"><Edit /></Button>
                 </Link>
                 <Button size="icon" variant="destructive" onClick={() => {
                   setDeleteModal({
                     id: params?.id,
                     title: "Trip",
-                    table: "trips",
+                    table: "services",
                     onSuccess: () => {
                       navigate({
-                        to: '/trips/depot'
+                        to: '/services/depot'
                       })
                     }
                   })

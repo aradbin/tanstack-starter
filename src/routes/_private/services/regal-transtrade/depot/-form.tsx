@@ -28,21 +28,21 @@ export default function TripForm({ id }: { id?: string }) {
   const [expenses, setExpenses] = useState<AnyType[]>([])
 
   const { data, isLoading } = useQuery({
-    queryKey: ['events', id],
+    queryKey: ['services', id],
     queryFn: async () => {
       const trip = await getData({ data: {
-        table: "events",
+        table: "services",
         relation: {
-          eventEntities: true
+          serviceEntities: true
         },
         id
       }})
 
       return {
         date: formatDateForInput(trip?.from),
-        vehicleId: trip?.eventEntities?.find((entity: AnyType) => entity.entityType === "assets" && entity.role === "vehicle")?.entityId,
-        driverId: trip?.eventEntities?.find((entity: AnyType) => entity.entityType === "employees" && entity.role === "driver")?.entityId,
-        helperId: trip?.eventEntities?.find((entity: AnyType) => entity.entityType === "employees" && entity.role === "helper")?.entityId,
+        vehicleId: trip?.serviceEntities?.find((entity: AnyType) => entity.entityType === "assets" && entity.role === "vehicle")?.entityId,
+        driverId: trip?.serviceEntities?.find((entity: AnyType) => entity.entityType === "employees" && entity.role === "driver")?.entityId,
+        helperId: trip?.serviceEntities?.find((entity: AnyType) => entity.entityType === "employees" && entity.role === "helper")?.entityId,
         metadata: trip?.metadata || {},
       }
     },
@@ -341,17 +341,17 @@ export default function TripForm({ id }: { id?: string }) {
       values={id && data ? data : {}}
       onSuccess={() => {
         navigate({
-          to: `/events/regal-transtrade/depot`
+          to: `/services/regal-transtrade/depot`
         })
       }}
       onCancel={() => {
         navigate({
-          to: `/events/regal-transtrade/depot`
+          to: `/services/regal-transtrade/depot`
         })
       }}
       options={{
         isLoading,
-        queryKey: 'events',
+        queryKey: 'services',
       }}
       children={(
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-2">
