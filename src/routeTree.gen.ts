@@ -20,6 +20,7 @@ import { Route as PrivateWhatsappIndexRouteImport } from './routes/_private/what
 import { Route as PrivateTasksIndexRouteImport } from './routes/_private/tasks/index'
 import { Route as PrivateRolesIndexRouteImport } from './routes/_private/roles/index'
 import { Route as PrivateMembersIndexRouteImport } from './routes/_private/members/index'
+import { Route as PrivateInvoicesIndexRouteImport } from './routes/_private/invoices/index'
 import { Route as PrivateEventsIndexRouteImport } from './routes/_private/events/index'
 import { Route as PrivateEmployeesIndexRouteImport } from './routes/_private/employees/index'
 import { Route as PrivateEmailIndexRouteImport } from './routes/_private/email/index'
@@ -88,6 +89,11 @@ const PrivateRolesIndexRoute = PrivateRolesIndexRouteImport.update({
 const PrivateMembersIndexRoute = PrivateMembersIndexRouteImport.update({
   id: '/members/',
   path: '/members/',
+  getParentRoute: () => PrivateRouteRoute,
+} as any)
+const PrivateInvoicesIndexRoute = PrivateInvoicesIndexRouteImport.update({
+  id: '/invoices/',
+  path: '/invoices/',
   getParentRoute: () => PrivateRouteRoute,
 } as any)
 const PrivateEventsIndexRoute = PrivateEventsIndexRouteImport.update({
@@ -236,6 +242,7 @@ export interface FileRoutesByFullPath {
   '/email': typeof PrivateEmailIndexRoute
   '/employees/': typeof PrivateEmployeesIndexRoute
   '/events': typeof PrivateEventsIndexRoute
+  '/invoices': typeof PrivateInvoicesIndexRoute
   '/members': typeof PrivateMembersIndexRoute
   '/roles': typeof PrivateRolesIndexRoute
   '/tasks': typeof PrivateTasksIndexRoute
@@ -266,6 +273,7 @@ export interface FileRoutesByTo {
   '/email': typeof PrivateEmailIndexRoute
   '/employees': typeof PrivateEmployeesIndexRoute
   '/events': typeof PrivateEventsIndexRoute
+  '/invoices': typeof PrivateInvoicesIndexRoute
   '/members': typeof PrivateMembersIndexRoute
   '/roles': typeof PrivateRolesIndexRoute
   '/tasks': typeof PrivateTasksIndexRoute
@@ -301,6 +309,7 @@ export interface FileRoutesById {
   '/_private/email/': typeof PrivateEmailIndexRoute
   '/_private/employees/': typeof PrivateEmployeesIndexRoute
   '/_private/events/': typeof PrivateEventsIndexRoute
+  '/_private/invoices/': typeof PrivateInvoicesIndexRoute
   '/_private/members/': typeof PrivateMembersIndexRoute
   '/_private/roles/': typeof PrivateRolesIndexRoute
   '/_private/tasks/': typeof PrivateTasksIndexRoute
@@ -335,6 +344,7 @@ export interface FileRouteTypes {
     | '/email'
     | '/employees/'
     | '/events'
+    | '/invoices'
     | '/members'
     | '/roles'
     | '/tasks'
@@ -365,6 +375,7 @@ export interface FileRouteTypes {
     | '/email'
     | '/employees'
     | '/events'
+    | '/invoices'
     | '/members'
     | '/roles'
     | '/tasks'
@@ -399,6 +410,7 @@ export interface FileRouteTypes {
     | '/_private/email/'
     | '/_private/employees/'
     | '/_private/events/'
+    | '/_private/invoices/'
     | '/_private/members/'
     | '/_private/roles/'
     | '/_private/tasks/'
@@ -507,6 +519,13 @@ declare module '@tanstack/react-router' {
       path: '/members'
       fullPath: '/members'
       preLoaderRoute: typeof PrivateMembersIndexRouteImport
+      parentRoute: typeof PrivateRouteRoute
+    }
+    '/_private/invoices/': {
+      id: '/_private/invoices/'
+      path: '/invoices'
+      fullPath: '/invoices'
+      preLoaderRoute: typeof PrivateInvoicesIndexRouteImport
       parentRoute: typeof PrivateRouteRoute
     }
     '/_private/events/': {
@@ -737,6 +756,7 @@ interface PrivateRouteRouteChildren {
   PrivateDesignationsIndexRoute: typeof PrivateDesignationsIndexRoute
   PrivateEmailIndexRoute: typeof PrivateEmailIndexRoute
   PrivateEventsIndexRoute: typeof PrivateEventsIndexRoute
+  PrivateInvoicesIndexRoute: typeof PrivateInvoicesIndexRoute
   PrivateMembersIndexRoute: typeof PrivateMembersIndexRoute
   PrivateRolesIndexRoute: typeof PrivateRolesIndexRoute
   PrivateTasksIndexRoute: typeof PrivateTasksIndexRoute
@@ -763,6 +783,7 @@ const PrivateRouteRouteChildren: PrivateRouteRouteChildren = {
   PrivateDesignationsIndexRoute: PrivateDesignationsIndexRoute,
   PrivateEmailIndexRoute: PrivateEmailIndexRoute,
   PrivateEventsIndexRoute: PrivateEventsIndexRoute,
+  PrivateInvoicesIndexRoute: PrivateInvoicesIndexRoute,
   PrivateMembersIndexRoute: PrivateMembersIndexRoute,
   PrivateRolesIndexRoute: PrivateRolesIndexRoute,
   PrivateTasksIndexRoute: PrivateTasksIndexRoute,

@@ -1,5 +1,5 @@
 import { NavigationType, NavItemType } from "@/lib/types";
-import { BaggageClaim, Briefcase, BriefcaseBusiness, Contact, LayoutGrid, ListChecks, Mail, MapPin, MapPinned, MessageCircle, ShieldUser, Truck, Users } from "lucide-react";
+import { BaggageClaim, Briefcase, BriefcaseBusiness, Contact, LayoutGrid, ListChecks, Mail, MapPin, MapPinned, MessageCircle, ShieldUser, Truck, Users, Wallet } from "lucide-react";
 
 export const mainNavItems: NavigationType[] = [
   {
@@ -88,6 +88,16 @@ export const mainNavItems: NavigationType[] = [
         title: "Designations",
         href: "/designations",
         icon: BriefcaseBusiness,
+      },
+    ],
+  },
+  {
+    title: "Accounts",
+    items: [
+      {
+        title: "Invoices",
+        href: "/invoices",
+        icon: Wallet,
       },
     ],
   },
