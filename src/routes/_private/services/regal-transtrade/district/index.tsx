@@ -11,7 +11,7 @@ import { endOfMonth, isValid, startOfMonth } from 'date-fns'
 import { Card, CardAction, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { getTrips } from '../-utils'
 
-export const Route = createFileRoute('/_private/events/regal-transtrade/district/')({
+export const Route = createFileRoute('/_private/services/regal-transtrade/district/')({
   validateSearch: validate({
     ...defaultSearchParamValidation,
     from: stringValidation('From Date').catch(undefined),
@@ -29,7 +29,7 @@ function RouteComponent() {
   const { vehicles, drivers, helpers, setDeleteModal } = useApp()
 
   const query: QueryParamType = {
-    table: "events",
+    table: "services",
     sort: {
       field: params.sort || "from",
       order: params.order
@@ -54,19 +54,19 @@ function RouteComponent() {
       actions: {
         // view: (id) => {
         //   navigate({
-        //     to: `/events/regal-transtrade/district/${id}`
+        //     to: `/services/regal-transtrade/district/${id}`
         //   })
         // },
         edit: (id) => {
           navigate({
-            to: `/events/regal-transtrade/district/${id}/edit`
+            to: `/services/regal-transtrade/district/${id}/edit`
           })
         },
         delete: (id) => {
           setDeleteModal({
             id,
             title: "Trip",
-            table: "events"
+            table: "services"
           })
         }
       }
@@ -84,7 +84,7 @@ function RouteComponent() {
     ]} query={query} queryFn={getTrips} options={{}} toolbar={(
       <Button size="sm" variant="outline" onClick={() => {
         navigate({
-          to: `/events/regal-transtrade/district/create`
+          to: `/services/regal-transtrade/district/create`
         })
       }}><PlusCircle /> Create</Button>
     )} children={{

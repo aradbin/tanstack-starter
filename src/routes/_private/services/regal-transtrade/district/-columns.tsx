@@ -2,16 +2,16 @@ import { ColumnDef } from "@tanstack/react-table"
 import { TableColumnHeader } from "@/components/table/table-column-header"
 import { TableRowActions } from "@/components/table/table-row-actions"
 import { AnyType, TableActionType } from "@/lib/types"
-import { assets, employees, events } from "@/lib/db/schema"
+import { assets, employees, services } from "@/lib/db/schema"
 import { Badge } from "@/components/ui/badge"
 import AvatarComponent from "@/components/common/avatar-component"
 import { formatCurrency, formatDate } from "@/lib/utils"
 
-export const tripDepotColumns = ({
+export const tripDistrictColumns = ({
   actions
 }: {
   actions?: TableActionType
-}): ColumnDef<typeof events.$inferSelect & {
+}): ColumnDef<typeof services.$inferSelect & {
   vehicle: typeof assets.$inferSelect,
   driver: typeof employees.$inferSelect,
   helper: typeof employees.$inferSelect,
@@ -49,12 +49,12 @@ export const tripDepotColumns = ({
       return (
         <div className="flex flex-col gap-1">
           {row?.original?.metadata?.items?.map((item: any, index: number) => {
-            total += item.count
+            total += item.amount
             return (
-              <Badge key={index} variant="outline"><span>{item?.route?.to === 'PL' ? 'CPA to PL' : item?.route?.to}</span>:<span>{item.count}</span></Badge>
+              <Badge key={index} variant="outline"><span>{item.destination}</span>:<span>{formatCurrency(item.amount)}</span></Badge>
             )
           })}
-          <Badge><span>Total</span>:<span>{total}</span></Badge>
+          <Badge><span>Total</span>:<span>{formatCurrency(total)}</span></Badge>
         </div>
       )
     },
@@ -73,6 +73,25 @@ export const tripDepotColumns = ({
             )
           })}
           <Badge><span>Total</span>:<span>{formatCurrency(total)}</span></Badge>
+        </div>
+      )
+    },
+  },
+  {
+    id: "payments",
+    header: ({ column }) => <TableColumnHeader column={column} title="Payments" />,
+    cell: ({ row }: AnyType) => {
+      let total = 0
+      return (
+        <div className="flex flex-col gap-1">
+          {row?.original?.metadata?.payments?.map((item: any, index: number) => {
+            total += item.amount
+            return (
+              <Badge key={index} variant="outline"><span>{formatDate(item.date)}</span>:<span>{formatCurrency(item.amount)}</span></Badge>
+            )
+          })}
+          <Badge><span>Total</span>:<span>{formatCurrency(total)}</span></Badge>
+          <Badge><span>Balance</span>:<span>{formatCurrency(row?.original?.metadata?.items?.reduce((acc: number, item: any) => acc + item.amount, 0) - total)}</span></Badge>
         </div>
       )
     },

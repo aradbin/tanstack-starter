@@ -1,8 +1,9 @@
 import { createServerFn } from "@tanstack/react-start"
 import { db } from "../db"
-import { assets, assetTypes, employees, eventEntities, events } from "../db/schema"
+import { assets, assetTypes, employees, eventEntities, events, eventTypes, serviceEntities, services, serviceTypes } from "../db/schema"
 import { endOfDay } from "date-fns"
 import { generateId } from "better-auth"
+import { and, isNull } from "drizzle-orm"
 
 export const tripRoutesDepot = [
   { from: "CPA", to: "PL", income: {
@@ -320,7 +321,20 @@ export const syncRegalTranstrade = createServerFn({ method: "POST" })
     //     }] : [],
     //   ])
     // })
-  })
+
+    // const allEventTypes = await db.select().from(eventTypes)
+    // const allEvents = await db.select().from(events)
+    // const allEventEntities = await db.select().from(eventEntities)
+    
+    // await db.insert(serviceTypes).values(allEventTypes)
+    // await db.insert(services).values(allEvents)
+    // await db.insert(serviceEntities).values(allEventEntities?.map((entity) => (
+    //    {
+    //     ...entity,
+    //     serviceId: entity?.eventId,
+    //   }
+    // )))
+})
 
 export const assetTypesBackup = [
   {

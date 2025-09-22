@@ -42,12 +42,12 @@ export default function TripForm({ id }: { id?: string }) {
     }
   ])
   const { data, isLoading } = useQuery({
-    queryKey: ['events', id],
+    queryKey: ['services', id],
     queryFn: async () => {
       const trip = await getData({ data: {
-        table: "events",
+        table: "services",
         relation: {
-          eventEntities: true
+          serviceEntities: true
         },
         id
       }})
@@ -58,9 +58,9 @@ export default function TripForm({ id }: { id?: string }) {
 
       return {
         date: formatDateForInput(trip?.from),
-        vehicleId: trip?.eventEntities?.find((entity: AnyType) => entity.entityType === "assets" && entity.role === "vehicle")?.entityId,
-        driverId: trip?.eventEntities?.find((entity: AnyType) => entity.entityType === "employees" && entity.role === "driver")?.entityId,
-        helperId: trip?.eventEntities?.find((entity: AnyType) => entity.entityType === "employees" && entity.role === "helper")?.entityId,
+        vehicleId: trip?.serviceEntities?.find((entity: AnyType) => entity.entityType === "assets" && entity.role === "vehicle")?.entityId,
+        driverId: trip?.serviceEntities?.find((entity: AnyType) => entity.entityType === "employees" && entity.role === "driver")?.entityId,
+        helperId: trip?.serviceEntities?.find((entity: AnyType) => entity.entityType === "employees" && entity.role === "helper")?.entityId,
         customer: trip?.metadata?.customer || "",
         phone: trip?.metadata?.phone || "",
         reference: trip?.metadata?.reference || "",
@@ -353,17 +353,17 @@ export default function TripForm({ id }: { id?: string }) {
       values={id && data ? data : {}}
       onSuccess={() => {
         navigate({
-          to: `/events/regal-transtrade/district`
+          to: `/services/regal-transtrade/district`
         })
       }}
       onCancel={() => {
         navigate({
-          to: `/events/regal-transtrade/district`
+          to: `/services/regal-transtrade/district`
         })
       }}
       options={{
         isLoading,
-        queryKey: 'events',
+        queryKey: 'services',
       }}
       children={(
         <div className="flex flex-col gap-4">
