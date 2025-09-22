@@ -5,7 +5,7 @@ import { AnyType, TableActionType } from "@/lib/types"
 import { assets, employees, events } from "@/lib/db/schema"
 import { Badge } from "@/components/ui/badge"
 import AvatarComponent from "@/components/common/avatar-component"
-import { formatDate } from "@/lib/utils"
+import { formatCurrency, formatDate } from "@/lib/utils"
 
 export const tripDepotColumns = ({
   actions
@@ -51,10 +51,10 @@ export const tripDepotColumns = ({
           {row?.original?.metadata?.items?.map((item: any, index: number) => {
             total += item.count
             return (
-              <Badge key={index} variant="outline"><span>{item?.route?.to === 'PL' ? 'CPA to PL' : item?.route?.to}</span> - <span>{item.count}</span></Badge>
+              <Badge key={index} variant="outline"><span>{item?.route?.to === 'PL' ? 'CPA to PL' : item?.route?.to}</span>:<span>{item.count}</span></Badge>
             )
           })}
-          <Badge><span>Total</span> - <span>{total}</span></Badge>
+          <Badge><span>Total</span>:<span>{total}</span></Badge>
         </div>
       )
     },
@@ -69,10 +69,10 @@ export const tripDepotColumns = ({
           {row?.original?.metadata?.expenses?.map((item: any, index: number) => {
             total += item.amount
             return (
-              <Badge key={index} variant="outline"><span>{item.description}</span> - <span>{item.amount}</span></Badge>
+              <Badge key={index} variant="outline"><span>{item.description}</span>:<span>{formatCurrency(item.amount)}</span></Badge>
             )
           })}
-          <Badge><span>Total</span> - <span>{total}</span></Badge>
+          <Badge><span>Total</span>:<span>{formatCurrency(total)}</span></Badge>
         </div>
       )
     },

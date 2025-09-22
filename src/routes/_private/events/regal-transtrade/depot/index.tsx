@@ -6,7 +6,7 @@ import { defaultSearchParamValidation, stringValidation, validate } from '@/lib/
 import { useApp } from '@/providers/app-provider'
 import { BaggageClaim, Calendar, DollarSign, Fuel, Loader2, PlusCircle } from 'lucide-react'
 import { tripDepotColumns } from './-columns'
-import { formatDateForInput } from '@/lib/utils'
+import { formatCurrency, formatDateForInput } from '@/lib/utils'
 import { endOfMonth, isValid, startOfMonth } from 'date-fns'
 import { Card, CardAction, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { getTrips } from '../-utils'
@@ -115,9 +115,20 @@ function RouteComponent() {
             </Card>
             <Card>
               <CardHeader>
+                <CardDescription>Total Fuel Cost</CardDescription>
+                <CardTitle className="text-2xl">
+                  {isLoading ? <Loader2 className="animate-spin size-6 mt-2" /> : formatCurrency(tableData?.totalFuelExpense || 0)}
+                </CardTitle>
+                <CardAction>
+                  <DollarSign />
+                </CardAction>
+              </CardHeader>
+            </Card>
+            <Card>
+              <CardHeader>
                 <CardDescription>Total Expenses</CardDescription>
                 <CardTitle className="text-2xl">
-                  {isLoading ? <Loader2 className="animate-spin size-6 mt-2" /> : tableData?.totalExpenses || 0}
+                  {isLoading ? <Loader2 className="animate-spin size-6 mt-2" /> : formatCurrency(tableData?.totalExpenses || 0)}
                 </CardTitle>
                 <CardAction>
                   <DollarSign />

@@ -6,7 +6,7 @@ import { defaultSearchParamValidation, stringValidation, validate } from '@/lib/
 import { useApp } from '@/providers/app-provider'
 import { BanknoteArrowDown, BanknoteArrowUp, Calendar, DollarSign, Fuel, Loader2, MapPinned, PlusCircle, Scale } from 'lucide-react'
 import { tripDistrictColumns } from './-columns'
-import { formatDateForInput } from '@/lib/utils'
+import { formatCurrency, formatDateForInput } from '@/lib/utils'
 import { endOfMonth, isValid, startOfMonth } from 'date-fns'
 import { Card, CardAction, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { getTrips } from '../-utils'
@@ -106,7 +106,7 @@ function RouteComponent() {
               <CardHeader>
                 <CardDescription>Total Fare</CardDescription>
                 <CardTitle className="text-2xl">
-                  {isLoading ? <Loader2 className="animate-spin size-6 mt-2" /> : tableData?.totalFare || 0}
+                  {isLoading ? <Loader2 className="animate-spin size-6 mt-2" /> : formatCurrency(tableData?.totalFare || 0)}
                 </CardTitle>
                 <CardAction>
                   <DollarSign />
@@ -117,7 +117,7 @@ function RouteComponent() {
               <CardHeader>
                 <CardDescription>Total Expenses</CardDescription>
                 <CardTitle className="text-2xl">
-                  {isLoading ? <Loader2 className="animate-spin size-6 mt-2" /> : tableData?.totalExpenses || 0}
+                  {isLoading ? <Loader2 className="animate-spin size-6 mt-2" /> : formatCurrency(tableData?.totalExpenses || 0)}
                 </CardTitle>
                 <CardAction>
                   <BanknoteArrowDown />
@@ -128,7 +128,7 @@ function RouteComponent() {
               <CardHeader>
                 <CardDescription>Total Payments</CardDescription>
                 <CardTitle className="text-2xl">
-                  {isLoading ? <Loader2 className="animate-spin size-6 mt-2" /> : tableData?.totalPayments || 0}
+                  {isLoading ? <Loader2 className="animate-spin size-6 mt-2" /> : formatCurrency(tableData?.totalPayments || 0)}
                 </CardTitle>
                 <CardAction>
                   <BanknoteArrowUp />
@@ -139,7 +139,7 @@ function RouteComponent() {
               <CardHeader>
                 <CardDescription>Total Balance</CardDescription>
                 <CardTitle className="text-2xl">
-                  {isLoading ? <Loader2 className="animate-spin size-6 mt-2" /> : tableData?.totalBalance || 0}
+                  {isLoading ? <Loader2 className="animate-spin size-6 mt-2" /> : formatCurrency(tableData?.totalBalance || 0)}
                 </CardTitle>
                 <CardAction>
                   <Scale />
