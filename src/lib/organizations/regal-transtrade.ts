@@ -3,7 +3,7 @@ import { db } from "../db"
 import { assets, assetTypes, employees, eventEntities, events, eventTypes, serviceEntities, services, serviceTypes } from "../db/schema"
 import { endOfDay } from "date-fns"
 import { generateId } from "better-auth"
-import { and, isNull } from "drizzle-orm"
+import { and, eq, isNull } from "drizzle-orm"
 
 export const tripRoutesDepot = [
   { from: "CPA", to: "PL", income: {
@@ -334,6 +334,8 @@ export const syncRegalTranstrade = createServerFn({ method: "POST" })
     //     serviceId: entity?.eventId,
     //   }
     // )))
+
+    // await db.update(serviceEntities).set({ entityType: "partners" }).where(eq(serviceEntities.entityType, "customers"))
 })
 
 export const assetTypesBackup = [

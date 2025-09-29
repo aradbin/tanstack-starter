@@ -62,7 +62,6 @@ export const getTrips = createServerFn()
 
     query = addWhere(query, context?.session?.activeOrganizationId, services, where, search)
     query = addOrder(query, services, sort)
-    query = addPagination(query, pagination)
 
     const result = await query
     const count = result?.length

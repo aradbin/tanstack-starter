@@ -87,7 +87,6 @@ export default function TableComponent<TData, TValue>({
     enableRowSelection: true,
     onRowSelectionChange: setRowSelection,
     onColumnVisibilityChange: setColumnVisibility,
-    // onPaginationChange: query?.pagination?.hasManualPagination === false ? setPagination : undefined,
     getCoreRowModel: getCoreRowModel(),
     getPaginationRowModel: getPaginationRowModel(),
   }), [

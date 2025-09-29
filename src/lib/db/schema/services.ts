@@ -50,7 +50,6 @@ export const serviceEntities = pgTable("service_entities", {
   organizationId: table
     .text("organization_id")
     .notNull()
-    .default("VOVj5e0Qn0lRuF5JXE0QplbVFKLdSbjM") // temp default for regal-transtrade
     .references(() => organizations.id, { onDelete: "cascade" }),
   ...timestamps,
 })
