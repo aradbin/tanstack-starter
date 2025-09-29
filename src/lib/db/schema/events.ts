@@ -48,6 +48,10 @@ export const eventEntities = pgTable("event_entities", {
     .text("event_id")
     .notNull()
     .references(() => events.id, { onDelete: "cascade" }),
+  organizationId: table
+    .text("organization_id")
+    .notNull()
+    .references(() => organizations.id, { onDelete: "cascade" }),
   ...timestamps,
 })
 

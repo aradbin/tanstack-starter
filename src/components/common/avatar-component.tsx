@@ -22,8 +22,8 @@ export default function AvatarComponent({ user, classNames, options }: {
       {!options?.hideBody && (
         <div className="flex flex-col text-left overflow-hidden">
           <p className="text-sm font-medium truncate">{user?.name}</p>
-          {!options?.hideDescription && user?.email && (
-            <p className="text-xs text-muted-foreground font-semibold truncate">{user?.email}</p>
+          {!options?.hideDescription && (user?.email || user?.phone) && (
+            <p className="text-xs text-muted-foreground font-semibold truncate">{user?.email || user?.phone}</p>
           )}
         </div>
       )}

@@ -20,6 +20,7 @@ export interface OptionType {
   id: string | number
   name: string
   email?: string | undefined | null
+  phone?: string | undefined | null
   icon?: ComponentType<{ className?: string }>
   image?: string | null
 }

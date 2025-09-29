@@ -30,6 +30,10 @@ export const taskUsers = pgTable("task_users", {
     .notNull()
     .references(() => users.id, { onDelete: "cascade" }),
   role: table.text().default("assignee").notNull(), // assignee, owner
+  organizationId: table
+    .text("organization_id")
+    .notNull()
+    .references(() => organizations.id, { onDelete: "cascade" }),
   ...timestamps
 })
 

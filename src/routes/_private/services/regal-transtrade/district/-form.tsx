@@ -61,9 +61,9 @@ export default function TripForm({ id }: { id?: string }) {
         vehicleId: trip?.serviceEntities?.find((entity: AnyType) => entity.entityType === "assets" && entity.role === "vehicle")?.entityId,
         driverId: trip?.serviceEntities?.find((entity: AnyType) => entity.entityType === "employees" && entity.role === "driver")?.entityId,
         helperId: trip?.serviceEntities?.find((entity: AnyType) => entity.entityType === "employees" && entity.role === "helper")?.entityId,
-        customer: trip?.metadata?.customer || "",
-        phone: trip?.metadata?.phone || "",
-        reference: trip?.metadata?.reference || "",
+        customer: trip?.metadata?.customer?.name || "",
+        phone: trip?.metadata?.customer?.phone || "",
+        reference: trip?.metadata?.customer?.reference || "",
       }
     },
     enabled: !!id

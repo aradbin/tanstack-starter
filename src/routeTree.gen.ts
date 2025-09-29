@@ -20,6 +20,7 @@ import { Route as PrivateWhatsappIndexRouteImport } from './routes/_private/what
 import { Route as PrivateTasksIndexRouteImport } from './routes/_private/tasks/index'
 import { Route as PrivateServicesIndexRouteImport } from './routes/_private/services/index'
 import { Route as PrivateRolesIndexRouteImport } from './routes/_private/roles/index'
+import { Route as PrivatePartnersIndexRouteImport } from './routes/_private/partners/index'
 import { Route as PrivateMembersIndexRouteImport } from './routes/_private/members/index'
 import { Route as PrivateEventsIndexRouteImport } from './routes/_private/events/index'
 import { Route as PrivateEmployeesIndexRouteImport } from './routes/_private/employees/index'
@@ -32,6 +33,7 @@ import { Route as AuthRegisterIndexRouteImport } from './routes/_auth/register/i
 import { Route as AuthLoginIndexRouteImport } from './routes/_auth/login/index'
 import { Route as AuthRegisterOrganizationRouteImport } from './routes/_auth/register/organization'
 import { Route as PrivateServicesRegalTranstradeIndexRouteImport } from './routes/_private/services/regal-transtrade/index'
+import { Route as PrivatePartnersRoleIndexRouteImport } from './routes/_private/partners/$role/index'
 import { Route as PrivateEmployeesIdIndexRouteImport } from './routes/_private/employees/$id/index'
 import { Route as PrivateCustomersIdIndexRouteImport } from './routes/_private/customers/$id/index'
 import { Route as PrivateContactsIdIndexRouteImport } from './routes/_private/contacts/$id/index'
@@ -89,6 +91,11 @@ const PrivateServicesIndexRoute = PrivateServicesIndexRouteImport.update({
 const PrivateRolesIndexRoute = PrivateRolesIndexRouteImport.update({
   id: '/roles/',
   path: '/roles/',
+  getParentRoute: () => PrivateRouteRoute,
+} as any)
+const PrivatePartnersIndexRoute = PrivatePartnersIndexRouteImport.update({
+  id: '/partners/',
+  path: '/partners/',
   getParentRoute: () => PrivateRouteRoute,
 } as any)
 const PrivateMembersIndexRoute = PrivateMembersIndexRouteImport.update({
@@ -152,6 +159,12 @@ const PrivateServicesRegalTranstradeIndexRoute =
   PrivateServicesRegalTranstradeIndexRouteImport.update({
     id: '/services/regal-transtrade/',
     path: '/services/regal-transtrade/',
+    getParentRoute: () => PrivateRouteRoute,
+  } as any)
+const PrivatePartnersRoleIndexRoute =
+  PrivatePartnersRoleIndexRouteImport.update({
+    id: '/partners/$role/',
+    path: '/partners/$role/',
     getParentRoute: () => PrivateRouteRoute,
   } as any)
 const PrivateEmployeesIdIndexRoute = PrivateEmployeesIdIndexRouteImport.update({
@@ -243,6 +256,7 @@ export interface FileRoutesByFullPath {
   '/employees/': typeof PrivateEmployeesIndexRoute
   '/events': typeof PrivateEventsIndexRoute
   '/members': typeof PrivateMembersIndexRoute
+  '/partners': typeof PrivatePartnersIndexRoute
   '/roles': typeof PrivateRolesIndexRoute
   '/services': typeof PrivateServicesIndexRoute
   '/tasks': typeof PrivateTasksIndexRoute
@@ -251,6 +265,7 @@ export interface FileRoutesByFullPath {
   '/contacts/$id': typeof PrivateContactsIdIndexRoute
   '/customers/$id': typeof PrivateCustomersIdIndexRoute
   '/employees/$id': typeof PrivateEmployeesIdIndexRoute
+  '/partners/$role': typeof PrivatePartnersRoleIndexRoute
   '/services/regal-transtrade': typeof PrivateServicesRegalTranstradeIndexRoute
   '/services/regal-transtrade/depot': typeof PrivateServicesRegalTranstradeDepotIndexRoute
   '/services/regal-transtrade/district': typeof PrivateServicesRegalTranstradeDistrictIndexRoute
@@ -274,6 +289,7 @@ export interface FileRoutesByTo {
   '/employees': typeof PrivateEmployeesIndexRoute
   '/events': typeof PrivateEventsIndexRoute
   '/members': typeof PrivateMembersIndexRoute
+  '/partners': typeof PrivatePartnersIndexRoute
   '/roles': typeof PrivateRolesIndexRoute
   '/services': typeof PrivateServicesIndexRoute
   '/tasks': typeof PrivateTasksIndexRoute
@@ -282,6 +298,7 @@ export interface FileRoutesByTo {
   '/contacts/$id': typeof PrivateContactsIdIndexRoute
   '/customers/$id': typeof PrivateCustomersIdIndexRoute
   '/employees/$id': typeof PrivateEmployeesIdIndexRoute
+  '/partners/$role': typeof PrivatePartnersRoleIndexRoute
   '/services/regal-transtrade': typeof PrivateServicesRegalTranstradeIndexRoute
   '/services/regal-transtrade/depot': typeof PrivateServicesRegalTranstradeDepotIndexRoute
   '/services/regal-transtrade/district': typeof PrivateServicesRegalTranstradeDistrictIndexRoute
@@ -310,6 +327,7 @@ export interface FileRoutesById {
   '/_private/employees/': typeof PrivateEmployeesIndexRoute
   '/_private/events/': typeof PrivateEventsIndexRoute
   '/_private/members/': typeof PrivateMembersIndexRoute
+  '/_private/partners/': typeof PrivatePartnersIndexRoute
   '/_private/roles/': typeof PrivateRolesIndexRoute
   '/_private/services/': typeof PrivateServicesIndexRoute
   '/_private/tasks/': typeof PrivateTasksIndexRoute
@@ -318,6 +336,7 @@ export interface FileRoutesById {
   '/_private/contacts/$id/': typeof PrivateContactsIdIndexRoute
   '/_private/customers/$id/': typeof PrivateCustomersIdIndexRoute
   '/_private/employees/$id/': typeof PrivateEmployeesIdIndexRoute
+  '/_private/partners/$role/': typeof PrivatePartnersRoleIndexRoute
   '/_private/services/regal-transtrade/': typeof PrivateServicesRegalTranstradeIndexRoute
   '/_private/services/regal-transtrade/depot/': typeof PrivateServicesRegalTranstradeDepotIndexRoute
   '/_private/services/regal-transtrade/district/': typeof PrivateServicesRegalTranstradeDistrictIndexRoute
@@ -345,6 +364,7 @@ export interface FileRouteTypes {
     | '/employees/'
     | '/events'
     | '/members'
+    | '/partners'
     | '/roles'
     | '/services'
     | '/tasks'
@@ -353,6 +373,7 @@ export interface FileRouteTypes {
     | '/contacts/$id'
     | '/customers/$id'
     | '/employees/$id'
+    | '/partners/$role'
     | '/services/regal-transtrade'
     | '/services/regal-transtrade/depot'
     | '/services/regal-transtrade/district'
@@ -376,6 +397,7 @@ export interface FileRouteTypes {
     | '/employees'
     | '/events'
     | '/members'
+    | '/partners'
     | '/roles'
     | '/services'
     | '/tasks'
@@ -384,6 +406,7 @@ export interface FileRouteTypes {
     | '/contacts/$id'
     | '/customers/$id'
     | '/employees/$id'
+    | '/partners/$role'
     | '/services/regal-transtrade'
     | '/services/regal-transtrade/depot'
     | '/services/regal-transtrade/district'
@@ -411,6 +434,7 @@ export interface FileRouteTypes {
     | '/_private/employees/'
     | '/_private/events/'
     | '/_private/members/'
+    | '/_private/partners/'
     | '/_private/roles/'
     | '/_private/services/'
     | '/_private/tasks/'
@@ -419,6 +443,7 @@ export interface FileRouteTypes {
     | '/_private/contacts/$id/'
     | '/_private/customers/$id/'
     | '/_private/employees/$id/'
+    | '/_private/partners/$role/'
     | '/_private/services/regal-transtrade/'
     | '/_private/services/regal-transtrade/depot/'
     | '/_private/services/regal-transtrade/district/'
@@ -521,6 +546,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof PrivateRolesIndexRouteImport
       parentRoute: typeof PrivateRouteRoute
     }
+    '/_private/partners/': {
+      id: '/_private/partners/'
+      path: '/partners'
+      fullPath: '/partners'
+      preLoaderRoute: typeof PrivatePartnersIndexRouteImport
+      parentRoute: typeof PrivateRouteRoute
+    }
     '/_private/members/': {
       id: '/_private/members/'
       path: '/members'
@@ -603,6 +635,13 @@ declare module '@tanstack/react-router' {
       path: '/services/regal-transtrade'
       fullPath: '/services/regal-transtrade'
       preLoaderRoute: typeof PrivateServicesRegalTranstradeIndexRouteImport
+      parentRoute: typeof PrivateRouteRoute
+    }
+    '/_private/partners/$role/': {
+      id: '/_private/partners/$role/'
+      path: '/partners/$role'
+      fullPath: '/partners/$role'
+      preLoaderRoute: typeof PrivatePartnersRoleIndexRouteImport
       parentRoute: typeof PrivateRouteRoute
     }
     '/_private/employees/$id/': {
@@ -757,12 +796,14 @@ interface PrivateRouteRouteChildren {
   PrivateEmailIndexRoute: typeof PrivateEmailIndexRoute
   PrivateEventsIndexRoute: typeof PrivateEventsIndexRoute
   PrivateMembersIndexRoute: typeof PrivateMembersIndexRoute
+  PrivatePartnersIndexRoute: typeof PrivatePartnersIndexRoute
   PrivateRolesIndexRoute: typeof PrivateRolesIndexRoute
   PrivateServicesIndexRoute: typeof PrivateServicesIndexRoute
   PrivateTasksIndexRoute: typeof PrivateTasksIndexRoute
   PrivateWhatsappIndexRoute: typeof PrivateWhatsappIndexRoute
   PrivateContactsIdIndexRoute: typeof PrivateContactsIdIndexRoute
   PrivateCustomersIdIndexRoute: typeof PrivateCustomersIdIndexRoute
+  PrivatePartnersRoleIndexRoute: typeof PrivatePartnersRoleIndexRoute
   PrivateServicesRegalTranstradeIndexRoute: typeof PrivateServicesRegalTranstradeIndexRoute
   PrivateServicesRegalTranstradeDepotIndexRoute: typeof PrivateServicesRegalTranstradeDepotIndexRoute
   PrivateServicesRegalTranstradeDistrictIndexRoute: typeof PrivateServicesRegalTranstradeDistrictIndexRoute
@@ -784,12 +825,14 @@ const PrivateRouteRouteChildren: PrivateRouteRouteChildren = {
   PrivateEmailIndexRoute: PrivateEmailIndexRoute,
   PrivateEventsIndexRoute: PrivateEventsIndexRoute,
   PrivateMembersIndexRoute: PrivateMembersIndexRoute,
+  PrivatePartnersIndexRoute: PrivatePartnersIndexRoute,
   PrivateRolesIndexRoute: PrivateRolesIndexRoute,
   PrivateServicesIndexRoute: PrivateServicesIndexRoute,
   PrivateTasksIndexRoute: PrivateTasksIndexRoute,
   PrivateWhatsappIndexRoute: PrivateWhatsappIndexRoute,
   PrivateContactsIdIndexRoute: PrivateContactsIdIndexRoute,
   PrivateCustomersIdIndexRoute: PrivateCustomersIdIndexRoute,
+  PrivatePartnersRoleIndexRoute: PrivatePartnersRoleIndexRoute,
   PrivateServicesRegalTranstradeIndexRoute:
     PrivateServicesRegalTranstradeIndexRoute,
   PrivateServicesRegalTranstradeDepotIndexRoute:
