@@ -19,32 +19,46 @@ import { AnyType } from "@/lib/types"
 
 interface TablePaginationProps<TData> {
   table: Table<TData>
+  hasManualPagination?: boolean
 }
 
 export function TablePagination<TData>({
   table,
+  hasManualPagination
 }: TablePaginationProps<TData>) {
   const navigate: AnyType = useNavigate()
 
   const onPageChange = (index: number) => {
-    navigate({
-      search: (prev: AnyType) => ({
-        ...prev,
-        page: index + 1
-      }),
-      replace: true
-    })
+    if(hasManualPagination){
+      navigate({
+        search: (prev: AnyType) => ({
+          ...prev,
+          page: index + 1
+        }),
+        replace: true
+      })
+    }else{
+      table.setPageIndex(index)
+      // table.options.onPaginationChange?.({
+      //   ...table.getState().pagination,
+      //   pageIndex: index,
+      // })
+    }
   }
 
   const onPageSizeChange = (size: number) => {
-    navigate({
-      search: (prev: AnyType) => ({
-        ...prev,
-        page: 1,
-        pageSize: size,
-      }),
-      replace: true
-    })
+    if(hasManualPagination){ 
+      navigate({
+        search: (prev: AnyType) => ({
+          ...prev,
+          page: 1,
+          pageSize: size,
+        }),
+        replace: true
+      })
+    }else{
+      table.setPageSize(size)
+    }
   }
 
   return (

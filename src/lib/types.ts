@@ -70,6 +70,7 @@ export interface PaginationType {
   page?: number
   pageSize?: number
   hasPagination?: boolean
+  hasManualPagination?: boolean
 }
 
 export interface SearchType {
