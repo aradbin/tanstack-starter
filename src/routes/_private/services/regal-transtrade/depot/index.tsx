@@ -35,7 +35,7 @@ function RouteComponent() {
       order: params.order
     },
     pagination: {
-      hasPagination: false
+      hasManualPagination: false
     },
     where: {
       typeId: "VOVj5e0Qn0lRuF5JXE0QplbVFKLdSbjM",

@@ -1,7 +1,7 @@
 import { authOrgMiddleware } from "@/lib/auth/middleware"
 import { db } from "@/lib/db"
 import { addOrder, addPagination, addWhere, QueryParamBaseType } from "@/lib/db/functions"
-import { assets, customers, employees, serviceEntities, services } from "@/lib/db/schema"
+import { assets, employees, serviceEntities, services } from "@/lib/db/schema"
 import { AnyType } from "@/lib/types"
 import { createServerFn } from "@tanstack/react-start"
 import { generateId } from "better-auth"
@@ -62,7 +62,6 @@ export const getTrips = createServerFn()
 
     query = addWhere(query, context?.session?.activeOrganizationId, services, where, search)
     query = addOrder(query, services, sort)
-    query = addPagination(query, pagination)
 
     const result = await query
     const count = result?.length
@@ -117,48 +116,28 @@ export const createTrip = createServerFn({ method: "POST" })
             ...values?.routes ? { routes: values?.routes } : {},
             ...values?.fuelPrice ? { fuelPrice: values?.fuelPrice } : {},
             ...values?.payments ? { payments: values?.payments } : {},
-            ...values?.customer ? { customer: values?.customer } : {},
-            ...values?.phone ? { phone: values?.phone } : {},
-            ...values?.reference ? { reference: values?.reference } : {},
+            ...values?.customer ? { customer: {
+              name: values?.customer,
+              ...values?.phone ? { phone: values?.phone } : {},
+              ...values?.reference ? { reference: values?.reference } : {},
+            } } : {},
           },
           typeId: values?.type === "depot" ? "VOVj5e0Qn0lRuF5JXE0QplbVFKLdSbjM" : "zeA6cPLyvfLXMFXOs5fsi4SPpKatGm3I",
           organizationId: context?.session?.activeOrganizationId,
           createdBy: context?.user?.id,
         }).returning()
 
-        let customerId: string | undefined = "64g2kKyWEyk7pAMojDhDu5o8nQRWN5qf" // depot
-        
-        if(values?.type === "district"){
-          let hasCustomer = await tx.query.customers.findMany({
-            where: and(
-              eq(customers.organizationId, context?.session?.activeOrganizationId),
-              eq(customers.name, values?.customer),
-              eq(customers.phone, values?.phone),
-            )
-          })
-          if(!hasCustomer?.length){
-            hasCustomer = await tx.insert(customers).values({
-              id: generateId(),
-              name: values?.customer,
-              phone: values?.phone,
-              businessType: "individual",
-              organizationId: context?.session?.activeOrganizationId,
-              createdBy: context?.user?.id,
-            }).returning()
-          }
-          customerId = hasCustomer?.[0]?.id
-        }
-
         await tx.insert(serviceEntities).values([
-          {
+          ...values?.type === "depot" ? [{
             id: generateId(),
             role: "customer",
             status: "attended",
-            entityType: "customers",
-            entityId: customerId,
+            entityType: "partners",
+            entityId: "64g2kKyWEyk7pAMojDhDu5o8nQRWN5qf",
             serviceId: result?.id,
+            organizationId: context?.session?.activeOrganizationId,
             createdBy: context?.user?.id
-          },
+          }] : [],
           ...values?.vehicleId ? [{
             id: generateId(),
             role: "vehicle",
@@ -166,6 +145,7 @@ export const createTrip = createServerFn({ method: "POST" })
             entityType: "assets",
             entityId: values?.vehicleId,
             serviceId: result?.id,
+            organizationId: context?.session?.activeOrganizationId,
             createdBy: context?.user?.id
           }] : [],
           ...values?.driverId ? [{
@@ -175,6 +155,7 @@ export const createTrip = createServerFn({ method: "POST" })
             entityType: "employees",
             entityId: values?.driverId,
             serviceId: result?.id,
+            organizationId: context?.session?.activeOrganizationId,
             createdBy: context?.user?.id
           }] : [],
           ...values?.helperId ? [{
@@ -184,6 +165,7 @@ export const createTrip = createServerFn({ method: "POST" })
             entityType: "employees",
             entityId: values?.helperId,
             serviceId: result?.id,
+            organizationId: context?.session?.activeOrganizationId,
             createdBy: context?.user?.id
           }] : [],
         ])
@@ -217,9 +199,11 @@ export const updateTrip = createServerFn({ method: "POST" })
             ...values?.routes ? { routes: values?.routes } : {},
             ...values?.fuelPrice ? { fuelPrice: values?.fuelPrice } : {},
             ...values?.payments ? { payments: values?.payments } : {},
-            ...values?.customer ? { customer: values?.customer } : {},
-            ...values?.phone ? { phone: values?.phone } : {},
-            ...values?.reference ? { reference: values?.reference } : {},
+            ...values?.customer ? { customer: {
+              name: values?.customer,
+              ...values?.phone ? { phone: values?.phone } : {},
+              ...values?.reference ? { reference: values?.reference } : {},
+            } } : {},
           },
           updatedBy: context?.user?.id,
         }).where(eq(services.id, id)).returning()
@@ -241,6 +225,7 @@ export const updateTrip = createServerFn({ method: "POST" })
             entityType: "assets",
             entityId: values?.vehicleId,
             serviceId: id,
+            organizationId: context?.session?.activeOrganizationId,
             createdBy: context?.user?.id
           })
         }
@@ -262,6 +247,7 @@ export const updateTrip = createServerFn({ method: "POST" })
             entityType: "employees",
             entityId: values?.driverId,
             serviceId: id,
+            organizationId: context?.session?.activeOrganizationId,
             createdBy: context?.user?.id
           })
         }
@@ -283,6 +269,7 @@ export const updateTrip = createServerFn({ method: "POST" })
             entityType: "employees",
             entityId: values?.helperId,
             serviceId: id,
+            organizationId: context?.session?.activeOrganizationId,
             createdBy: context?.user?.id
           })
         }
@@ -294,51 +281,6 @@ export const updateTrip = createServerFn({ method: "POST" })
         }
         if(helper && !values?.helperId){
           await tx.delete(serviceEntities).where(eq(serviceEntities.id, helper?.id))
-        }
-
-        if(values?.customer){
-          let customerId: string | undefined = "64g2kKyWEyk7pAMojDhDu5o8nQRWN5qf" // depot
-        
-          if(values?.type === "district"){
-            let hasCustomer = await tx.query.customers.findMany({
-              where: and(
-                eq(customers.organizationId, context?.session?.activeOrganizationId),
-                eq(customers.name, values?.customer),
-                eq(customers.phone, values?.phone),
-              )
-            })
-            if(!hasCustomer?.length){
-              hasCustomer = await tx.insert(customers).values({
-                id: generateId(),
-                name: values?.customer,
-                phone: values?.phone,
-                businessType: "individual",
-                organizationId: context?.session?.activeOrganizationId,
-                createdBy: context?.user?.id,
-              }).returning()
-            }
-            customerId = hasCustomer?.[0]?.id
-          }
-          if(!customer){
-            await tx.insert(serviceEntities).values({
-              id: generateId(),
-              role: "customer",
-              status: "attended",
-              entityType: "customers",
-              entityId: customerId,
-              serviceId: id,
-              createdBy: context?.user?.id
-            })
-          }
-          if(customer && customer?.entityId !== customerId){
-            await tx.update(serviceEntities).set({
-              entityId: customerId,
-              updatedBy: context?.user?.id,
-            }).where(eq(serviceEntities.id, customer?.id))
-          }
-        }
-        if(customer && !values?.customer){
-          await tx.delete(serviceEntities).where(eq(serviceEntities.id, customer?.id))
         }
 
         return {

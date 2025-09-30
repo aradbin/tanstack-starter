@@ -21,7 +21,7 @@ export interface QueryParamType extends QueryParamBaseType {
 }
 
 export const getPaginationArgs = (pagination?: PaginationType): { limit?: number; offset?: number } => {
-  if(!pagination || pagination?.hasPagination === false){
+  if(!pagination || pagination?.hasPagination === false || pagination?.hasManualPagination === false){
     return {}
   }
 

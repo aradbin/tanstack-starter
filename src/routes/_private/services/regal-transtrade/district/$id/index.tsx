@@ -41,14 +41,14 @@ function RouteComponent() {
         <CardHeader>
           <CardTitle className='flex justify-between items-center'>
             <div className='flex justify-start items-center gap-4'>
-              <Link to='/services/depot'>
+              <Link to='/services/regal-transtrade/depot'>
                 <Button size="icon" variant="outline"><ArrowLeft /></Button>
               </Link>
               Trip Details
             </div>
             {params?.id && (
               <div className='flex justify-end items-center gap-2'>
-                <Link to='/services/depot/$id/edit' params={{ id: params?.id }}>
+                <Link to='/services/regal-transtrade/depot/$id/edit' params={{ id: params?.id }}>
                   <Button size="icon"><Edit /></Button>
                 </Link>
                 <Button size="icon" variant="destructive" onClick={() => {
@@ -58,7 +58,7 @@ function RouteComponent() {
                     table: "services",
                     onSuccess: () => {
                       navigate({
-                        to: '/services/depot'
+                        to: '/services/regal-transtrade/depot'
                       })
                     }
                   })

@@ -20,6 +20,7 @@ export interface OptionType {
   id: string | number
   name: string
   email?: string | undefined | null
+  phone?: string | undefined | null
   icon?: ComponentType<{ className?: string }>
   image?: string | null
 }
@@ -69,6 +70,7 @@ export interface PaginationType {
   page?: number
   pageSize?: number
   hasPagination?: boolean
+  hasManualPagination?: boolean
 }
 
 export interface SearchType {

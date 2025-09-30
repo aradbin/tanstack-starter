@@ -1,5 +1,5 @@
 import { ReactNode, useMemo, useState } from 'react'
-import { ColumnDef, getCoreRowModel, useReactTable, VisibilityState } from "@tanstack/react-table"
+import { ColumnDef, getCoreRowModel, getPaginationRowModel, PaginationState, useReactTable, VisibilityState } from "@tanstack/react-table"
 import { TablePagination } from "@/components/table/table-pagination"
 import { getDatas, QueryParamType } from "@/lib/db/functions"
 import { defaultPageSize } from "@/lib/variables"
@@ -10,6 +10,7 @@ import TableSearch from '@/components/table/table-search'
 import { TableFilter } from '@/components/table/table-filter'
 import TableReset from '@/components/table/table-reset'
 import { TableViewOptions } from '@/components/table/table-view-options'
+import { Badge } from '../ui/badge'
 
 interface TableComponentProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[]
@@ -57,7 +58,7 @@ export default function TableComponent<TData, TValue>({
     rowCount: tableData?.count || tableData?.result?.length || 0,
     columns,
     state: {
-      ...(query?.pagination?.hasPagination === false ? {} : {
+      ...(query?.pagination?.hasPagination === false || query?.pagination?.hasManualPagination === false ? {} : {
         pagination: {
           pageIndex: query?.pagination?.page ? query.pagination.page - 1 : 0,
           pageSize: query?.pagination?.pageSize || defaultPageSize,
@@ -67,6 +68,14 @@ export default function TableComponent<TData, TValue>({
       columnVisibility,
       rowSelection,
     },
+    initialState: {
+      ...(query?.pagination?.hasManualPagination === false ? {
+        pagination: {
+          pageIndex: 0,
+          pageSize: defaultPageSize,
+        }
+      } : {}),
+    },
     defaultColumn: {
       enableSorting: false,
       enableHiding: false,
@@ -74,11 +83,12 @@ export default function TableComponent<TData, TValue>({
       enableResizing: false
     },
     manualSorting: true,
-    manualPagination: true,
+    manualPagination: query?.pagination?.hasManualPagination === false ? false : true,
     enableRowSelection: true,
     onRowSelectionChange: setRowSelection,
     onColumnVisibilityChange: setColumnVisibility,
     getCoreRowModel: getCoreRowModel(),
+    getPaginationRowModel: getPaginationRowModel(),
   }), [
     query,
     columns,
@@ -121,20 +131,21 @@ export default function TableComponent<TData, TValue>({
 
       {/* Table Footer */}
       <div className="flex flex-col lg:flex-row lg:justify-between flex-wrap gap-4">
-        <div className="flex gap-8 items-center justify-between">
+        <div className="flex gap-8 lg:gap-2 items-center justify-between lg:justify-start">
+          <Badge variant="outline" className='text-sm'>Total: {table.getRowCount()}</Badge>
           {table.getSelectedRowModel().rows.length > 0 && (
-            <div className="text-muted-foreground text-sm">
+            <Badge variant="outline" className='text-sm'>
               {table.getSelectedRowModel().rows.length} of{" "}
               {table.getRowModel().rows.length} row(s) selected.
-            </div>
+            </Badge>
           )}
           {query?.pagination?.hasPagination !== false && (
-            <div className="text-sm font-medium">
+            <Badge variant="outline" className='text-sm'>
               Page {table.getState().pagination.pageIndex + 1} of{" "} {table.getPageCount()}
-            </div>
+            </Badge>
           )}
         </div>  
-        {query?.pagination?.hasPagination !== false && <TablePagination table={table} />}
+        {query?.pagination?.hasPagination !== false && <TablePagination table={table} hasManualPagination={query?.pagination?.hasManualPagination === false ? false : true} />}
       </div>
     </div>
   )

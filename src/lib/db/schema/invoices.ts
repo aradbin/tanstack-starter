@@ -28,6 +28,10 @@ export const invoiceEntities = pgTable("invoice_entities", {
     .text("invoice_id")
     .notNull()
     .references(() => invoices.id, { onDelete: "cascade" }),
+  organizationId: table
+    .text("organization_id")
+    .notNull()
+    .references(() => organizations.id, { onDelete: "cascade" }),
   ...timestamps,
 })
 
@@ -42,6 +46,10 @@ export const invoicePayments = pgTable("invoice_payments", {
     .text("invoice_id")
     .notNull()
     .references(() => invoices.id, { onDelete: "cascade" }),
+  organizationId: table
+    .text("organization_id")
+    .notNull()
+    .references(() => organizations.id, { onDelete: "cascade" }),
   ...timestamps,
 })
 
