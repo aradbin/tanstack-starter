@@ -19,7 +19,7 @@ export const tripRoutesDepot = [
   }},
   { from: "PL", to: "KDS", income: {
     fuel: 14,
-    fixed: 0,
+    fixed: 500,
     toll: 0,
     tips: 0,
   }, expense: {
@@ -30,7 +30,7 @@ export const tripRoutesDepot = [
   }},
   { from: "PL", to: "BM", income: {
     fuel: 12,
-    fixed: 0,
+    fixed: 500,
     toll: 0,
     tips: 0,
   }, expense: {
@@ -41,7 +41,7 @@ export const tripRoutesDepot = [
   }},
   { from: "PL", to: "SAPL", income: {
     fuel: 7,
-    fixed: 0,
+    fixed: 500,
     toll: 0,
     tips: 0,
   }, expense: {
@@ -52,7 +52,7 @@ export const tripRoutesDepot = [
   }},
   { from: "PL", to: "OCL", income: {
     fuel: 7,
-    fixed: 0,
+    fixed: 500,
     toll: 0,
     tips: 0,
   }, expense: {
@@ -63,7 +63,7 @@ export const tripRoutesDepot = [
   }},
   { from: "PL", to: "VERTEX", income: {
     fuel: 7,
-    fixed: 0,
+    fixed: 500,
     toll: 0,
     tips: 0,
   }, expense: {
@@ -74,7 +74,7 @@ export const tripRoutesDepot = [
   }},
   { from: "PL", to: "EBIL", income: {
     fuel: 5,
-    fixed: 0,
+    fixed: 500,
     toll: 0,
     tips: 0,
   }, expense: {
@@ -85,7 +85,7 @@ export const tripRoutesDepot = [
   }},
   { from: "PL", to: "CCTCL", income: {
     fuel: 5,
-    fixed: 0,
+    fixed: 500,
     toll: 0,
     tips: 0,
   }, expense: {
@@ -96,7 +96,7 @@ export const tripRoutesDepot = [
   }},
   { from: "PL", to: "GCL", income: {
     fuel: 12,
-    fixed: 0,
+    fixed: 500,
     toll: 0,
     tips: 0,
   }, expense: {
@@ -107,7 +107,7 @@ export const tripRoutesDepot = [
   }},
   { from: "PL", to: "SML", income: {
     fuel: 14,
-    fixed: 0,
+    fixed: 500,
     toll: 0,
     tips: 0,
   }, expense: {
@@ -118,7 +118,7 @@ export const tripRoutesDepot = [
   }},
   { from: "PL", to: "ISATL", income: {
     fuel: 14,
-    fixed: 0,
+    fixed: 500,
     toll: 0,
     tips: 0,
   }, expense: {
@@ -129,7 +129,7 @@ export const tripRoutesDepot = [
   }},
   { from: "PL", to: "K&T", income: {
     fuel: 3,
-    fixed: 0,
+    fixed: 500,
     toll: 0,
     tips: 0,
   }, expense: {
@@ -140,7 +140,7 @@ export const tripRoutesDepot = [
   }},
   { from: "PL", to: "QNS", income: {
     fuel: 3,
-    fixed: 0,
+    fixed: 500,
     toll: 0,
     tips: 0,
   }, expense: {
@@ -151,7 +151,7 @@ export const tripRoutesDepot = [
   }},
   { from: "PL", to: "NCL", income: {
     fuel: 15,
-    fixed: 0,
+    fixed: 500,
     toll: 0,
     tips: 0,
   }, expense: {
@@ -162,7 +162,7 @@ export const tripRoutesDepot = [
   }},
   { from: "PL", to: "ICL", income: {
     fuel: 10,
-    fixed: 0,
+    fixed: 500,
     toll: 0,
     tips: 0,
   }, expense: {
@@ -173,7 +173,7 @@ export const tripRoutesDepot = [
   }},
   { from: "PL", to: "ELL", income: {
     fuel: 5,
-    fixed: 0,
+    fixed: 500,
     toll: 0,
     tips: 0,
   }, expense: {

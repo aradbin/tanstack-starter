@@ -7,8 +7,8 @@ import { relations } from "drizzle-orm"
 export const invoices = pgTable("invoices", {
   id: table.text().primaryKey(),
   number: table.text().notNull(),
-  amount: table.integer().notNull(),
-  date: table.date().notNull(),
+  amount: table.numeric().notNull(),
+  paid: table.numeric().default("0").notNull(),
   dueDate: table.date("due_date").notNull(),
   status: table.text().notNull(), // paid, unpaid, overdue, draft, canceled, partial, refunded
   attachments: table.text(),
@@ -37,7 +37,7 @@ export const invoiceEntities = pgTable("invoice_entities", {
 
 export const invoicePayments = pgTable("invoice_payments", {
   id: table.text().primaryKey(),
-  amount: table.integer().notNull(),
+  amount: table.numeric().notNull(),
   date: table.date().notNull(),
   method: table.text().notNull(), // credit_card, bank_transfer, cash, check, paypal, stripe
   reference: table.text(), // transaction id, check number, etc.

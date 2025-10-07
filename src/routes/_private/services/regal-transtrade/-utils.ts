@@ -1,12 +1,13 @@
 import { authOrgMiddleware } from "@/lib/auth/middleware"
 import { db } from "@/lib/db"
-import { addOrder, addPagination, addWhere, QueryParamBaseType } from "@/lib/db/functions"
-import { assets, employees, serviceEntities, services } from "@/lib/db/schema"
+import { addOrder, addPagination, addWhere, getDatas, getWhereArgs, QueryParamBaseType } from "@/lib/db/functions"
+import { assets, employees, invoiceEntities, invoices, serviceEntities, services } from "@/lib/db/schema"
 import { AnyType } from "@/lib/types"
+import { formatDateForInput } from "@/lib/utils"
 import { createServerFn } from "@tanstack/react-start"
 import { generateId } from "better-auth"
 import { endOfDay } from "date-fns"
-import { and, eq, getTableColumns } from "drizzle-orm"
+import { and, eq, getTableColumns, gte, lte } from "drizzle-orm"
 import { alias } from "drizzle-orm/pg-core"
 
 export const getTrips = createServerFn()
@@ -286,6 +287,76 @@ export const updateTrip = createServerFn({ method: "POST" })
         return {
           ...result,
           message: "Trip Updated Successfully"
+        }
+      })
+    } catch {
+      throw new Error("Something went wrong. Please try again")
+    }
+  })
+
+export const createTripInvoice = createServerFn({ method: "POST" })
+  .middleware([authOrgMiddleware])
+  .validator((data: {
+    values: AnyType
+  }) => data)
+  .handler(async ({ context, data }): Promise<AnyType> => {
+    const { values } = data
+
+    try {
+      return await db.transaction(async (tx) => {
+        const trips: typeof services.$inferSelect[] = await tx.query.services.findMany({
+          where: and(...getWhereArgs(context?.session?.activeOrganizationId, services, {
+            typeId: values?.type === "depot" ? "VOVj5e0Qn0lRuF5JXE0QplbVFKLdSbjM" : "zeA6cPLyvfLXMFXOs5fsi4SPpKatGm3I",
+            from: {
+              gte: new Date(values?.from),
+              lte: new Date(values?.to)
+            }
+          }))
+        })
+        
+        let amount = 0
+        trips?.forEach((trip: AnyType) => {
+          trip?.metadata?.items?.forEach((item: AnyType) => {
+            amount += item?.count * ((item?.route?.income?.fuel * trip?.metadata?.fuelPrice) + item?.route?.income?.fixed)
+            console.log('item amount', item?.count * ((item?.route?.income?.fuel * trip?.metadata?.fuelPrice) + item?.route?.income?.fixed))
+          })
+        })
+
+        const count = await tx.$count(invoices, and(eq(invoices.organizationId, context?.session?.activeOrganizationId)))
+
+        const [result] = await tx.insert(invoices).values({
+          id: generateId(),
+          number: `${(count || 0) + 1}`,
+          amount: `${amount}`,
+          paid: "0",
+          dueDate: values?.dueDate,
+          status: "unpaid",
+          organizationId: context?.session?.activeOrganizationId,
+          createdBy: context?.user?.id,
+        }).returning()
+
+        await tx.insert(invoiceEntities).values([
+          ...trips?.map((trip) => ({
+            id: generateId(),
+            entityType: "services",
+            entityId: trip?.id,
+            organizationId: context?.session?.activeOrganizationId,
+            createdBy: context?.user?.id,
+            invoiceId: result?.id,
+          })),
+          ...[{
+            id: generateId(),
+            entityType: "partners",
+            entityId: "64g2kKyWEyk7pAMojDhDu5o8nQRWN5qf",
+            organizationId: context?.session?.activeOrganizationId,
+            createdBy: context?.user?.id,
+            invoiceId: result?.id,
+          }]
+        ])
+
+        return {
+          ...result,
+          message: "Trip Invoice Created Successfully"
         }
       })
     } catch {
