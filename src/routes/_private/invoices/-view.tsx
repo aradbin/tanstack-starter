@@ -116,6 +116,12 @@ export default function InvoiceView({ modal }: {
                 </View>
               </View>
 
+              <Text style={{
+                fontWeight: 700,
+                textAlign: "center",
+                marginTop: 10
+              }}>{modal?.item?.metadata?.invoiceItems?.title}</Text>
+
               {/* Items table */}
               <View style={styles.table}>
                 {/* Header row */}
