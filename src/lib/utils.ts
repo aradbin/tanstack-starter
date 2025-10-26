@@ -78,6 +78,11 @@ export const formatDateForInput = (date: AnyType) => {
   return format(new Date(date), "yyyy-MM-dd")
 }
 
+export const formatMonth = (date: AnyType) => {
+  if (!date || !isValid(new Date(date))) return ""
+  return format(new Date(date), "MMM, yyyy")
+}
+
 export const isUrl = (string: string) => {
   var urlPattern = new RegExp('^(https?:\\/\\/)?'+ // validate protocol
     '((([a-z\\d]([a-z\\d-]*[a-z\\d])*)\\.)+[a-z]{2,}|'+ // validate domain name

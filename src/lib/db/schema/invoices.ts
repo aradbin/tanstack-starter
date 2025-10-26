@@ -22,6 +22,7 @@ export const invoices = pgTable("invoices", {
 
 export const invoiceEntities = pgTable("invoice_entities", {
   id: table.text().primaryKey(),
+  role: table.text(), // customer, service, product
   entityType: table.text("entity_type").notNull(), // table name: customers, employees, assets
   entityId: table.text("entity_id").notNull(),
   invoiceId: table

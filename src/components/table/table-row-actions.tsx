@@ -18,7 +18,7 @@ export function TableRowActions({
       {actions?.view && (
         <Tooltip>
           <TooltipTrigger asChild>
-            <Button variant="outline" size="icon" onClick={() => actions?.view?.(row.original.id)}><Eye /></Button>
+            <Button variant="outline" size="icon" onClick={() => actions?.view?.(row.original.id, row.original)}><Eye /></Button>
           </TooltipTrigger>
           <TooltipContent>View</TooltipContent>
         </Tooltip>
@@ -26,7 +26,7 @@ export function TableRowActions({
       {actions?.edit && (
         <Tooltip>
           <TooltipTrigger asChild>
-            <Button variant="outline" size="icon" onClick={() => actions?.edit?.(row.original.id)}><Edit /></Button>
+            <Button variant="outline" size="icon" onClick={() => actions?.edit?.(row.original.id, row.original)}><Edit /></Button>
           </TooltipTrigger>
           <TooltipContent>Edit</TooltipContent>
         </Tooltip>
@@ -34,7 +34,7 @@ export function TableRowActions({
       {actions?.delete && (
         <Tooltip>
           <TooltipTrigger asChild>
-            <Button variant="outline" size="icon" className="text-red-500" onClick={() => { actions?.delete?.(row.original.id)}}><Trash2 /></Button>
+            <Button variant="outline" size="icon" className="text-red-500" onClick={() => { actions?.delete?.(row.original.id, row.original)}}><Trash2 /></Button>
           </TooltipTrigger>
           <TooltipContent>Delete</TooltipContent>
         </Tooltip>

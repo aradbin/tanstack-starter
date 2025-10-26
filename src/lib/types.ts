@@ -56,9 +56,9 @@ export interface TableFilterType {
 }
 
 export interface TableActionType {
-  view?: (id: AnyType) => void
-  edit?: (id: AnyType) => void
-  delete?: (id: AnyType) => void
+  view?: (id: AnyType, item?: AnyType) => void
+  edit?: (id: AnyType, item?: AnyType) => void
+  delete?: (id: AnyType, item?: AnyType) => void
 }
 
 export interface SortType {
@@ -81,6 +81,7 @@ export interface SearchType {
 export type ModalStateType = {
   id: string | null
   isOpen: boolean
+  item?: AnyType
 } | null
 
 export type WhereType = Record<string, AnyType>

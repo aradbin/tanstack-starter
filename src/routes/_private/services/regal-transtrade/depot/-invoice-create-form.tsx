@@ -1,10 +1,9 @@
 import FormComponent from "@/components/form/form-component"
 import ModalComponent from "@/components/modal/modal-component"
 import { useQuery } from "@tanstack/react-query"
-import { createData, getData, updateData } from "@/lib/db/functions"
+import { getData, updateData } from "@/lib/db/functions"
 import { FormFieldType, ModalStateType } from "@/lib/types"
 import { stringRequiredValidation } from "@/lib/validations"
-import { generateId } from "better-auth"
 import { createTripInvoice } from "../-utils"
 
 export default function InvoiceCreateForm({ modal, setModal }: {
@@ -23,20 +22,11 @@ export default function InvoiceCreateForm({ modal, setModal }: {
   const formFields: FormFieldType[][] = [
     [
       {
-        name: "from",
-        label: "From",
-        type: "date",
-        validationOnSubmit: stringRequiredValidation("From Date"),
-        placeholder: "Enter From Date",
-      },
-    ],
-    [
-      {
-        name: "to",
-        label: "To",
-        type: "date",
-        validationOnSubmit: stringRequiredValidation("To Date"),
-        placeholder: "Enter To Date",
+        name: "month",
+        label: "Invoice Month",
+        type: "month",
+        validationOnSubmit: stringRequiredValidation("Month"),
+        placeholder: "Enter Month",
       },
     ],
     [

@@ -3,16 +3,51 @@ import { ColumnDef } from "@tanstack/react-table"
 import { TableColumnHeader } from "@/components/table/table-column-header"
 import { TableRowActions } from "@/components/table/table-row-actions"
 import { TableActionType } from "@/lib/types"
-import { invoices } from "@/lib/db/schema"
+import { invoices, partners } from "@/lib/db/schema"
+import AvatarComponent from "@/components/common/avatar-component"
+import { formatCurrency, formatDate } from "@/lib/utils"
+import InvoiceBadge from "@/components/app/invoice-badge"
 
 export const invoiceColumns = ({
   actions
 }: {
   actions?: TableActionType
-}): ColumnDef<typeof invoices.$inferSelect>[] => [
+}): ColumnDef<typeof invoices.$inferSelect & {
+  customer: typeof partners.$inferSelect
+}>[] => [
   {
     accessorKey: "number",
     header: ({ column }) => <TableColumnHeader column={column} title="#" />,
+  },
+  {
+    id: "status",
+    header: ({ column }) => <TableColumnHeader column={column} title="Status" />,
+    cell: ({ row }) => <InvoiceBadge amount={Number(row.original.amount)} paid={Number(row.original.paid)} dueDate={row.original.dueDate} />,
+  },
+  {
+    accessorKey: "customer.name",
+    header: ({ column }) => <TableColumnHeader column={column} title="Customer" />,
+    cell: ({ row }) => <AvatarComponent user={row.original.customer} />,
+  },
+  {
+    accessorKey: "createdAt",
+    header: ({ column }) => <TableColumnHeader column={column} title="Issued Date" />,
+    cell: ({ row }) => formatDate(row.original.createdAt),
+  },
+  {
+    accessorKey: "dueDate",
+    header: ({ column }) => <TableColumnHeader column={column} title="Due Date" />,
+    cell: ({ row }) => formatDate(row.original.dueDate),
+  },
+  {
+    accessorKey: "amount",
+    header: ({ column }) => <TableColumnHeader column={column} title="Amount" className="text-right" />,
+    cell: ({ row }) => <div className="text-right">{formatCurrency(Number(row.original.amount) || 0)}</div>,
+  },
+  {
+    accessorKey: "paid",
+    header: ({ column }) => <TableColumnHeader column={column} title="Paid" className="text-right" />,
+    cell: ({ row }) => <div className="text-right">{formatCurrency(Number(row.original.paid) || 0)}</div>,
   },
   {
     id: "actions",

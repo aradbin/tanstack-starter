@@ -1,12 +1,12 @@
 import { authOrgMiddleware } from "@/lib/auth/middleware"
 import { db } from "@/lib/db"
-import { addOrder, addPagination, addWhere, getDatas, getWhereArgs, QueryParamBaseType } from "@/lib/db/functions"
+import { addOrder, addWhere, getWhereArgs, QueryParamBaseType } from "@/lib/db/functions"
 import { assets, employees, invoiceEntities, invoices, serviceEntities, services } from "@/lib/db/schema"
 import { AnyType } from "@/lib/types"
-import { formatDateForInput } from "@/lib/utils"
+import { formatDateForInput, formatMonth } from "@/lib/utils"
 import { createServerFn } from "@tanstack/react-start"
 import { generateId } from "better-auth"
-import { endOfDay } from "date-fns"
+import { endOfDay, endOfMonth, format, startOfDay, startOfMonth } from "date-fns"
 import { and, eq, getTableColumns, gte, lte } from "drizzle-orm"
 import { alias } from "drizzle-orm/pg-core"
 
@@ -301,7 +301,9 @@ export const createTripInvoice = createServerFn({ method: "POST" })
   }) => data)
   .handler(async ({ context, data }): Promise<AnyType> => {
     const { values } = data
-
+    values["from"] = formatDateForInput(startOfMonth(new Date(values?.month)))
+    values["to"] = formatDateForInput(endOfMonth(new Date(values?.month)))
+    
     try {
       return await db.transaction(async (tx) => {
         const trips: typeof services.$inferSelect[] = await tx.query.services.findMany({
@@ -315,22 +317,66 @@ export const createTripInvoice = createServerFn({ method: "POST" })
         })
         
         let amount = 0
+        let invoiceItems = {
+          title: `Prime Mover Bill for the Month of ${formatMonth(new Date(values?.month))}`,
+          items: {
+            "PL": { particulars: "Line Trailer: Trip (CPA to Portlink)", quantity: 0, unitPrice: 0, total: 0 },
+            "PCT (Import)": { particulars: "Line Trailer: Other Depot (Import) PCT Trip", quantity: 0, unitPrice: 0, total: 0 },
+            "PCT (Export)": { particulars: "Line Trailer: Other Depot (Export) PCT Trip", quantity: 0, unitPrice: 0, total: 0 },
+            "otherDepotTripAmount": { particulars: "Line Trailer: Other Depot Trip amount", quantity: 0, unitPrice: 0, total: 0 },
+            "otherDepotTripFuel": { particulars: "Line Trailer: Other Depot Trip Fuel", quantity: 0, unitPrice: 0, total: 0 },
+          }
+        }
+        let invoiceFuels: AnyType = {
+          title: "Line Trailer: Other Depot Trip Fuel Details",
+          items: {}
+        }
         trips?.forEach((trip: AnyType) => {
           trip?.metadata?.items?.forEach((item: AnyType) => {
             amount += item?.count * ((item?.route?.income?.fuel * trip?.metadata?.fuelPrice) + item?.route?.income?.fixed)
-            console.log('item amount', item?.count * ((item?.route?.income?.fuel * trip?.metadata?.fuelPrice) + item?.route?.income?.fixed))
+
+            if(item?.route?.income?.fixed){
+              let key = "otherDepotTripAmount"
+              if(["PL", "PCT (Import)", "PCT (Export)"].includes(item?.route?.to)){
+                key = item?.route?.to
+              }
+              invoiceItems.items[key] = {
+                particulars: invoiceItems.items[key]?.particulars,
+                quantity: invoiceItems.items[key]?.quantity + item?.count,
+                unitPrice: item?.route?.income?.fixed,
+                total: ((invoiceItems.items[key].quantity + item?.count) * item?.route?.income?.fixed)
+              }
+            }
+
+            if(item?.route?.income?.fuel){
+              invoiceItems.items["otherDepotTripFuel"] = {
+                particulars: invoiceItems.items["otherDepotTripFuel"]?.particulars,
+                quantity: invoiceItems.items["otherDepotTripFuel"]?.quantity + (item?.count * item?.route?.income?.fuel),
+                unitPrice: trip?.metadata?.fuelPrice,
+                total: (invoiceItems.items["otherDepotTripFuel"]?.quantity + (item?.count * item?.route?.income?.fuel)) * trip?.metadata?.fuelPrice
+              }
+              invoiceFuels.items[item?.route?.to] = {
+                tripFuel: item?.route?.income?.fuel,
+                tripCount: (invoiceFuels?.items?.[item?.route?.to]?.count || 0) + item?.count,
+                fuelQuantity: ((invoiceFuels?.items?.[item?.route?.to]?.count || 0) + item?.count) * item?.route?.income?.fuel,
+              }
+            }
           })
         })
 
-        const count = await tx.$count(invoices, and(eq(invoices.organizationId, context?.session?.activeOrganizationId)))
-
         const [result] = await tx.insert(invoices).values({
           id: generateId(),
-          number: `${(count || 0) + 1}`,
+          number: `INV-DEPOT-${format(new Date(values.month), "MMyyyy")}`,
           amount: `${amount}`,
           paid: "0",
           dueDate: values?.dueDate,
           status: "unpaid",
+          metadata: {
+            from: values?.from,
+            to: values?.to,
+            invoiceItems,
+            invoiceFuels,
+          },
           organizationId: context?.session?.activeOrganizationId,
           createdBy: context?.user?.id,
         }).returning()
@@ -338,6 +384,7 @@ export const createTripInvoice = createServerFn({ method: "POST" })
         await tx.insert(invoiceEntities).values([
           ...trips?.map((trip) => ({
             id: generateId(),
+            role: "trip",
             entityType: "services",
             entityId: trip?.id,
             organizationId: context?.session?.activeOrganizationId,
@@ -346,6 +393,7 @@ export const createTripInvoice = createServerFn({ method: "POST" })
           })),
           ...[{
             id: generateId(),
+            role: "customer",
             entityType: "partners",
             entityId: "64g2kKyWEyk7pAMojDhDu5o8nQRWN5qf",
             organizationId: context?.session?.activeOrganizationId,
@@ -356,7 +404,7 @@ export const createTripInvoice = createServerFn({ method: "POST" })
 
         return {
           ...result,
-          message: "Trip Invoice Created Successfully"
+          message: "Trip Invoice Generated Successfully"
         }
       })
     } catch {
