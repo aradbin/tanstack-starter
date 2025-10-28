@@ -4,9 +4,9 @@ import { useQuery } from "@tanstack/react-query"
 import { getData, updateData } from "@/lib/db/functions"
 import { FormFieldType, ModalStateType } from "@/lib/types"
 import { stringRequiredValidation } from "@/lib/validations"
-import { createTripInvoice } from "../-utils"
+import { createDepotTripInvoice } from "../-utils"
 
-export default function InvoiceCreateForm({ modal, setModal }: {
+export default function InvoiceForm({ modal, setModal }: {
   modal: ModalStateType,
   setModal: (state: ModalStateType) => void
 }) {
@@ -22,11 +22,27 @@ export default function InvoiceCreateForm({ modal, setModal }: {
   const formFields: FormFieldType[][] = [
     [
       {
-        name: "month",
-        label: "Invoice Month",
-        type: "month",
-        validationOnSubmit: stringRequiredValidation("Month"),
-        placeholder: "Enter Month",
+        name: "from",
+        label: "From",
+        type: "date",
+        validationOnSubmit: stringRequiredValidation("From"),
+        placeholder: "Enter From",
+      },
+      {
+        name: "to",
+        label: "To",
+        type: "date",
+        validationOnSubmit: stringRequiredValidation("To"),
+        placeholder: "Enter To",
+      },
+    ],
+    [
+      {
+        name: "date",
+        label: "Invoice Date",
+        type: "date",
+        validationOnSubmit: stringRequiredValidation("Invoice Date"),
+        placeholder: "Enter Invoice Date",
       },
     ],
     [
@@ -51,12 +67,12 @@ export default function InvoiceCreateForm({ modal, setModal }: {
       {(props) => (
         <FormComponent
           fields={formFields}
-          handleSubmit={(values: Record<string, any>) => modal?.id ?
-            updateData({ data: { table: "invoices", id: modal?.id, values, title: "Invoice" } }) :
-            createTripInvoice({ data: { values: {
-              type: "depot",
-              ...values,
-            }}})}
+          handleSubmit={(values: {
+            from: string,
+            to: string,
+            date: string,
+            dueDate: string,
+          }) => createDepotTripInvoice({ data: { values }})}
           values={modal?.isOpen && modal?.id && data ? data : {}}
           onSuccess={() => {
             props.close()

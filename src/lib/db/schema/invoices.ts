@@ -9,6 +9,7 @@ export const invoices = pgTable("invoices", {
   number: table.text().notNull(),
   amount: table.numeric().notNull(),
   paid: table.numeric().default("0").notNull(),
+  date: table.date().notNull(),
   dueDate: table.date("due_date").notNull(),
   status: table.text().notNull(), // paid, unpaid, overdue, draft, canceled, partial, refunded
   attachments: table.text(),

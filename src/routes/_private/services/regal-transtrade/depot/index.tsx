@@ -12,7 +12,7 @@ import { Card, CardAction, CardDescription, CardHeader, CardTitle } from '@/comp
 import { getTrips } from '../-utils'
 import { ModalStateType } from '@/lib/types'
 import { useState } from 'react'
-import InvoiceCreateForm from './-invoice-create-form'
+import InvoiceForm from './-invoice-form'
 
 export const Route = createFileRoute('/_private/services/regal-transtrade/depot/')({
   validateSearch: validate({
@@ -30,7 +30,7 @@ function RouteComponent() {
   const params = Route.useSearch()
   const navigate = Route.useNavigate()
   const { vehicles, drivers, helpers, setDeleteModal } = useApp()
-  const [invoiceCreateModal, setInvoiceCreateModal] = useState<ModalStateType>(null)
+  const [invoiceModal, setInvoiceModal] = useState<ModalStateType>(null)
 
   const query: QueryParamType = {
     table: "services",
@@ -89,7 +89,7 @@ function RouteComponent() {
       ]} query={query} queryFn={getTrips} options={{}} toolbar={(
         <div className='flex gap-2'>
           <Button size="sm" variant="outline" onClick={() => {
-            setInvoiceCreateModal({
+            setInvoiceModal({
               id: null,
               isOpen: true
             })
@@ -152,7 +152,7 @@ function RouteComponent() {
           )
         },
       }} />
-      <InvoiceCreateForm modal={invoiceCreateModal} setModal={setInvoiceCreateModal} />
+      <InvoiceForm modal={invoiceModal} setModal={setInvoiceModal} />
     </>
   )
 }

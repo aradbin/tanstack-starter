@@ -20,24 +20,24 @@ export const invoiceColumns = ({
     header: ({ column }) => <TableColumnHeader column={column} title="#" />,
   },
   {
-    id: "status",
-    header: ({ column }) => <TableColumnHeader column={column} title="Status" />,
-    cell: ({ row }) => <InvoiceBadge amount={Number(row.original.amount)} paid={Number(row.original.paid)} dueDate={row.original.dueDate} />,
-  },
-  {
     accessorKey: "customer.name",
     header: ({ column }) => <TableColumnHeader column={column} title="Customer" />,
     cell: ({ row }) => <AvatarComponent user={row.original.customer} />,
   },
   {
-    accessorKey: "createdAt",
+    accessorKey: "date",
     header: ({ column }) => <TableColumnHeader column={column} title="Issued Date" />,
-    cell: ({ row }) => formatDate(row.original.createdAt),
+    cell: ({ row }) => formatDate(row.original.date),
   },
   {
     accessorKey: "dueDate",
     header: ({ column }) => <TableColumnHeader column={column} title="Due Date" />,
     cell: ({ row }) => formatDate(row.original.dueDate),
+  },
+  {
+    id: "status",
+    header: ({ column }) => <TableColumnHeader column={column} title="Status" />,
+    cell: ({ row }) => <InvoiceBadge amount={Number(row.original.amount)} paid={Number(row.original.paid)} dueDate={row.original.dueDate} />,
   },
   {
     accessorKey: "amount",

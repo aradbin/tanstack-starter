@@ -4,12 +4,61 @@ import { invoices } from "@/lib/db/schema"
 import { formatCurrency, formatDate, formatMonth } from "@/lib/utils";
 import { endOfMonth, startOfMonth } from "date-fns";
 
+const Header = () => {
+  return (
+    <View style={{
+      textAlign: "center",
+      paddingBottom: 20,
+      borderBottom: "1px solid #000",
+    }}>
+      <View>
+        <Text style={{
+          fontSize: 15,
+          fontWeight: 700,
+        }}>Regal TransTrade (PVT) LTD.</Text>
+      </View>
+    </View>
+  )
+}
+const Footer = () => {
+  return (
+    <View style={{
+      position: "absolute",
+      bottom: 20,
+      left: 20,
+      right: 20,
+      textAlign: "center",
+    }}>
+      <Text style={{
+        borderBottom: "1px solid #000",
+        paddingHorizontal: 40,
+        paddingBottom: 20,
+        fontSize: 11,
+      }}>
+        Kindly Arrange The Payment At Your Earliest. Please Make All Payment Through A/C Payee Cheque Only In Favour Of Regal TransTrade (PVT) LTD.
+      </Text>
+      <Text style={{
+        fontSize: 10,
+        marginTop: 20,
+      }}>1183/1262, F.M.S Waquf Estate Building, South Halishahar, CEPZ Approach Road, Bandar, Chittagong</Text>
+      <Text style={{
+        fontSize: 8,
+        marginTop: 5,
+      }}>Mobile: 01681121850, 01814659746</Text>
+    </View>
+  )
+}
+
 export default function InvoiceView({ modal }: {
   modal: ModalStateType,
   // setModal: (state: ModalStateType) => void
 }) {
-  const data: typeof invoices.$inferSelect = modal?.item;
   const styles = StyleSheet.create({
+    page: {
+      fontSize: 10,
+      padding: 20,
+      lineHeight: 1.5,
+    },
     table: {
       border: "1px solid #000",
       borderBottom: "none",
@@ -24,7 +73,8 @@ export default function InvoiceView({ modal }: {
       fontWeight: 700,
     },
     cell: {
-      padding: 10,
+      padding: 6,
+      paddingBottom: 3,
       borderRight: "1px solid #000",
     },
     col1: { width: "8%", textAlign: "center", borderLeft: "none" },
@@ -33,20 +83,6 @@ export default function InvoiceView({ modal }: {
     col4: { width: "20%", textAlign: "right" },
     col5: { width: "20%", textAlign: "right", borderRight: "none" },
   });
-
-  const DefaultData = {
-    items: [
-      { desc: "Line Trailer: Trip (C/A to Portlink)", qty: "846", unit: "5900", total: "4,991,400" },
-      { desc: "Line Trailer: Trip (C/A to Portlink)", qty: "000", unit: "000", total: "000" },
-      { desc: "Line Trailer: (EXPORT) PCT Trip", qty: "24", unit: "2000", total: "48,000" },
-      { desc: "Line Trailer: Other Deposit (IMPORT) PCT Trip", qty: "21", unit: "2700", total: "56,700" },
-      { desc: "Line Trailer: Other Deposit Trip amount", qty: "23", unit: "500", total: "11,500" },
-      { desc: "Line Trailer: Other Deposit Trip Fuel", qty: "000", unit: "000", total: "000" },
-      { desc: "Line Trailer: Other Deposit Trip Fuel", qty: "294", unit: "102", total: "29,988" },
-      { desc: "Line Trailer: Other Deposit Trip Fuel", qty: "000", unit: "00", total: "000" },
-    ],
-    grandTotal: "5,137,588",
-  };
 
   return (
     // <ModalComponent variant="default" options={{
@@ -60,26 +96,10 @@ export default function InvoiceView({ modal }: {
     //   {(props) => (
         // <PDFViewer width="100%" height={842} showToolbar={false}>
           <Document>
-            <Page size="A4" style={{
-              fontSize: 10,
-              padding: 20,
-              lineHeight: 1.5,
-            }} wrap>
-              <View style={{
-                textAlign: "center",
-                marginBottom: 10,
-              }}>
-                <View>
-                  <Text style={{
-                    fontSize: 15,
-                    fontWeight: 700,
-                  }}>Regal TransTrade (PVT) LTD.</Text>
-                </View>
-              </View>
+            <Page size="A4" style={styles.page} wrap>
+              <Header />
 
               <View style={{
-                borderTopWidth: 1,
-                borderTopColor: "#000000",
                 marginTop: 10,
                 paddingTop: 10,
                 marginBottom: 10,
@@ -88,7 +108,7 @@ export default function InvoiceView({ modal }: {
                 <Text style={{
                   fontSize: 12,
                   fontWeight: 700,
-                }}>Summary Statement for the Month of {formatMonth(modal?.item?.metadata?.from)}</Text>
+                }}>Summary Statement for the Month of {formatMonth(modal?.item?.metadata?.to)}</Text>
               </View>
 
               <View style={{
@@ -112,7 +132,7 @@ export default function InvoiceView({ modal }: {
                   <Text style={{ fontWeight: 700 }}>Invoice Details</Text>
                   <Text>Bill No: #{modal?.item?.number}</Text>
                   <Text>Billing Cycle: {formatDate(startOfMonth(modal?.item?.metadata?.from))} to {formatDate(endOfMonth(modal?.item?.metadata?.to))}</Text>
-                  <Text>Due Date: {formatDate(modal?.item?.dueDate)}</Text>
+                  <Text>Invoice Date: {formatDate(modal?.item?.date)}</Text>
                 </View>
               </View>
 
@@ -130,7 +150,7 @@ export default function InvoiceView({ modal }: {
                   <Text style={[styles.cell, styles.col2]}>Particulars</Text>
                   <Text style={[styles.cell, styles.col3]}>Quantity</Text>
                   <Text style={[styles.cell, styles.col4]}>Unit Price</Text>
-                  <Text style={[styles.cell, styles.col5, { textAlign: "center" }]}>Total</Text>
+                  <Text style={[styles.cell, styles.col5]}>Total</Text>
                 </View>
 
                 {Object.values(modal?.item?.metadata?.invoiceItems?.items)?.map((item: AnyType, index: number) => (
@@ -143,58 +163,21 @@ export default function InvoiceView({ modal }: {
                   </View>
                 ))}
                 <View style={styles.tableRow}>
-                  <Text style={[styles.cell, { width: "80%" }]}>Total</Text>
+                  <Text style={[styles.cell, { width: "80%", textAlign: "center" }]}>Total</Text>
                   <Text style={[styles.cell, styles.col5]}>{formatCurrency(Number(modal?.item?.amount))}</Text>
                 </View>
               </View>
 
-              <View style={{
-                position: "absolute",
-                bottom: 20,
-                left: 20,
-                right: 20,
-                textAlign: "center",
-              }}>
-                <Text style={{
-                  borderBottom: "1px solid #000",
-                  paddingHorizontal: 40,
-                  paddingBottom: 20,
-                  fontSize: 11,
-                }}>
-                  Kindly Arrange The Payment At Your Earliest. Please Make All Payment Through A/C Payee Cheque Only In Favour Of Regal TransTrade (PVT) LTD.
-                </Text>
-                <Text style={{
-                  fontSize: 10,
-                  marginTop: 20,
-                }}>1183/1262, F.M.S Waquf Estate Building, South Halishahar, CEPZ Approach Road, Bandar, Chittagong</Text>
-                <Text style={{
-                  fontSize: 8,
-                  marginTop: 5,
-                }}>Mobile: 01681121850, 01814659746</Text>
-              </View>
+              <Footer />
             </Page>
-            <Page size="A4" style={{
-              fontSize: 10,
-              padding: 20,
-              lineHeight: 1.5,
-            }} wrap>
-              <View style={{
-                textAlign: "center",
-                marginBottom: 10,
-              }}>
-                <View>
-                  <Text style={{
-                    fontSize: 15,
-                    fontWeight: 700,
-                  }}>Regal TransTrade (PVT) LTD.</Text>
-                </View>
-              </View>
+            <Page size="A4" style={styles.page} wrap>
+              <Header />
 
               <Text style={{
                 fontWeight: 700,
                 textAlign: "center",
                 marginTop: 10
-              }}>{modal?.item?.metadata?.invoiceFuels?.title}</Text>
+              }}>{modal?.item?.metadata?.invoiceFuelItems?.title}</Text>
 
               {/* Items table */}
               <View style={styles.table}>
@@ -204,10 +187,10 @@ export default function InvoiceView({ modal }: {
                   <Text style={[styles.cell, styles.col2]}>Depot Name</Text>
                   <Text style={[styles.cell, styles.col3]}>Fuel/Trip</Text>
                   <Text style={[styles.cell, styles.col4]}>Trips</Text>
-                  <Text style={[styles.cell, styles.col5, { textAlign: "center" }]}>Fuel Quantity</Text>
+                  <Text style={[styles.cell, styles.col5]}>Fuel Quantity</Text>
                 </View>
 
-                {Object.entries(modal?.item?.metadata?.invoiceFuels?.items)?.map((item: AnyType, index: number) => (
+                {Object.entries(modal?.item?.metadata?.invoiceFuelItems?.items)?.map((item: AnyType, index: number) => (
                   <View style={styles.tableRow} key={index}>
                     <Text style={[styles.cell, styles.col1]}>{index+1}</Text>
                     <Text style={[styles.cell, styles.col2]}>{item[0]}</Text>
@@ -217,35 +200,12 @@ export default function InvoiceView({ modal }: {
                   </View>
                 ))}
                 <View style={styles.tableRow}>
-                  <Text style={[styles.cell, { width: "80%" }]}>Total</Text>
+                  <Text style={[styles.cell, { width: "80%", textAlign: "center" }]}>Total</Text>
                   <Text style={[styles.cell, styles.col5]}>{modal?.item?.metadata?.invoiceItems?.items?.["otherDepotTripFuel"]?.quantity}</Text>
                 </View>
               </View>
 
-              <View style={{
-                position: "absolute",
-                bottom: 20,
-                left: 20,
-                right: 20,
-                textAlign: "center",
-              }}>
-                <Text style={{
-                  borderBottom: "1px solid #000",
-                  paddingHorizontal: 40,
-                  paddingBottom: 20,
-                  fontSize: 11,
-                }}>
-                  Kindly Arrange The Payment At Your Earliest. Please Make All Payment Through A/C Payee Cheque Only In Favour Of Regal TransTrade (PVT) LTD.
-                </Text>
-                <Text style={{
-                  fontSize: 10,
-                  marginTop: 20,
-                }}>1183/1262, F.M.S Waquf Estate Building, South Halishahar, CEPZ Approach Road, Bandar, Chittagong</Text>
-                <Text style={{
-                  fontSize: 8,
-                  marginTop: 5,
-                }}>Mobile: 01681121850, 01814659746</Text>
-              </View>
+              <Footer />
             </Page>
           </Document>
         // </PDFViewer>

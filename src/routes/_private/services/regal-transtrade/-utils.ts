@@ -6,7 +6,7 @@ import { AnyType } from "@/lib/types"
 import { formatDateForInput, formatMonth } from "@/lib/utils"
 import { createServerFn } from "@tanstack/react-start"
 import { generateId } from "better-auth"
-import { endOfDay, endOfMonth, format, startOfDay, startOfMonth } from "date-fns"
+import { endOfDay, endOfMonth, format, isPast, startOfDay, startOfMonth } from "date-fns"
 import { and, eq, getTableColumns, gte, lte } from "drizzle-orm"
 import { alias } from "drizzle-orm/pg-core"
 
@@ -294,21 +294,24 @@ export const updateTrip = createServerFn({ method: "POST" })
     }
   })
 
-export const createTripInvoice = createServerFn({ method: "POST" })
+export const createDepotTripInvoice = createServerFn({ method: "POST" })
   .middleware([authOrgMiddleware])
   .validator((data: {
-    values: AnyType
+    values: {
+      from: string,
+      to: string,
+      date: string,
+      dueDate: string,
+    }
   }) => data)
   .handler(async ({ context, data }): Promise<AnyType> => {
     const { values } = data
-    values["from"] = formatDateForInput(startOfMonth(new Date(values?.month)))
-    values["to"] = formatDateForInput(endOfMonth(new Date(values?.month)))
     
     try {
       return await db.transaction(async (tx) => {
         const trips: typeof services.$inferSelect[] = await tx.query.services.findMany({
           where: and(...getWhereArgs(context?.session?.activeOrganizationId, services, {
-            typeId: values?.type === "depot" ? "VOVj5e0Qn0lRuF5JXE0QplbVFKLdSbjM" : "zeA6cPLyvfLXMFXOs5fsi4SPpKatGm3I",
+            typeId: "VOVj5e0Qn0lRuF5JXE0QplbVFKLdSbjM",
             from: {
               gte: new Date(values?.from),
               lte: new Date(values?.to)
@@ -318,7 +321,7 @@ export const createTripInvoice = createServerFn({ method: "POST" })
         
         let amount = 0
         let invoiceItems = {
-          title: `Prime Mover Bill for the Month of ${formatMonth(new Date(values?.month))}`,
+          title: `Prime Mover Bill for the Month of ${formatMonth(new Date(values?.to))}`,
           items: {
             "PL": { particulars: "Line Trailer: Trip (CPA to Portlink)", quantity: 0, unitPrice: 0, total: 0 },
             "PCT (Import)": { particulars: "Line Trailer: Other Depot (Import) PCT Trip", quantity: 0, unitPrice: 0, total: 0 },
@@ -327,7 +330,7 @@ export const createTripInvoice = createServerFn({ method: "POST" })
             "otherDepotTripFuel": { particulars: "Line Trailer: Other Depot Trip Fuel", quantity: 0, unitPrice: 0, total: 0 },
           }
         }
-        let invoiceFuels: AnyType = {
+        const invoiceFuels: AnyType = {
           title: "Line Trailer: Other Depot Trip Fuel Details",
           items: {}
         }
@@ -364,18 +367,32 @@ export const createTripInvoice = createServerFn({ method: "POST" })
           })
         })
 
+        const invoiceFuelItems: AnyType = {
+          title: "Line Trailer: Other Depot Trip Fuel Details",
+          items: {}
+        }
+
+        trips[0]?.metadata?.["routes"]?.forEach((route: AnyType) => {
+          invoiceFuelItems.items[route?.to] = {
+            tripFuel: route?.income?.fuel || 0,
+            tripCount: invoiceFuels?.items?.[route?.to]?.tripCount || 0,
+            fuelQuantity: ((invoiceFuels?.items?.[route?.to]?.tripCount || 0) * (route?.income?.fuel || 0)) || 0,
+          }
+        })
+
         const [result] = await tx.insert(invoices).values({
           id: generateId(),
-          number: `INV-DEPOT-${format(new Date(values.month), "MMyyyy")}`,
+          number: `INV-DEPOT-${format(new Date(values.to), "MMyyyy")}`,
           amount: `${amount}`,
           paid: "0",
+          date: values?.date,
           dueDate: values?.dueDate,
-          status: "unpaid",
+          status: isPast(new Date(values?.dueDate)) ? "overdue" : "unpaid",
           metadata: {
             from: values?.from,
             to: values?.to,
             invoiceItems,
-            invoiceFuels,
+            invoiceFuelItems,
           },
           organizationId: context?.session?.activeOrganizationId,
           createdBy: context?.user?.id,
