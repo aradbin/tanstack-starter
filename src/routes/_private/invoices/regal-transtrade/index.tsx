@@ -2,13 +2,14 @@ import TableComponent from '@/components/table/table-component'
 import { QueryParamType } from '@/lib/db/functions'
 import { defaultSearchParamValidation, validate } from '@/lib/validations'
 import { createFileRoute } from '@tanstack/react-router'
-import { invoiceColumns } from './-columns'
 import { useState } from 'react'
 import { ModalStateType } from '@/lib/types'
 import { pdf } from '@react-pdf/renderer'
-import { getInvoices } from './-utils'
+import { invoiceColumns } from '../-columns'
+import InvoiceView from './-view'
+import { getInvoices } from '../-utils'
 
-export const Route = createFileRoute('/_private/invoices/')({
+export const Route = createFileRoute('/_private/invoices/regal-transtrade/')({
   validateSearch: validate({
     ...defaultSearchParamValidation,
   }),
@@ -43,13 +44,13 @@ function RouteComponent() {
               isOpen: true,
               item
             })
-            // const blob = await pdf(<InvoiceView modal={{
-            //   id,
-            //   isOpen: true,
-            //   item
-            // }} />).toBlob();
-            // const url = URL.createObjectURL(blob);
-            // window.open(url, "_blank");
+            const blob = await pdf(<InvoiceView modal={{
+              id,
+              isOpen: true,
+              item
+            }} />).toBlob();
+            const url = URL.createObjectURL(blob);
+            window.open(url, "_blank");
           },
         }
       })} filters={[]} query={query} queryFn={getInvoices} options={{

@@ -33,6 +33,7 @@ import { Route as AuthLoginIndexRouteImport } from './routes/_auth/login/index'
 import { Route as AuthRegisterOrganizationRouteImport } from './routes/_auth/register/organization'
 import { Route as PrivateServicesRegalTranstradeIndexRouteImport } from './routes/_private/services/regal-transtrade/index'
 import { Route as PrivatePartnersRoleIndexRouteImport } from './routes/_private/partners/$role/index'
+import { Route as PrivateInvoicesRegalTranstradeIndexRouteImport } from './routes/_private/invoices/regal-transtrade/index'
 import { Route as PrivateEmployeesIdIndexRouteImport } from './routes/_private/employees/$id/index'
 import { Route as PrivateAssetsIdIndexRouteImport } from './routes/_private/assets/$id/index'
 import { Route as PrivateServicesRegalTranstradeDistrictIndexRouteImport } from './routes/_private/services/regal-transtrade/district/index'
@@ -159,6 +160,12 @@ const PrivatePartnersRoleIndexRoute =
     path: '/partners/$role/',
     getParentRoute: () => PrivateRouteRoute,
   } as any)
+const PrivateInvoicesRegalTranstradeIndexRoute =
+  PrivateInvoicesRegalTranstradeIndexRouteImport.update({
+    id: '/invoices/regal-transtrade/',
+    path: '/invoices/regal-transtrade/',
+    getParentRoute: () => PrivateRouteRoute,
+  } as any)
 const PrivateEmployeesIdIndexRoute = PrivateEmployeesIdIndexRouteImport.update({
   id: '/$id/',
   path: '/$id/',
@@ -244,6 +251,7 @@ export interface FileRoutesByFullPath {
   '/whatsapp': typeof PrivateWhatsappIndexRoute
   '/assets/$id': typeof PrivateAssetsIdIndexRoute
   '/employees/$id': typeof PrivateEmployeesIdIndexRoute
+  '/invoices/regal-transtrade': typeof PrivateInvoicesRegalTranstradeIndexRoute
   '/partners/$role': typeof PrivatePartnersRoleIndexRoute
   '/services/regal-transtrade': typeof PrivateServicesRegalTranstradeIndexRoute
   '/services/regal-transtrade/depot': typeof PrivateServicesRegalTranstradeDepotIndexRoute
@@ -274,6 +282,7 @@ export interface FileRoutesByTo {
   '/whatsapp': typeof PrivateWhatsappIndexRoute
   '/assets/$id': typeof PrivateAssetsIdIndexRoute
   '/employees/$id': typeof PrivateEmployeesIdIndexRoute
+  '/invoices/regal-transtrade': typeof PrivateInvoicesRegalTranstradeIndexRoute
   '/partners/$role': typeof PrivatePartnersRoleIndexRoute
   '/services/regal-transtrade': typeof PrivateServicesRegalTranstradeIndexRoute
   '/services/regal-transtrade/depot': typeof PrivateServicesRegalTranstradeDepotIndexRoute
@@ -309,6 +318,7 @@ export interface FileRoutesById {
   '/_private/whatsapp/': typeof PrivateWhatsappIndexRoute
   '/_private/assets/$id/': typeof PrivateAssetsIdIndexRoute
   '/_private/employees/$id/': typeof PrivateEmployeesIdIndexRoute
+  '/_private/invoices/regal-transtrade/': typeof PrivateInvoicesRegalTranstradeIndexRoute
   '/_private/partners/$role/': typeof PrivatePartnersRoleIndexRoute
   '/_private/services/regal-transtrade/': typeof PrivateServicesRegalTranstradeIndexRoute
   '/_private/services/regal-transtrade/depot/': typeof PrivateServicesRegalTranstradeDepotIndexRoute
@@ -343,6 +353,7 @@ export interface FileRouteTypes {
     | '/whatsapp'
     | '/assets/$id'
     | '/employees/$id'
+    | '/invoices/regal-transtrade'
     | '/partners/$role'
     | '/services/regal-transtrade'
     | '/services/regal-transtrade/depot'
@@ -373,6 +384,7 @@ export interface FileRouteTypes {
     | '/whatsapp'
     | '/assets/$id'
     | '/employees/$id'
+    | '/invoices/regal-transtrade'
     | '/partners/$role'
     | '/services/regal-transtrade'
     | '/services/regal-transtrade/depot'
@@ -407,6 +419,7 @@ export interface FileRouteTypes {
     | '/_private/whatsapp/'
     | '/_private/assets/$id/'
     | '/_private/employees/$id/'
+    | '/_private/invoices/regal-transtrade/'
     | '/_private/partners/$role/'
     | '/_private/services/regal-transtrade/'
     | '/_private/services/regal-transtrade/depot/'
@@ -601,6 +614,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof PrivatePartnersRoleIndexRouteImport
       parentRoute: typeof PrivateRouteRoute
     }
+    '/_private/invoices/regal-transtrade/': {
+      id: '/_private/invoices/regal-transtrade/'
+      path: '/invoices/regal-transtrade'
+      fullPath: '/invoices/regal-transtrade'
+      preLoaderRoute: typeof PrivateInvoicesRegalTranstradeIndexRouteImport
+      parentRoute: typeof PrivateRouteRoute
+    }
     '/_private/employees/$id/': {
       id: '/_private/employees/$id/'
       path: '/$id'
@@ -743,6 +763,7 @@ interface PrivateRouteRouteChildren {
   PrivateServicesIndexRoute: typeof PrivateServicesIndexRoute
   PrivateTasksIndexRoute: typeof PrivateTasksIndexRoute
   PrivateWhatsappIndexRoute: typeof PrivateWhatsappIndexRoute
+  PrivateInvoicesRegalTranstradeIndexRoute: typeof PrivateInvoicesRegalTranstradeIndexRoute
   PrivatePartnersRoleIndexRoute: typeof PrivatePartnersRoleIndexRoute
   PrivateServicesRegalTranstradeIndexRoute: typeof PrivateServicesRegalTranstradeIndexRoute
   PrivateServicesRegalTranstradeDepotIndexRoute: typeof PrivateServicesRegalTranstradeDepotIndexRoute
@@ -769,6 +790,8 @@ const PrivateRouteRouteChildren: PrivateRouteRouteChildren = {
   PrivateServicesIndexRoute: PrivateServicesIndexRoute,
   PrivateTasksIndexRoute: PrivateTasksIndexRoute,
   PrivateWhatsappIndexRoute: PrivateWhatsappIndexRoute,
+  PrivateInvoicesRegalTranstradeIndexRoute:
+    PrivateInvoicesRegalTranstradeIndexRoute,
   PrivatePartnersRoleIndexRoute: PrivatePartnersRoleIndexRoute,
   PrivateServicesRegalTranstradeIndexRoute:
     PrivateServicesRegalTranstradeIndexRoute,

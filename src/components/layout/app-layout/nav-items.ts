@@ -96,7 +96,7 @@ export const mainNavItems: NavigationType[] = [
     items: [
       {
         title: "Invoices",
-        href: "/invoices",
+        href: "/invoices/regal-transtrade",
         icon: Wallet,
       },
     ],
