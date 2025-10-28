@@ -8,9 +8,9 @@ export const Route = createFileRoute("/_private/")({
 function Home() {
   return (
     <div className="grid gap-4 md:gap-6 grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5">
-      {/* <button onClick={async () => {
+      <button onClick={async () => {
         await syncRegalTranstrade()
-      }}>sync</button> */}
+      }}>sync</button>
       {/* <Card>
         <CardHeader>
           <CardTitle className="text-2xl font-semibold tabular-nums">10</CardTitle>
