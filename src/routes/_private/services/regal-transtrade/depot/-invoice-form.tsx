@@ -2,9 +2,11 @@ import FormComponent from "@/components/form/form-component"
 import ModalComponent from "@/components/modal/modal-component"
 import { useQuery } from "@tanstack/react-query"
 import { getData, updateData } from "@/lib/db/functions"
-import { FormFieldType, ModalStateType } from "@/lib/types"
+import { AnyType, FormFieldType, ModalStateType } from "@/lib/types"
 import { stringRequiredValidation } from "@/lib/validations"
 import { createDepotTripInvoice } from "../-utils"
+import { pdf } from "@react-pdf/renderer"
+import InvoiceView from "@/routes/_private/invoices/regal-transtrade/-view"
 
 export default function InvoiceForm({ modal, setModal }: {
   modal: ModalStateType,
@@ -74,8 +76,15 @@ export default function InvoiceForm({ modal, setModal }: {
             dueDate: string,
           }) => createDepotTripInvoice({ data: { values }})}
           values={modal?.isOpen && modal?.id && data ? data : {}}
-          onSuccess={() => {
+          onSuccess={async (response: AnyType) => {
             props.close()
+            const blob = await pdf(<InvoiceView modal={{
+              id: response.id,
+              isOpen: true,
+              item: response
+            }} />).toBlob();
+            const url = URL.createObjectURL(blob);
+            window.open(url, "_blank");
           }}
           onCancel={() => {
             props.close()

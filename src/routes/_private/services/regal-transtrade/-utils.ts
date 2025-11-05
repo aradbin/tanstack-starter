@@ -322,13 +322,13 @@ export const createDepotTripInvoice = createServerFn({ method: "POST" })
         let amount = 0
         let invoiceItems = {
           title: `Prime Mover Bill for the Month of ${formatMonth(new Date(values?.to))}`,
-          items: {
-            "PL": { particulars: "Line Trailer: Trip (CPA to Portlink)", quantity: 0, unitPrice: 0, total: 0 },
-            "PCT (Import)": { particulars: "Line Trailer: Other Depot (Import) PCT Trip", quantity: 0, unitPrice: 0, total: 0 },
-            "PCT (Export)": { particulars: "Line Trailer: Other Depot (Export) PCT Trip", quantity: 0, unitPrice: 0, total: 0 },
-            "otherDepotTripAmount": { particulars: "Line Trailer: Other Depot Trip amount", quantity: 0, unitPrice: 0, total: 0 },
-            "otherDepotTripFuel": { particulars: "Line Trailer: Other Depot Trip Fuel", quantity: 0, unitPrice: 0, total: 0 },
-          }
+          items: [
+            { key: "PL", particulars: "Line Trailer: Trip (CPA to Portlink)", quantity: 0, unitPrice: 0, total: 0 },
+            { key: "PCT (Import)", particulars: "Line Trailer: Other Depot (Import) PCT Trip", quantity: 0, unitPrice: 0, total: 0 },
+            { key: "PCT (Export)", particulars: "Line Trailer: Other Depot (Export) PCT Trip", quantity: 0, unitPrice: 0, total: 0 },
+            { key: "otherDepotTripAmount", particulars: "Line Trailer: Other Depot Trip amount", quantity: 0, unitPrice: 0, total: 0 },
+            { key: "otherDepotTripFuel", particulars: "Line Trailer: Other Depot Trip Fuel", quantity: 0, unitPrice: 0, total: 0 },
+          ]
         }
         const invoiceFuels: AnyType = {
           title: "Line Trailer: Other Depot Trip Fuel Details",
@@ -343,20 +343,24 @@ export const createDepotTripInvoice = createServerFn({ method: "POST" })
               if(["PL", "PCT (Import)", "PCT (Export)"].includes(item?.route?.to)){
                 key = item?.route?.to
               }
-              invoiceItems.items[key] = {
-                particulars: invoiceItems.items[key]?.particulars,
-                quantity: invoiceItems.items[key]?.quantity + item?.count,
+              const itemIndex = invoiceItems?.items?.findIndex((invoiceItem: AnyType) => invoiceItem?.key === key)
+              invoiceItems.items[itemIndex] = {
+                ...invoiceItems.items[itemIndex],
+                particulars: invoiceItems.items[itemIndex]?.particulars,
+                quantity: invoiceItems.items[itemIndex]?.quantity + item?.count,
                 unitPrice: item?.route?.income?.fixed,
-                total: ((invoiceItems.items[key].quantity + item?.count) * item?.route?.income?.fixed)
+                total: ((invoiceItems.items[itemIndex].quantity + item?.count) * item?.route?.income?.fixed)
               }
             }
 
             if(item?.route?.income?.fuel){
-              invoiceItems.items["otherDepotTripFuel"] = {
-                particulars: invoiceItems.items["otherDepotTripFuel"]?.particulars,
-                quantity: invoiceItems.items["otherDepotTripFuel"]?.quantity + (item?.count * item?.route?.income?.fuel),
+              const otherDepotTripFuelIndex = invoiceItems?.items?.findIndex((invoiceItem: AnyType) => invoiceItem?.key === "otherDepotTripFuel")
+              invoiceItems.items[otherDepotTripFuelIndex] = {
+                ...invoiceItems.items[otherDepotTripFuelIndex],
+                particulars: invoiceItems.items[otherDepotTripFuelIndex]?.particulars,
+                quantity: invoiceItems.items[otherDepotTripFuelIndex]?.quantity + (item?.count * item?.route?.income?.fuel),
                 unitPrice: trip?.metadata?.fuelPrice,
-                total: (invoiceItems.items["otherDepotTripFuel"]?.quantity + (item?.count * item?.route?.income?.fuel)) * trip?.metadata?.fuelPrice
+                total: (invoiceItems.items[otherDepotTripFuelIndex]?.quantity + (item?.count * item?.route?.income?.fuel)) * trip?.metadata?.fuelPrice
               }
               invoiceFuels.items[item?.route?.to] = {
                 tripFuel: item?.route?.income?.fuel,
@@ -421,6 +425,11 @@ export const createDepotTripInvoice = createServerFn({ method: "POST" })
 
         return {
           ...result,
+          customer: {
+            id: "64g2kKyWEyk7pAMojDhDu5o8nQRWN5qf",
+            name: "Portlink Logistic Centre Limited",
+            address: "Bhatiary, Satkania, Chittagong"
+          },
           message: "Trip Invoice Generated Successfully"
         }
       })

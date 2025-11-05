@@ -1,6 +1,5 @@
 import { AnyType, ModalStateType } from "@/lib/types"
 import { Page, Text, View, Document, StyleSheet } from '@react-pdf/renderer'
-import { invoices } from "@/lib/db/schema"
 import { formatCurrency, formatDate, formatMonth } from "@/lib/utils";
 import { endOfMonth, startOfMonth } from "date-fns";
 
@@ -153,7 +152,7 @@ export default function InvoiceView({ modal }: {
                   <Text style={[styles.cell, styles.col5]}>Total</Text>
                 </View>
 
-                {Object.values(modal?.item?.metadata?.invoiceItems?.items)?.map((item: AnyType, index: number) => (
+                {modal?.item?.metadata?.invoiceItems?.items?.map((item: AnyType, index: number) => (
                   <View style={styles.tableRow} key={index}>
                     <Text style={[styles.cell, styles.col1]}>{index+1}</Text>
                     <Text style={[styles.cell, styles.col2]}>{item?.particulars}</Text>
@@ -185,7 +184,7 @@ export default function InvoiceView({ modal }: {
                 <View style={[styles.tableRow, styles.tableHeader]}>
                   <Text style={[styles.cell, styles.col1]}>SL</Text>
                   <Text style={[styles.cell, styles.col2]}>Depot Name</Text>
-                  <Text style={[styles.cell, styles.col3]}>Fuel/Trip</Text>
+                  <Text style={[styles.cell, styles.col3]}>Fuels/Trip</Text>
                   <Text style={[styles.cell, styles.col4]}>Trips</Text>
                   <Text style={[styles.cell, styles.col5]}>Fuel Quantity</Text>
                 </View>
@@ -201,7 +200,7 @@ export default function InvoiceView({ modal }: {
                 ))}
                 <View style={styles.tableRow}>
                   <Text style={[styles.cell, { width: "80%", textAlign: "center" }]}>Total</Text>
-                  <Text style={[styles.cell, styles.col5]}>{modal?.item?.metadata?.invoiceItems?.items?.["otherDepotTripFuel"]?.quantity}</Text>
+                  <Text style={[styles.cell, styles.col5]}>{modal?.item?.metadata?.invoiceItems?.items?.[modal?.item?.metadata?.invoiceItems?.items?.findIndex((item: AnyType) => item?.key === "otherDepotTripFuel")]?.quantity}</Text>
                 </View>
               </View>
 
