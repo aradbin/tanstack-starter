@@ -12,7 +12,7 @@ import { Card, CardAction, CardDescription, CardHeader, CardTitle } from '@/comp
 import { getTrips } from '../-utils'
 import { ModalStateType } from '@/lib/types'
 import { useState } from 'react'
-import InvoiceForm from './-invoice-form'
+import InvoiceForm from '../../../invoices/regal-transtrade/-form'
 
 export const Route = createFileRoute('/_private/services/regal-transtrade/depot/')({
   validateSearch: validate({
