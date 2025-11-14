@@ -70,7 +70,7 @@ export const invoiceColumns = ({
           <TooltipTrigger asChild>
             <Button variant="outline" size="icon" onClick={() => actions?.edit?.(row.original.id, row.original)}><Receipt /></Button>
           </TooltipTrigger>
-          <TooltipContent>Edit</TooltipContent>
+          <TooltipContent>Payment</TooltipContent>
         </Tooltip>
       )}
     </div>
