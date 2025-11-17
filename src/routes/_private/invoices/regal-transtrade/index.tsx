@@ -22,6 +22,7 @@ export const Route = createFileRoute('/_private/invoices/regal-transtrade/')({
 
 function RouteComponent() {
   const params = Route.useSearch()
+  const navigate = Route.useNavigate() 
   const [invoiceCreateModal, setInvoiceCreateModal] = useState<ModalStateType>(null)
   const [invoicePaymentModal, setInvoicePaymentModal] = useState<ModalStateType>(null)
   const query: QueryParamType = {
@@ -43,16 +44,10 @@ function RouteComponent() {
     <>
       <TableComponent columns={invoiceColumns({
         actions: {
-          async view(id, item) {
-            const blob = await pdf(<InvoiceView modal={{
-              id,
-              isOpen: true,
-              item
-            }} />).toBlob();
-            const url = URL.createObjectURL(blob);
-            window.open(url, "_blank");
+          view(id) {
+            navigate({ to: "/invoices/regal-transtrade/$id", params: { id } })
           },
-          async edit(id, item) {
+          edit(id, item) {
             setInvoicePaymentModal({
               id,
               isOpen: true,

@@ -154,24 +154,30 @@ export const createDepotTripInvoice = createServerFn({ method: "POST" })
   })
 
   export const createInvoicePayment = createServerFn({ method: "POST" })
-  .middleware([authOrgMiddleware])
-  .validator((data: AnyType) => data)
-  .handler(async ({ context, data }) => {
-    try {
-      return await db.transaction(async (tx) => {
-        await tx.insert(invoicePayments).values({
-          id: generateId(),
-          organizationId: context?.session?.activeOrganizationId,
-          createdBy: context?.user?.id,
-          ...data,
-        })
+    .middleware([authOrgMiddleware])
+    .validator((data: AnyType) => data)
+    .handler(async ({ context, data }) => {
+      try {
+        return await db.transaction(async (tx) => {
+          await tx.insert(invoicePayments).values({
+            id: generateId(),
+            organizationId: context?.session?.activeOrganizationId,
+            createdBy: context?.user?.id,
+            ...data,
+          })
 
-        await tx.update(invoices).set({
-          paid: data?.paid,
-          updatedBy: context?.user?.id
-        }).where(eq(invoices.id, data?.invoiceId))
-      })
-    } catch {
-      throw new Error("Something went wrong. Please try again")
-    }
-  })
+          const payments = await tx.query.invoicePayments.findMany({
+            where: and(...getWhereArgs(context?.session?.activeOrganizationId, invoicePayments, {
+              invoiceId: data?.invoiceId
+            }))
+          })
+
+          await tx.update(invoices).set({
+            paid: `${payments?.reduce((acc, payment) => acc + Number(payment.amount), 0)}`,
+            updatedBy: context?.user?.id
+          }).where(eq(invoices.id, data?.invoiceId))
+        })
+      } catch {
+        throw new Error("Something went wrong. Please try again")
+      }
+    })

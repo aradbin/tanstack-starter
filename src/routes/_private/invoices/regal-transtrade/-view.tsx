@@ -1,7 +1,8 @@
 import { AnyType, ModalStateType } from "@/lib/types"
-import { Page, Text, View, Document, StyleSheet } from '@react-pdf/renderer'
+import { Page, Text, View, Document, StyleSheet, PDFViewer } from '@react-pdf/renderer'
 import { formatCurrency, formatDate, formatMonth } from "@/lib/utils";
 import { endOfMonth, startOfMonth } from "date-fns";
+import { invoices, partners } from "@/lib/db/schema";
 
 const Header = () => {
   return (
@@ -19,6 +20,7 @@ const Header = () => {
     </View>
   )
 }
+
 const Footer = () => {
   return (
     <View style={{
@@ -48,9 +50,11 @@ const Footer = () => {
   )
 }
 
-export default function InvoiceView({ modal }: {
-  modal: ModalStateType,
-  // setModal: (state: ModalStateType) => void
+export default function InvoiceView({ invoice }: {
+  invoice: typeof invoices.$inferSelect & {
+    metadata: AnyType,
+    customer: typeof partners.$inferSelect
+  },
 }) {
   const styles = StyleSheet.create({
     page: {
@@ -84,131 +88,120 @@ export default function InvoiceView({ modal }: {
   });
 
   return (
-    // <ModalComponent variant="default" options={{
-    //   header: "Invoice Details",
-    //   isOpen: modal?.isOpen,
-    //   onClose: () => {
-    //     setModal(null)
-    //   },
-    //   size: "full"
-    // }}>
-    //   {(props) => (
-        // <PDFViewer width="100%" height={842} showToolbar={false}>
-          <Document>
-            <Page size="A4" style={styles.page} wrap>
-              <Header />
+    <PDFViewer width="100%" height={2350}>
+      <Document>
+        <Page size="A4" style={styles.page} wrap>
+          <Header />
 
-              <View style={{
-                marginTop: 10,
-                paddingTop: 10,
-                marginBottom: 10,
-                textAlign: "center",
-              }}>
-                <Text style={{
-                  fontSize: 12,
-                  fontWeight: 700,
-                }}>Summary Statement for the Month of {formatMonth(modal?.item?.metadata?.to)}</Text>
+          <View style={{
+            marginTop: 10,
+            paddingTop: 10,
+            marginBottom: 10,
+            textAlign: "center",
+          }}>
+            <Text style={{
+              fontSize: 12,
+              fontWeight: 700,
+            }}>Summary Statement for the Month of {formatMonth(invoice?.metadata?.to)}</Text>
+          </View>
+
+          <View style={{
+            flexDirection: "row",
+            justifyContent: "space-between",
+            marginBottom: 10,
+          }}>
+            <View style={{
+              width: "48%",
+            }}>
+              <Text style={{ fontWeight: 700 }}>Bill To:</Text>
+              <Text>Executive Director</Text>
+              <Text>{invoice?.customer?.name}</Text>
+              <Text>{invoice?.customer?.address}</Text>
+            </View>
+
+            <View style={{
+              width: "48%",
+              textAlign: "right",
+            }}>
+              <Text style={{ fontWeight: 700 }}>Invoice Details</Text>
+              <Text>Bill No: #{invoice?.number}</Text>
+              <Text>Billing Cycle: {formatDate(startOfMonth(invoice?.metadata?.from))} to {formatDate(endOfMonth(invoice?.metadata?.to))}</Text>
+              <Text>Invoice Date: {formatDate(invoice?.date)}</Text>
+            </View>
+          </View>
+
+          <Text style={{
+            fontWeight: 700,
+            textAlign: "center",
+            marginTop: 10
+          }}>{invoice?.metadata?.invoiceItems?.title}</Text>
+
+          {/* Items table */}
+          <View style={styles.table}>
+            {/* Header row */}
+            <View style={[styles.tableRow, styles.tableHeader]}>
+              <Text style={[styles.cell, styles.col1]}>SL</Text>
+              <Text style={[styles.cell, styles.col2]}>Particulars</Text>
+              <Text style={[styles.cell, styles.col3]}>Quantity</Text>
+              <Text style={[styles.cell, styles.col4]}>Unit Price</Text>
+              <Text style={[styles.cell, styles.col5]}>Total</Text>
+            </View>
+
+            {invoice?.metadata?.invoiceItems?.items?.map((item: AnyType, index: number) => (
+              <View style={styles.tableRow} key={index}>
+                <Text style={[styles.cell, styles.col1]}>{index+1}</Text>
+                <Text style={[styles.cell, styles.col2]}>{item?.particulars}</Text>
+                <Text style={[styles.cell, styles.col3]}>{item?.quantity}</Text>
+                <Text style={[styles.cell, styles.col4]}>{formatCurrency(Number(item?.unitPrice))}</Text>
+                <Text style={[styles.cell, styles.col5]}>{formatCurrency(Number(item?.total))}</Text>
               </View>
+            ))}
+            <View style={styles.tableRow}>
+              <Text style={[styles.cell, { width: "80%", textAlign: "center" }]}>Total</Text>
+              <Text style={[styles.cell, styles.col5]}>{formatCurrency(Number(invoice?.amount))}</Text>
+            </View>
+          </View>
 
-              <View style={{
-                flexDirection: "row",
-                justifyContent: "space-between",
-                marginBottom: 10,
-              }}>
-                <View style={{
-                  width: "48%",
-                }}>
-                  <Text style={{ fontWeight: 700 }}>Bill To:</Text>
-                  <Text>Executive Director</Text>
-                  <Text>{modal?.item?.customer?.name}</Text>
-                  <Text>{modal?.item?.customer?.address}</Text>
-                </View>
+          <Footer />
+        </Page>
+        <Page size="A4" style={styles.page} wrap>
+          <Header />
 
-                <View style={{
-                  width: "48%",
-                  textAlign: "right",
-                }}>
-                  <Text style={{ fontWeight: 700 }}>Invoice Details</Text>
-                  <Text>Bill No: #{modal?.item?.number}</Text>
-                  <Text>Billing Cycle: {formatDate(startOfMonth(modal?.item?.metadata?.from))} to {formatDate(endOfMonth(modal?.item?.metadata?.to))}</Text>
-                  <Text>Invoice Date: {formatDate(modal?.item?.date)}</Text>
-                </View>
+          <Text style={{
+            fontWeight: 700,
+            textAlign: "center",
+            marginTop: 10
+          }}>{invoice?.metadata?.invoiceFuelItems?.title}</Text>
+
+          {/* Items table */}
+          <View style={styles.table}>
+            {/* Header row */}
+            <View style={[styles.tableRow, styles.tableHeader]}>
+              <Text style={[styles.cell, styles.col1]}>SL</Text>
+              <Text style={[styles.cell, styles.col2]}>Depot Name</Text>
+              <Text style={[styles.cell, styles.col3]}>Fuels/Trip</Text>
+              <Text style={[styles.cell, styles.col4]}>Trips</Text>
+              <Text style={[styles.cell, styles.col5]}>Fuel Quantity</Text>
+            </View>
+
+            {Object.entries(invoice?.metadata?.invoiceFuelItems?.items)?.map((item: AnyType, index: number) => (
+              <View style={styles.tableRow} key={index}>
+                <Text style={[styles.cell, styles.col1]}>{index+1}</Text>
+                <Text style={[styles.cell, styles.col2]}>{item[0]}</Text>
+                <Text style={[styles.cell, styles.col3]}>{item[1]?.tripFuel}</Text>
+                <Text style={[styles.cell, styles.col4]}>{item[1]?.tripCount}</Text>
+                <Text style={[styles.cell, styles.col5]}>{item[1]?.fuelQuantity}</Text>
               </View>
+            ))}
+            <View style={styles.tableRow}>
+              <Text style={[styles.cell, { width: "80%", textAlign: "center" }]}>Total</Text>
+              <Text style={[styles.cell, styles.col5]}>{invoice?.metadata?.invoiceItems?.items?.[invoice?.metadata?.invoiceItems?.items?.findIndex((item: AnyType) => item?.key === "otherDepotTripFuel")]?.quantity}</Text>
+            </View>
+          </View>
 
-              <Text style={{
-                fontWeight: 700,
-                textAlign: "center",
-                marginTop: 10
-              }}>{modal?.item?.metadata?.invoiceItems?.title}</Text>
-
-              {/* Items table */}
-              <View style={styles.table}>
-                {/* Header row */}
-                <View style={[styles.tableRow, styles.tableHeader]}>
-                  <Text style={[styles.cell, styles.col1]}>SL</Text>
-                  <Text style={[styles.cell, styles.col2]}>Particulars</Text>
-                  <Text style={[styles.cell, styles.col3]}>Quantity</Text>
-                  <Text style={[styles.cell, styles.col4]}>Unit Price</Text>
-                  <Text style={[styles.cell, styles.col5]}>Total</Text>
-                </View>
-
-                {modal?.item?.metadata?.invoiceItems?.items?.map((item: AnyType, index: number) => (
-                  <View style={styles.tableRow} key={index}>
-                    <Text style={[styles.cell, styles.col1]}>{index+1}</Text>
-                    <Text style={[styles.cell, styles.col2]}>{item?.particulars}</Text>
-                    <Text style={[styles.cell, styles.col3]}>{item?.quantity}</Text>
-                    <Text style={[styles.cell, styles.col4]}>{formatCurrency(Number(item?.unitPrice))}</Text>
-                    <Text style={[styles.cell, styles.col5]}>{formatCurrency(Number(item?.total))}</Text>
-                  </View>
-                ))}
-                <View style={styles.tableRow}>
-                  <Text style={[styles.cell, { width: "80%", textAlign: "center" }]}>Total</Text>
-                  <Text style={[styles.cell, styles.col5]}>{formatCurrency(Number(modal?.item?.amount))}</Text>
-                </View>
-              </View>
-
-              <Footer />
-            </Page>
-            <Page size="A4" style={styles.page} wrap>
-              <Header />
-
-              <Text style={{
-                fontWeight: 700,
-                textAlign: "center",
-                marginTop: 10
-              }}>{modal?.item?.metadata?.invoiceFuelItems?.title}</Text>
-
-              {/* Items table */}
-              <View style={styles.table}>
-                {/* Header row */}
-                <View style={[styles.tableRow, styles.tableHeader]}>
-                  <Text style={[styles.cell, styles.col1]}>SL</Text>
-                  <Text style={[styles.cell, styles.col2]}>Depot Name</Text>
-                  <Text style={[styles.cell, styles.col3]}>Fuels/Trip</Text>
-                  <Text style={[styles.cell, styles.col4]}>Trips</Text>
-                  <Text style={[styles.cell, styles.col5]}>Fuel Quantity</Text>
-                </View>
-
-                {Object.entries(modal?.item?.metadata?.invoiceFuelItems?.items)?.map((item: AnyType, index: number) => (
-                  <View style={styles.tableRow} key={index}>
-                    <Text style={[styles.cell, styles.col1]}>{index+1}</Text>
-                    <Text style={[styles.cell, styles.col2]}>{item[0]}</Text>
-                    <Text style={[styles.cell, styles.col3]}>{item[1]?.tripFuel}</Text>
-                    <Text style={[styles.cell, styles.col4]}>{item[1]?.tripCount}</Text>
-                    <Text style={[styles.cell, styles.col5]}>{item[1]?.fuelQuantity}</Text>
-                  </View>
-                ))}
-                <View style={styles.tableRow}>
-                  <Text style={[styles.cell, { width: "80%", textAlign: "center" }]}>Total</Text>
-                  <Text style={[styles.cell, styles.col5]}>{modal?.item?.metadata?.invoiceItems?.items?.[modal?.item?.metadata?.invoiceItems?.items?.findIndex((item: AnyType) => item?.key === "otherDepotTripFuel")]?.quantity}</Text>
-                </View>
-              </View>
-
-              <Footer />
-            </Page>
-          </Document>
-        // </PDFViewer>
-      // )}
-    // </ModalComponent>
+          <Footer />
+        </Page>
+      </Document>
+    </PDFViewer>
   )
 }

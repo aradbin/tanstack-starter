@@ -69,7 +69,7 @@ export default function InvoicePaymentForm({ modal, setModal }: {
             paid: values.amount + modal?.item?.paid || 0,
             ...values,
           }})}
-          onSuccess={async (response: AnyType) => {
+          onSuccess={() => {
             props.close()
           }}
           onCancel={() => {

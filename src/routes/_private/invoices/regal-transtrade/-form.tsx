@@ -5,11 +5,13 @@ import { stringRequiredValidation } from "@/lib/validations"
 import { pdf } from "@react-pdf/renderer"
 import InvoiceView from "@/routes/_private/invoices/regal-transtrade/-view"
 import { createDepotTripInvoice } from "./-utils"
+import { useNavigate } from "@tanstack/react-router"
 
 export default function InvoiceForm({ modal, setModal }: {
   modal: ModalStateType,
   setModal: (state: ModalStateType) => void
 }) {
+  const navigate = useNavigate()
   const formFields: FormFieldType[][] = [
     [
       {
@@ -66,13 +68,10 @@ export default function InvoiceForm({ modal, setModal }: {
           }) => createDepotTripInvoice({ data: { values }})}
           onSuccess={async (response: AnyType) => {
             props.close()
-            const blob = await pdf(<InvoiceView modal={{
-              id: response.id,
-              isOpen: true,
-              item: response
-            }} />).toBlob();
-            const url = URL.createObjectURL(blob);
-            window.open(url, "_blank");
+            navigate({
+              to: "/invoices/regal-transtrade/$id",
+              params: { id: response?.id }
+            })
           }}
           onCancel={() => {
             props.close()
