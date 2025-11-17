@@ -10,7 +10,8 @@ import InvoiceView from './-view'
 import { getInvoices } from '../-utils'
 import { Button } from '@/components/ui/button'
 import { FileCog } from 'lucide-react'
-import InvoiceForm from '../../services/regal-transtrade/depot/-invoice-form'
+import InvoiceForm from './-form'
+import InvoicePaymentForm from './-payment-form'
 
 export const Route = createFileRoute('/_private/invoices/regal-transtrade/')({
   validateSearch: validate({
@@ -21,7 +22,9 @@ export const Route = createFileRoute('/_private/invoices/regal-transtrade/')({
 
 function RouteComponent() {
   const params = Route.useSearch()
+  const navigate = Route.useNavigate() 
   const [invoiceCreateModal, setInvoiceCreateModal] = useState<ModalStateType>(null)
+  const [invoicePaymentModal, setInvoicePaymentModal] = useState<ModalStateType>(null)
   const query: QueryParamType = {
     table: 'invoices',
     relation: {
@@ -41,15 +44,16 @@ function RouteComponent() {
     <>
       <TableComponent columns={invoiceColumns({
         actions: {
-          async view(id, item) {
-            const blob = await pdf(<InvoiceView modal={{
+          view(id) {
+            navigate({ to: "/invoices/regal-transtrade/$id", params: { id } })
+          },
+          edit(id, item) {
+            setInvoicePaymentModal({
               id,
               isOpen: true,
               item
-            }} />).toBlob();
-            const url = URL.createObjectURL(blob);
-            window.open(url, "_blank");
-          },
+            })
+          }
         }
       })} filters={[]} query={query} queryFn={getInvoices} options={{
         hasSearch: true
@@ -64,6 +68,7 @@ function RouteComponent() {
         </div>
       )} />
       <InvoiceForm modal={invoiceCreateModal} setModal={setInvoiceCreateModal} />
+      <InvoicePaymentForm modal={invoicePaymentModal} setModal={setInvoicePaymentModal} />
     </>
   )
 }

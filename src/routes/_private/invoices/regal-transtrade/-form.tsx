@@ -1,26 +1,17 @@
 import FormComponent from "@/components/form/form-component"
 import ModalComponent from "@/components/modal/modal-component"
-import { useQuery } from "@tanstack/react-query"
-import { getData, updateData } from "@/lib/db/functions"
 import { AnyType, FormFieldType, ModalStateType } from "@/lib/types"
 import { stringRequiredValidation } from "@/lib/validations"
-import { createDepotTripInvoice } from "../-utils"
 import { pdf } from "@react-pdf/renderer"
 import InvoiceView from "@/routes/_private/invoices/regal-transtrade/-view"
+import { createDepotTripInvoice } from "./-utils"
+import { useNavigate } from "@tanstack/react-router"
 
 export default function InvoiceForm({ modal, setModal }: {
   modal: ModalStateType,
   setModal: (state: ModalStateType) => void
 }) {
-  const { data, isLoading } = useQuery({
-    queryKey: ['invoices', modal?.id],
-    queryFn: async () => getData({ data: {
-      table: "invoices",
-      id: modal?.id
-    }}),
-    enabled: !!modal?.id && modal?.isOpen
-  })
-
+  const navigate = useNavigate()
   const formFields: FormFieldType[][] = [
     [
       {
@@ -60,7 +51,7 @@ export default function InvoiceForm({ modal, setModal }: {
 
   return (
     <ModalComponent variant="sheet" options={{
-      header: modal?.id ? 'Edit Invoice' : 'Generate Invoice',
+      header: 'Generate Invoice',
       isOpen: modal?.isOpen,
       onClose: () => {
         setModal(null)
@@ -75,22 +66,17 @@ export default function InvoiceForm({ modal, setModal }: {
             date: string,
             dueDate: string,
           }) => createDepotTripInvoice({ data: { values }})}
-          values={modal?.isOpen && modal?.id && data ? data : {}}
           onSuccess={async (response: AnyType) => {
             props.close()
-            const blob = await pdf(<InvoiceView modal={{
-              id: response.id,
-              isOpen: true,
-              item: response
-            }} />).toBlob();
-            const url = URL.createObjectURL(blob);
-            window.open(url, "_blank");
+            navigate({
+              to: "/invoices/regal-transtrade/$id",
+              params: { id: response?.id }
+            })
           }}
           onCancel={() => {
             props.close()
           }}
           options={{
-            isLoading,
             queryKey: 'invoices',
           }}
         />
