@@ -88,12 +88,12 @@ export default function TripSection() {
   const isPositiveChange = percentageChange >= 0
 
   return (
-    <div className="grid gap-4 md:gap-6 grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5">
+    <div className="grid gap-4 md:gap-6 grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
       <Link to="/services/regal-transtrade/depot">
         <Card>
           <CardHeader className="flex justify-between">
             <CardTitle className="text-sm font-medium">Depot Trips</CardTitle>
-            <TrendingUp className="size-5" />
+            <TrendingUp className={isPositiveChange ? 'size-5 text-green-600' : 'size-5 text-red-600'} />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">
