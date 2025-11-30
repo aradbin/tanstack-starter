@@ -13,7 +13,6 @@ import { createServerRootRoute } from '@tanstack/react-start/server'
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as PrivateRouteRouteImport } from './routes/_private/route'
 import { Route as AuthRouteRouteImport } from './routes/_auth/route'
-import { Route as PrivateIndexRouteImport } from './routes/_private/index'
 import { Route as PrivateEmployeesRouteRouteImport } from './routes/_private/employees/route'
 import { Route as PrivateAssetsRouteRouteImport } from './routes/_private/assets/route'
 import { Route as PrivateWhatsappIndexRouteImport } from './routes/_private/whatsapp/index'
@@ -28,6 +27,7 @@ import { Route as PrivateEmployeesIndexRouteImport } from './routes/_private/emp
 import { Route as PrivateEmailIndexRouteImport } from './routes/_private/email/index'
 import { Route as PrivateDesignationsIndexRouteImport } from './routes/_private/designations/index'
 import { Route as PrivateAssetsIndexRouteImport } from './routes/_private/assets/index'
+import { Route as PrivateDashboardIndexRouteImport } from './routes/_private/_dashboard/index'
 import { Route as AuthRegisterIndexRouteImport } from './routes/_auth/register/index'
 import { Route as AuthLoginIndexRouteImport } from './routes/_auth/login/index'
 import { Route as AuthRegisterOrganizationRouteImport } from './routes/_auth/register/organization'
@@ -56,11 +56,6 @@ const PrivateRouteRoute = PrivateRouteRouteImport.update({
 const AuthRouteRoute = AuthRouteRouteImport.update({
   id: '/_auth',
   getParentRoute: () => rootRouteImport,
-} as any)
-const PrivateIndexRoute = PrivateIndexRouteImport.update({
-  id: '/',
-  path: '/',
-  getParentRoute: () => PrivateRouteRoute,
 } as any)
 const PrivateEmployeesRouteRoute = PrivateEmployeesRouteRouteImport.update({
   id: '/employees',
@@ -132,6 +127,11 @@ const PrivateAssetsIndexRoute = PrivateAssetsIndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => PrivateAssetsRouteRoute,
+} as any)
+const PrivateDashboardIndexRoute = PrivateDashboardIndexRouteImport.update({
+  id: '/_dashboard/',
+  path: '/',
+  getParentRoute: () => PrivateRouteRoute,
 } as any)
 const AuthRegisterIndexRoute = AuthRegisterIndexRouteImport.update({
   id: '/register/',
@@ -240,10 +240,10 @@ const ApiAuthSplatServerRoute = ApiAuthSplatServerRouteImport.update({
 export interface FileRoutesByFullPath {
   '/assets': typeof PrivateAssetsRouteRouteWithChildren
   '/employees': typeof PrivateEmployeesRouteRouteWithChildren
-  '/': typeof PrivateIndexRoute
   '/register/organization': typeof AuthRegisterOrganizationRoute
   '/login': typeof AuthLoginIndexRoute
   '/register': typeof AuthRegisterIndexRoute
+  '/': typeof PrivateDashboardIndexRoute
   '/assets/': typeof PrivateAssetsIndexRoute
   '/designations': typeof PrivateDesignationsIndexRoute
   '/email': typeof PrivateEmailIndexRoute
@@ -272,10 +272,10 @@ export interface FileRoutesByFullPath {
   '/services/regal-transtrade/district/$id/edit': typeof PrivateServicesRegalTranstradeDistrictIdEditIndexRoute
 }
 export interface FileRoutesByTo {
-  '/': typeof PrivateIndexRoute
   '/register/organization': typeof AuthRegisterOrganizationRoute
   '/login': typeof AuthLoginIndexRoute
   '/register': typeof AuthRegisterIndexRoute
+  '/': typeof PrivateDashboardIndexRoute
   '/assets': typeof PrivateAssetsIndexRoute
   '/designations': typeof PrivateDesignationsIndexRoute
   '/email': typeof PrivateEmailIndexRoute
@@ -309,10 +309,10 @@ export interface FileRoutesById {
   '/_private': typeof PrivateRouteRouteWithChildren
   '/_private/assets': typeof PrivateAssetsRouteRouteWithChildren
   '/_private/employees': typeof PrivateEmployeesRouteRouteWithChildren
-  '/_private/': typeof PrivateIndexRoute
   '/_auth/register/organization': typeof AuthRegisterOrganizationRoute
   '/_auth/login/': typeof AuthLoginIndexRoute
   '/_auth/register/': typeof AuthRegisterIndexRoute
+  '/_private/_dashboard/': typeof PrivateDashboardIndexRoute
   '/_private/assets/': typeof PrivateAssetsIndexRoute
   '/_private/designations/': typeof PrivateDesignationsIndexRoute
   '/_private/email/': typeof PrivateEmailIndexRoute
@@ -345,10 +345,10 @@ export interface FileRouteTypes {
   fullPaths:
     | '/assets'
     | '/employees'
-    | '/'
     | '/register/organization'
     | '/login'
     | '/register'
+    | '/'
     | '/assets/'
     | '/designations'
     | '/email'
@@ -377,10 +377,10 @@ export interface FileRouteTypes {
     | '/services/regal-transtrade/district/$id/edit'
   fileRoutesByTo: FileRoutesByTo
   to:
-    | '/'
     | '/register/organization'
     | '/login'
     | '/register'
+    | '/'
     | '/assets'
     | '/designations'
     | '/email'
@@ -413,10 +413,10 @@ export interface FileRouteTypes {
     | '/_private'
     | '/_private/assets'
     | '/_private/employees'
-    | '/_private/'
     | '/_auth/register/organization'
     | '/_auth/login/'
     | '/_auth/register/'
+    | '/_private/_dashboard/'
     | '/_private/assets/'
     | '/_private/designations/'
     | '/_private/email/'
@@ -486,13 +486,6 @@ declare module '@tanstack/react-router' {
       fullPath: ''
       preLoaderRoute: typeof AuthRouteRouteImport
       parentRoute: typeof rootRouteImport
-    }
-    '/_private/': {
-      id: '/_private/'
-      path: '/'
-      fullPath: '/'
-      preLoaderRoute: typeof PrivateIndexRouteImport
-      parentRoute: typeof PrivateRouteRoute
     }
     '/_private/employees': {
       id: '/_private/employees'
@@ -591,6 +584,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/assets/'
       preLoaderRoute: typeof PrivateAssetsIndexRouteImport
       parentRoute: typeof PrivateAssetsRouteRoute
+    }
+    '/_private/_dashboard/': {
+      id: '/_private/_dashboard/'
+      path: '/'
+      fullPath: '/'
+      preLoaderRoute: typeof PrivateDashboardIndexRouteImport
+      parentRoute: typeof PrivateRouteRoute
     }
     '/_auth/register/': {
       id: '/_auth/register/'
@@ -772,7 +772,7 @@ const PrivateEmployeesRouteRouteWithChildren =
 interface PrivateRouteRouteChildren {
   PrivateAssetsRouteRoute: typeof PrivateAssetsRouteRouteWithChildren
   PrivateEmployeesRouteRoute: typeof PrivateEmployeesRouteRouteWithChildren
-  PrivateIndexRoute: typeof PrivateIndexRoute
+  PrivateDashboardIndexRoute: typeof PrivateDashboardIndexRoute
   PrivateDesignationsIndexRoute: typeof PrivateDesignationsIndexRoute
   PrivateEmailIndexRoute: typeof PrivateEmailIndexRoute
   PrivateEventsIndexRoute: typeof PrivateEventsIndexRoute
@@ -800,7 +800,7 @@ interface PrivateRouteRouteChildren {
 const PrivateRouteRouteChildren: PrivateRouteRouteChildren = {
   PrivateAssetsRouteRoute: PrivateAssetsRouteRouteWithChildren,
   PrivateEmployeesRouteRoute: PrivateEmployeesRouteRouteWithChildren,
-  PrivateIndexRoute: PrivateIndexRoute,
+  PrivateDashboardIndexRoute: PrivateDashboardIndexRoute,
   PrivateDesignationsIndexRoute: PrivateDesignationsIndexRoute,
   PrivateEmailIndexRoute: PrivateEmailIndexRoute,
   PrivateEventsIndexRoute: PrivateEventsIndexRoute,

@@ -65,6 +65,7 @@ export const organizations = pgTable("organizations", {
   id: table.text().primaryKey(),
   name: table.text().notNull(),
   slug: table.text().unique(),
+  domain: table.text().unique(),
   logo: table.text(),
   metadata: table.text(),
   ...timestamps,
