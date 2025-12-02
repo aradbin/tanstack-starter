@@ -1,10 +1,11 @@
-import { ArrowDown, ArrowUp, Loader2, TrendingUp } from "lucide-react";
+import { Loader2, TrendingDown, TrendingUp } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { QueryParamType } from "@/lib/db/functions";
 import { Link } from "@tanstack/react-router";
 import { endOfMonth, startOfMonth, subMonths } from "date-fns";
 import { getTrips } from "../services/regal-transtrade/-utils";
-import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardAction, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
 
 export default function TripSection() {
   const currentMonthQuery: QueryParamType = {
@@ -91,28 +92,24 @@ export default function TripSection() {
     <div className="grid gap-4 md:gap-6 grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
       <Link to="/services/regal-transtrade/depot">
         <Card>
-          <CardHeader className="flex justify-between">
-            <CardTitle className="text-sm font-medium">Depot Trips</CardTitle>
-            <TrendingUp className={isPositiveChange ? 'size-5 text-green-600' : 'size-5 text-red-600'} />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">
+          <CardHeader>
+            <CardDescription>Depot Trips</CardDescription>
+            <CardTitle className="text-xl font-semibold">
               {depotTripsCurrentMonthLoading ? <Loader2 className="animate-spin size-6 mt-2" /> : depotTripsCurrentMonth?.totalTrips ?? 0}
-            </div>
-          </CardContent>
-          <CardFooter>
-            <div className={`flex items-center gap-1 text-sm ${isPositiveChange ? 'text-green-600' : 'text-red-600'}`}>
-              {depotTripsLastMonthLoading ? (
-                <Loader2 className="animate-spin size-3" />
-              ) : (
-                <>
-                  {isPositiveChange ? <ArrowUp className="size-3" /> : <ArrowDown className="size-3" />}
-                  <span className="font-medium">{Math.abs(percentageChange).toFixed(0)}%</span>
-                  <span className="text-muted-foreground">from last month</span>
-                </>
-              )}
-            </div>
-          </CardFooter>
+            </CardTitle>
+            <CardAction>
+              <Badge variant={isPositiveChange ? "default" : "destructive"}>
+                {isPositiveChange ? <TrendingUp /> : <TrendingDown />}
+                <span className="font-medium">{Math.abs(percentageChange).toFixed(0)}%</span>
+              </Badge>
+            </CardAction>
+          </CardHeader>
+          <CardHeader className="flex-col items-start">
+            <CardDescription>Last month</CardDescription>
+            <CardTitle className="text-xl font-semibold">
+              {depotTripsLastMonthLoading ? <Loader2 className="animate-spin size-5 mt-2" /> : depotTripsLastMonth?.totalTrips ?? 0}
+            </CardTitle>
+          </CardHeader>
         </Card>
       </Link>
     </div>

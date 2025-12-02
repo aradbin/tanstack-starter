@@ -14,15 +14,11 @@ export default function MetricCard({
 }) {
   return (
     <Card>
-      <CardHeader className="flex justify-between">
-        <CardTitle className="text-sm font-medium">{title}</CardTitle>
-        {icon}
+      <CardHeader>
+        <CardDescription>{title}</CardDescription>
+        <CardTitle className="text-2xl font-semibold">{description}</CardTitle>
+        <CardAction>{icon}</CardAction>
       </CardHeader>
-      <CardContent>
-        <div className="text-2xl font-bold">
-          {description}
-        </div>
-      </CardContent>
     </Card>
   )
 }
