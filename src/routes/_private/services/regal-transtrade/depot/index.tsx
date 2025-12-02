@@ -13,6 +13,7 @@ import { getTrips } from '../-utils'
 import { ModalStateType } from '@/lib/types'
 import { useState } from 'react'
 import InvoiceForm from '../../../invoices/regal-transtrade/-form'
+import { depotTripServiceTypeId } from '@/lib/organizations/regal-transtrade'
 
 export const Route = createFileRoute('/_private/services/regal-transtrade/depot/')({
   validateSearch: validate({
@@ -42,7 +43,7 @@ function RouteComponent() {
       hasManualPagination: false
     },
     where: {
-      typeId: "VOVj5e0Qn0lRuF5JXE0QplbVFKLdSbjM",
+      typeId: depotTripServiceTypeId,
       from: {
         gte: params.from && isValid(new Date(params.from)) ? new Date(params.from) : new Date(startOfMonth(new Date())),
         lte: params.to && isValid(new Date(params.to)) ? new Date(params.to) : new Date(endOfMonth(new Date())),
@@ -108,7 +109,7 @@ function RouteComponent() {
                 <CardHeader>
                   <CardDescription>Total Trips</CardDescription>
                   <CardTitle className="text-2xl">
-                    {isLoading ? <Loader2 className="animate-spin size-6 mt-2" /> : tableData?.totalTrips || 0}
+                    {isLoading ? <Loader2 className="animate-spin size-6 mt-2" /> : formatCurrency(tableData?.totalTrips || 0)}
                   </CardTitle>
                   <CardAction>
                     <BaggageClaim />
@@ -119,7 +120,7 @@ function RouteComponent() {
                 <CardHeader>
                   <CardDescription>Total Fuels</CardDescription>
                   <CardTitle className="text-2xl">
-                    {isLoading ? <Loader2 className="animate-spin size-6 mt-2" /> : tableData?.totalFuel || 0}
+                    {isLoading ? <Loader2 className="animate-spin size-6 mt-2" /> : formatCurrency(tableData?.totalFuel || 0)}
                   </CardTitle>
                   <CardAction>
                     <Fuel />

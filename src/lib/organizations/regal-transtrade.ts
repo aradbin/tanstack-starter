@@ -204,7 +204,9 @@ export const tripRoutesDepot = [
   }},
 ]
 
-export const fuelPrice = 102
+export const fuelPrice = 102;
+export const depotTripServiceTypeId = "VOVj5e0Qn0lRuF5JXE0QplbVFKLdSbjM";
+export const districtTripServiceTypeId = "zeA6cPLyvfLXMFXOs5fsi4SPpKatGm3I";
 
 export const syncRegalTranstrade = createServerFn({ method: "POST" })
   .handler(async () => {
@@ -220,7 +222,7 @@ export const syncRegalTranstrade = createServerFn({ method: "POST" })
 
     console.log("1")
 
-    const depotServices = await db.select().from(services).where(eq(services.typeId, "VOVj5e0Qn0lRuF5JXE0QplbVFKLdSbjM"))
+    const depotServices = await db.select().from(services).where(eq(services.typeId, depotTripServiceTypeId))
 
     console.log("2")
 

@@ -2,6 +2,7 @@ import { authOrgMiddleware } from "@/lib/auth/middleware"
 import { db } from "@/lib/db"
 import { addOrder, addWhere, QueryParamBaseType } from "@/lib/db/functions"
 import { assets, employees, serviceEntities, services } from "@/lib/db/schema"
+import { depotTripServiceTypeId, districtTripServiceTypeId } from "@/lib/organizations/regal-transtrade"
 import { AnyType } from "@/lib/types"
 import { createServerFn } from "@tanstack/react-start"
 import { generateId } from "better-auth"
@@ -13,7 +14,7 @@ export const getTrips = createServerFn()
   .middleware([authOrgMiddleware])
   .validator((data: QueryParamBaseType) => data)
   .handler(async ({ context, data }): Promise<AnyType> => {
-    const { sort, pagination, where, search } = data
+    const { sort, where, search } = data
 
     const vehicleServiceEntity = alias(serviceEntities, 'vehicle_service_entity')
     const vehicleAsset = alias(assets, 'vehicle_asset')
@@ -76,7 +77,7 @@ export const getTrips = createServerFn()
   })
 
 export const getTripCalculations = (result: AnyType[], typeId: string) => {
-  if(typeId === "VOVj5e0Qn0lRuF5JXE0QplbVFKLdSbjM"){
+  if(typeId === depotTripServiceTypeId){
     return {
       totalTrips: result?.flatMap((trip: AnyType) => trip?.metadata?.items || []).reduce((total: number, item: AnyType) => total + (item.count || 0), 0),
       totalFuel: result?.flatMap((trip: AnyType) => trip?.metadata?.items || []).reduce((total: number, item: AnyType) => total + ((item?.route?.expense?.fuel * item.count) || 0), 0),
@@ -84,7 +85,7 @@ export const getTripCalculations = (result: AnyType[], typeId: string) => {
       totalExpenses: result?.flatMap((trip: AnyType) => trip?.metadata?.expenses || []).reduce((total: number, item: AnyType) => total + (item.amount || 0), 0)
     }
   }
-  if(typeId === "zeA6cPLyvfLXMFXOs5fsi4SPpKatGm3I"){
+  if(typeId === districtTripServiceTypeId){
     return {
       totalTrips: result?.flatMap((trip: AnyType) => trip?.metadata?.items || [])?.reduce((total: number, _: AnyType) => total + 1, 0),
       totalFare: result?.flatMap((trip: AnyType) => trip?.metadata?.items || []).reduce((total: number, item: AnyType) => total + (item.amount || 0), 0),
@@ -122,7 +123,7 @@ export const createTrip = createServerFn({ method: "POST" })
               ...values?.reference ? { reference: values?.reference } : {},
             } } : {},
           },
-          typeId: values?.type === "depot" ? "VOVj5e0Qn0lRuF5JXE0QplbVFKLdSbjM" : "zeA6cPLyvfLXMFXOs5fsi4SPpKatGm3I",
+          typeId: values?.type === "depot" ? depotTripServiceTypeId : districtTripServiceTypeId,
           organizationId: context?.session?.activeOrganizationId,
           createdBy: context?.user?.id,
         }).returning()

@@ -29,11 +29,11 @@ export const mainNavItems: NavigationType[] = [
         href: "/services/regal-transtrade/depot",
         icon: BaggageClaim,
       },
-      {
-        title: "District Trips",
-        href: "/services/regal-transtrade/district",
-        icon: MapPinned,
-      },
+      // {
+      //   title: "District Trips",
+      //   href: "/services/regal-transtrade/district",
+      //   icon: MapPinned,
+      // },
     ]
   },
   // {

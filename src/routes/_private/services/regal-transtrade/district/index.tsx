@@ -10,6 +10,7 @@ import { formatCurrency, formatDateForInput } from '@/lib/utils'
 import { endOfMonth, isValid, startOfMonth } from 'date-fns'
 import { Card, CardAction, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { getTrips } from '../-utils'
+import { districtTripServiceTypeId } from '@/lib/organizations/regal-transtrade'
 
 export const Route = createFileRoute('/_private/services/regal-transtrade/district/')({
   validateSearch: validate({
@@ -38,7 +39,7 @@ function RouteComponent() {
       hasManualPagination: false
     },
     where: {
-      typeId: "zeA6cPLyvfLXMFXOs5fsi4SPpKatGm3I",
+      typeId: districtTripServiceTypeId,
       from: {
         gte: params.from && isValid(new Date(params.from)) ? new Date(params.from) : new Date(startOfMonth(new Date())),
         lte: params.to && isValid(new Date(params.to)) ? new Date(params.to) : new Date(endOfMonth(new Date())),
