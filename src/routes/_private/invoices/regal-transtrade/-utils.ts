@@ -2,6 +2,7 @@ import { authOrgMiddleware } from "@/lib/auth/middleware"
 import { db } from "@/lib/db"
 import { getWhereArgs } from "@/lib/db/functions"
 import { invoiceEntities, invoicePayments, invoices, services } from "@/lib/db/schema"
+import { depotTripServiceTypeId } from "@/lib/organizations/regal-transtrade"
 import { AnyType } from "@/lib/types"
 import { formatMonth } from "@/lib/utils"
 import { createServerFn } from "@tanstack/react-start"
@@ -26,7 +27,7 @@ export const createDepotTripInvoice = createServerFn({ method: "POST" })
       return await db.transaction(async (tx) => {
         const trips: typeof services.$inferSelect[] = await tx.query.services.findMany({
           where: and(...getWhereArgs(context?.session?.activeOrganizationId, services, {
-            typeId: "VOVj5e0Qn0lRuF5JXE0QplbVFKLdSbjM",
+            typeId: depotTripServiceTypeId,
             from: {
               gte: new Date(values?.from),
               lte: new Date(values?.to)
