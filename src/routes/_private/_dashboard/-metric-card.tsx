@@ -1,6 +1,4 @@
-import { Card, CardAction, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { ArrowRight } from "lucide-react";
+import { Card, CardAction, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { AnyType } from "@/lib/types";
 
 export default function MetricCard({

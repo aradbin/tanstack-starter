@@ -1,5 +1,5 @@
 import { Loader2, Truck, Users } from "lucide-react";
-import MetricCard from "./metric-card";
+import MetricCard from "./-metric-card";
 import { useQuery } from "@tanstack/react-query";
 import { getDatas } from "@/lib/db/functions";
 import { Link } from "@tanstack/react-router";
