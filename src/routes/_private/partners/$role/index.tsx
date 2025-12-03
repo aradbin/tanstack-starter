@@ -5,6 +5,10 @@ import { createFileRoute } from '@tanstack/react-router'
 import { partnerColumns } from './-columns'
 import { Button } from '@/components/ui/button'
 import { PlusCircle } from 'lucide-react'
+import { useState } from 'react'
+import { ModalStateType } from '@/lib/types'
+import PartnerForm from './-form'
+import { useApp } from '@/providers/app-provider'
 
 export const Route = createFileRoute('/_private/partners/$role/')({
   validateSearch: validate({
@@ -16,6 +20,8 @@ export const Route = createFileRoute('/_private/partners/$role/')({
 function RouteComponent() {
   const { role } = Route.useParams()
   const params = Route.useSearch()
+  const { setDeleteModal } = useApp()
+  const [partnerModal, setPartnerModal] = useState<ModalStateType>(null)
 
   const query: QueryParamType = {
     table: "partnerRoles",
@@ -48,31 +54,34 @@ function RouteComponent() {
   }
 
   return (
-    <TableComponent columns={partnerColumns({
-      actions: {
-        // view: (id) => {
-        //   navigate({
-        //     to: `/customers/${id}`
-        //   })
-        // },
-        // edit: (id) => {
-        //   setCustomerModal({
-        //     id,
-        //     isOpen: true
-        //   })
-        // },
-        // delete: (id) => {
-        //   setDeleteModal({
-        //     id,
-        //     title: "Customer",
-        //     table: "customers"
-        //   })
-        // }
-      }
-    })} filters={[]} query={query} options={{
-      hasSearch: true
-    }} toolbar={(
-      <Button size="sm" variant="outline" onClick={() => {}}><PlusCircle  /> Create</Button>
-    )} />
+    <>
+      <TableComponent columns={partnerColumns({
+        actions: {
+          edit: (id) => {
+            setPartnerModal({
+              id,
+              isOpen: true
+            })
+          },
+          delete: (id) => {
+            setDeleteModal({
+              id,
+              title: "Partner",
+              table: "partnerRoles"
+            })
+          }
+        }
+      })} filters={[]} query={query} options={{
+        hasSearch: true
+      }} toolbar={(
+        <Button size="sm" variant="outline" onClick={() => {
+          setPartnerModal({
+            id: null,
+            isOpen: true
+          })
+        }}><PlusCircle  /> Create</Button>
+      )} />
+      <PartnerForm modal={partnerModal} setModal={setPartnerModal} />
+    </>
   )
 }

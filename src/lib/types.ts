@@ -25,9 +25,11 @@ export interface OptionType {
   image?: string | null
 }
 
+export type FieldType = "text" | "email" | "password" | "number" | "textarea" | "select"
+
 export interface FormFieldType {
   name: string
-  type?: string
+  type?: FieldType
   label?: string
   placeholder?: string
   options?: OptionType[]

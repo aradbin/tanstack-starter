@@ -36,3 +36,9 @@ export const paymentMethods = [
   { id: "bank_transfer", name: "Bank Transfer" },
   { id: "mobile_transfer", name: "Mobile Transfer" },
 ]
+
+export const partnerTypes = [
+  { id: "Individual", name: "Individual" },
+  { id: "Limited", name: "Limited" },
+  { id: "Partnership", name: "Partnership" },
+]
