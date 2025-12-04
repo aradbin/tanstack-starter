@@ -61,21 +61,21 @@ export const mainNavItems: NavigationType[] = [
       },
     ]
   },
-  {
-    title: "CRM",
-    items: [
-      {
-        title: "Contacts",
-        href: "/partners/contact",
-        icon: Contact,
-      },
-      {
-        title: "Customers",
-        href: "/partners/customer",
-        icon: Briefcase,
-      },
-    ],
-  },
+  // {
+  //   title: "CRM",
+  //   items: [
+  //     {
+  //       title: "Contacts",
+  //       href: "/partners/contact",
+  //       icon: Contact,
+  //     },
+  //     {
+  //       title: "Customers",
+  //       href: "/partners/customer",
+  //       icon: Briefcase,
+  //     },
+  //   ],
+  // },
   {
     title: "HRM",
     items: [
