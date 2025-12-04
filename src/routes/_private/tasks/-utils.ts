@@ -30,12 +30,15 @@ export const getTasks = createServerFn()
 
     const assigneeTaskUser = alias(taskEntities, 'assignee_task_users')
     const assigneeUser = alias(users, 'assignee_users')
+    const reporterTaskUser = alias(taskEntities, 'reporter_task_users')
+    const reporterUser = alias(users, 'reporter_users')
     const ownerTaskUser = alias(taskEntities, 'owner_task_users')
     const ownerUser = alias(users, 'owner_users')
     
     let query = db.select({
       ...getTableColumns(tasks),
         assignee: getTableColumns(assigneeUser),
+        reporter: getTableColumns(reporterUser),
         owner: getTableColumns(ownerUser),
         count: sql<number>`count(*) over()`
     }).from(tasks)
@@ -44,12 +47,29 @@ export const getTasks = createServerFn()
       query.innerJoin(assigneeTaskUser, and(
         eq(tasks.id, assigneeTaskUser.taskId),
         eq(assigneeTaskUser.entityId, where?.assignee),
+        eq(assigneeTaskUser.entityType, 'users'),
         eq(assigneeTaskUser.role, 'assignee'))
       )
     }else{
       query.leftJoin(assigneeTaskUser, and(
         eq(tasks.id, assigneeTaskUser.taskId),
+        eq(assigneeTaskUser.entityType, 'users'),
         eq(assigneeTaskUser.role, 'assignee'))
+      )
+    }
+
+    if(where?.reporter){
+      query.innerJoin(reporterTaskUser, and(
+        eq(tasks.id, reporterTaskUser.taskId),
+        eq(reporterTaskUser.entityId, where?.reporter),
+        eq(reporterTaskUser.entityType, 'users'),
+        eq(reporterTaskUser.role, 'reporter'))
+      )
+    }else{
+      query.leftJoin(reporterTaskUser, and(
+        eq(tasks.id, reporterTaskUser.taskId),
+        eq(reporterTaskUser.entityType, 'users'),
+        eq(reporterTaskUser.role, 'reporter'))
       )
     }
 
@@ -57,16 +77,19 @@ export const getTasks = createServerFn()
       query.innerJoin(ownerTaskUser, and(
         eq(tasks.id, ownerTaskUser.taskId),
         eq(ownerTaskUser.entityId, where?.owner),
+        eq(ownerTaskUser.entityType, 'users'),
         eq(ownerTaskUser.role, 'owner'))
       )
     }else{
       query.leftJoin(ownerTaskUser, and(
         eq(tasks.id, ownerTaskUser.taskId),
+        eq(ownerTaskUser.entityType, 'users'),
         eq(ownerTaskUser.role, 'owner'))
       )
     }
 
     query.leftJoin(assigneeUser, eq(assigneeTaskUser?.entityId, assigneeUser?.id))
+    query.leftJoin(reporterUser, eq(reporterTaskUser?.entityId, reporterUser?.id))
     query.leftJoin(ownerUser, eq(ownerTaskUser?.entityId, ownerUser?.id))
 
     query = addWhere(query, context?.session?.activeOrganizationId, tasks, where, search)
@@ -94,32 +117,46 @@ export const createTask = createServerFn({ method: "POST" })
     try {
       return await db.transaction(async (tx) => {
         const count = await tx.$count(tasks, and(eq(tasks.organizationId, context?.session?.activeOrganizationId)))
+        const { assignee, reporter, owner, ...taskValues } = values
         const [result] = await tx.insert(tasks).values({
           id: generateId(),
-          ...values,
+          ...taskValues,
           number: count + 1,
           organizationId: context?.session?.activeOrganizationId,
           createdBy: context?.user?.id,
         }).returning()
 
-        // if(values?.assignee || values?.owner){
-        //   await tx.insert(taskEntities).values([
-        //     ...values?.assignee ? [{
-        //       id: generateId(),
-        //       taskId: result?.id,
-        //       entityId: values?.assignee,
-        //       role: "assignee",
-        //       createdBy: context?.user?.id
-        //     }] : [],
-        //     ...values?.owner ? [{
-        //       id: generateId(),
-        //       taskId: result?.id,
-        //       entityId: values?.owner,
-        //       role: "owner",
-        //       createdBy: context?.user?.id
-        //     }] : []
-        //   ])
-        // }
+        if(values?.assignee || values?.reporter || values?.owner){
+          await tx.insert(taskEntities).values([
+            ...(values?.assignee ? [{
+              id: generateId(),
+              taskId: result?.id,
+              entityId: values?.assignee,
+              entityType: "users",
+              role: "assignee",
+              organizationId: context?.session?.activeOrganizationId,
+              createdBy: context?.user?.id
+            }] : []),
+            ...(values?.reporter ? [{
+              id: generateId(),
+              taskId: result?.id,
+              entityId: values?.reporter,
+              entityType: "users",
+              role: "reporter",
+              organizationId: context?.session?.activeOrganizationId,
+              createdBy: context?.user?.id
+            }] : []),
+            ...(values?.owner ? [{
+              id: generateId(),
+              taskId: result?.id,
+              entityId: values?.owner,
+              entityType: "users",
+              role: "owner",
+              organizationId: context?.session?.activeOrganizationId,
+              createdBy: context?.user?.id
+            }] : [])
+          ])
+        }
 
         return {
           ...result,
@@ -151,17 +188,21 @@ export const updateTask = createServerFn({ method: "POST" })
         })
 
         const assignee = existing?.find((taskUser) => taskUser?.role === 'assignee')
+        const reporter = existing?.find((taskUser) => taskUser?.role === 'reporter')
         const owner = existing?.find((taskUser) => taskUser?.role === 'owner')
 
-        // if(!assignee && values?.assignee){
-        //   await tx.insert(taskEntities).values({
-        //     id: generateId(),
-        //     taskId: id,
-        //     entityId: values?.assignee,
-        //     role: "assignee",
-        //     createdBy: context?.user?.id
-        //   })
-        // }
+        // Handle assignee
+        if(!assignee && values?.assignee){
+          await tx.insert(taskEntities).values({
+            id: generateId(),
+            taskId: id,
+            entityId: values?.assignee,
+            entityType: "users",
+            role: "assignee",
+            organizationId: context?.session?.activeOrganizationId,
+            createdBy: context?.user?.id
+          })
+        }
         if(assignee && values?.assignee && assignee?.entityId !== values?.assignee){
           await tx.update(taskEntities).set({
             entityId: values?.assignee,
@@ -172,15 +213,40 @@ export const updateTask = createServerFn({ method: "POST" })
           await tx.delete(taskEntities).where(eq(taskEntities.id, assignee?.id))
         }
 
-        // if(!owner && values?.owner){
-        //   await tx.insert(taskEntities).values({
-        //     id: generateId(),
-        //     taskId: id,
-        //     entityId: values?.owner,
-        //     role: "owner",
-        //     createdBy: context?.user?.id
-        //   })
-        // }
+        // Handle reporter
+        if(!reporter && values?.reporter){
+          await tx.insert(taskEntities).values({
+            id: generateId(),
+            taskId: id,
+            entityId: values?.reporter,
+            entityType: "users",
+            role: "reporter",
+            organizationId: context?.session?.activeOrganizationId,
+            createdBy: context?.user?.id
+          })
+        }
+        if(reporter && values?.reporter && reporter?.entityId !== values?.reporter){
+          await tx.update(taskEntities).set({
+            entityId: values?.reporter,
+            updatedBy: context?.user?.id,
+          }).where(eq(taskEntities.id, reporter?.id))
+        }
+        if(reporter && !values?.reporter){
+          await tx.delete(taskEntities).where(eq(taskEntities.id, reporter?.id))
+        }
+
+        // Handle owner
+        if(!owner && values?.owner){
+          await tx.insert(taskEntities).values({
+            id: generateId(),
+            taskId: id,
+            entityId: values?.owner,
+            entityType: "users",
+            role: "owner",
+            organizationId: context?.session?.activeOrganizationId,
+            createdBy: context?.user?.id
+          })
+        }
         if(owner && values?.owner && owner?.entityId !== values?.owner){
           await tx.update(taskEntities).set({
             entityId: values?.owner,

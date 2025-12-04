@@ -12,6 +12,7 @@ export const tasks = pgTable("tasks", {
   status: table.text().default("todo").notNull(), // todo, inprogress, done
   priority: table.text().default("medium").notNull(), // low, medium, high
   dueDate: table.date("due_date").defaultNow().notNull(),
+  parentId: table.text("parent_id").references(() => tasks.id, { onDelete: "cascade" }),
   organizationId: table
     .text("organization_id")
     .notNull()
@@ -21,7 +22,7 @@ export const tasks = pgTable("tasks", {
 
 export const taskEntities = pgTable("task_entities", {
   id: table.text().primaryKey(),
-  role: table.text(), // assignee, owner
+  role: table.text(), // assignee, owner, reporter
   entityType: table.text("entity_type").notNull(), // table name: users, employees, partners, assets
   entityId: table.text("entity_id").notNull(),
   taskId: table
@@ -36,6 +37,11 @@ export const taskEntities = pgTable("task_entities", {
 })
 
 export const taskRelations = relations(tasks, ({ many, one }) => ({
+  parent: one(tasks, {
+    fields: [tasks.parentId],
+    references: [tasks.id]
+  }),
+  children: many(tasks),
   taskEntities: many(taskEntities),
   organization: one(organizations, {
     fields: [tasks.organizationId],

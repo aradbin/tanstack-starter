@@ -16,14 +16,18 @@ export default function TaskForm() {
     queryFn: async () => {
       const result = await getData({ data: {
         table: "tasks",
+        relation: {
+          taskEntities: true
+        },
         id: taskModal?.id
       }})
       
       if(result){
         return {
           ...result,
-          assignee: result.taskEntities?.find((taskEntity: AnyType) => taskEntity?.role === 'assignee')?.user?.id,
-          owner: result.taskEntities?.find((taskEntity: AnyType) => taskEntity?.role === 'owner')?.user?.id
+          assignee: result?.taskEntities?.find((taskEntity: AnyType) => taskEntity?.role === 'assignee')?.user?.id,
+          reporter: result?.taskEntities?.find((taskEntity: AnyType) => taskEntity?.role === 'reporter')?.user?.id,
+          owner: result?.taskEntities?.find((taskEntity: AnyType) => taskEntity?.role === 'owner')?.user?.id
         }
       }
 
@@ -84,10 +88,10 @@ export default function TaskForm() {
     ],
     [
       {
-        name: 'owner',
+        name: 'reporter',
         type: 'user',
         options: users,
-        validationOnSubmit: stringValidation('Owner'),
+        validationOnSubmit: stringValidation('Reporter'),
       }
     ],
   ]

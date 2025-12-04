@@ -21,13 +21,9 @@ export const taskColumns = ({
   }
 }): ColumnDef<typeof tasks.$inferSelect & {
   assignee?: typeof users.$inferSelect
+  reporter?: typeof users.$inferSelect
   owner?: typeof users.$inferSelect
 }>[] => ([
-  {
-    id: "select",
-    header: ({ table }) => <TableCheckboxHeader table={table} />,
-    cell: ({ row }) => <TableCheckboxRow row={row} />,
-  },
   {
     accessorKey: "title",
     header: ({ column }) => <TableColumnHeader column={column} title="Title" />,
@@ -37,6 +33,11 @@ export const taskColumns = ({
     accessorKey: "assignee",
     header: ({ column }) => <TableColumnHeader column={column} title="Assignee" />,
     cell: ({ row }) => row?.original?.assignee ? <AvatarComponent user={row.original.assignee} options={{ hideDescription: false }} /> : "",
+  },
+  {
+    accessorKey: "reporter",
+    header: ({ column }) => <TableColumnHeader column={column} title="Reporter" />,
+    cell: ({ row }) => row?.original?.reporter ? <AvatarComponent user={row.original.reporter} options={{ hideDescription: false }} /> : "",
   },
   {
     accessorKey: "owner",

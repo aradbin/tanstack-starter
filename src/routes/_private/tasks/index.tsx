@@ -17,6 +17,7 @@ export const Route = createFileRoute('/_private/tasks/')({
     status: enamValidation('Status', taskStatuses).catch(undefined),
     priority: enamValidation('Priority', taskPriorities).catch(undefined),
     assignee: stringValidation('Assignee').catch(undefined),
+    reporter: stringValidation('Reporter').catch(undefined),
     owner: stringValidation('Owner').catch(undefined)
   })
 })
@@ -39,11 +40,12 @@ function RouteComponent() {
       status: params.status,
       priority: params.priority,
       assignee: params.assignee,
+      reporter: params.reporter,
       owner: params.owner
     },
     search: {
       term: params.search,
-      key: ["title"]
+      key: ["title", "number"]
     }
   }
 
@@ -61,6 +63,12 @@ function RouteComponent() {
     {
       key: 'assignee',
       value: params.assignee,
+      options: users,
+      type: 'avatar'
+    },
+    {
+      key: 'reporter',
+      value: params.reporter,
       options: users,
       type: 'avatar'
     },
