@@ -5,18 +5,6 @@ import { timestamps } from "./columns.helpers"
 import { relations } from "drizzle-orm"
 import { organizations } from "./users"
 
-export const serviceTypes = pgTable("service_types", {
-  id: table.text().primaryKey(),
-  name: table.text().notNull().unique(),
-  parentId: table
-    .text("parent_id")
-    .references(() => serviceTypes.id, { onDelete: "cascade" }),
-  organizationId: table
-    .text("organization_id")
-    .notNull()
-    .references(() => organizations.id, { onDelete: "cascade" }),
-})
-
 export const services = pgTable("services", {
   id: table.text().primaryKey(),
   title: table.text(),
@@ -26,10 +14,7 @@ export const services = pgTable("services", {
   status: table.text(), // scheduled, completed, canceled, postponed
   attachments: table.text(),
   metadata: table.jsonb(),
-  typeId: table
-    .text("type_id")
-    .notNull()
-    .references(() => serviceTypes.id, { onDelete: "cascade" }),
+  typeId: table.text("type_id").notNull(),
   organizationId: table
     .text("organization_id")
     .notNull()
@@ -56,10 +41,6 @@ export const serviceEntities = pgTable("service_entities", {
 
 export const serviceRelations = relations(services, ({ one, many }) => ({
   serviceEntities: many(serviceEntities),
-  type: one(serviceTypes, {
-    fields: [services.typeId],
-    references: [serviceTypes.id],
-  }),
   organization: one(organizations, {
     fields: [services.organizationId],
     references: [organizations.id],

@@ -19,17 +19,15 @@ export const tasks = pgTable("tasks", {
   ...timestamps,
 })
 
-export const taskUsers = pgTable("task_users", {
+export const taskEntities = pgTable("task_entities", {
   id: table.text().primaryKey(),
+  role: table.text(), // assignee, owner
+  entityType: table.text("entity_type").notNull(), // table name: users, employees, partners, assets
+  entityId: table.text("entity_id").notNull(),
   taskId: table
     .text("task_id")
     .notNull()
     .references(() => tasks.id, { onDelete: "cascade" }),
-  userId: table
-    .text("user_id")
-    .notNull()
-    .references(() => users.id, { onDelete: "cascade" }),
-  role: table.text().default("assignee").notNull(), // assignee, owner
   organizationId: table
     .text("organization_id")
     .notNull()
@@ -38,20 +36,16 @@ export const taskUsers = pgTable("task_users", {
 })
 
 export const taskRelations = relations(tasks, ({ many, one }) => ({
-  taskUsers: many(taskUsers),
+  taskEntities: many(taskEntities),
   organization: one(organizations, {
     fields: [tasks.organizationId],
     references: [organizations.id]
   })
 }))
 
-export const taskUserRelations = relations(taskUsers, ({ one }) => ({
+export const taskEntityRelations = relations(taskEntities, ({ one }) => ({
   task: one(tasks, {
-    fields: [taskUsers.taskId],
+    fields: [taskEntities.taskId],
     references: [tasks.id]
   }),
-  user: one(users, {
-    fields: [taskUsers.userId], 
-    references: [users.id]
-  })
 }))

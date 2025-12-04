@@ -2,6 +2,7 @@ import { createServerFn } from "@tanstack/react-start"
 import { db } from "../db"
 import { organizations, services } from "../db/schema"
 import { eq } from "drizzle-orm"
+import { generateId } from "better-auth"
 
 export const tripRoutesDepot = [
   { from: "CPA", to: "PL", income: {
@@ -216,30 +217,17 @@ export const syncRegalTranstrade = createServerFn({ method: "POST" })
 
     await db.update(organizations).set({
       metadata: JSON.stringify({
+        assetTypes: [{ id: "kP47g0lpyblJWVgH0XTHEWh3ftZMhuk0", name: "Vehicle" }],
+        eventTypes: [],
+        partnerRoles: [{ id: generateId(), name: "Contact" }, { id: generateId(), name: "Customer" }],
+        serviceTypes: [
+          { id: "VOVj5e0Qn0lRuF5JXE0QplbVFKLdSbjM", name: "Depot Trip" },
+          { id: "zeA6cPLyvfLXMFXOs5fsi4SPpKatGm3I", name: "District Trip" }
+        ],
         tripRoutesDepot: tripRoutesDepot,
         fuelPrice: fuelPrice
       })
     }).where(eq(organizations.id, "HXAVBIRDQcztDzjB99NRVjY6yz6NqAoT"))
-
-    console.log("1")
-
-    const depotServices = await db.select().from(services).where(eq(services.typeId, depotTripServiceTypeId))
-
-    console.log("2")
-
-    depotServices?.forEach(async (depotService: typeof services.$inferSelect & { metadata: any }) => {
-      await db.update(services).set({
-        metadata: {
-          routes: tripRoutesDepot,
-          fuelPrice: fuelPrice,
-          expenses: depotService?.metadata?.expenses,
-          items: depotService?.metadata?.items?.map((item: any) => ({
-            count: item.count,
-            route: tripRoutesDepot?.find(route => route.from === item.route.from && route.to === item.route.to)
-          }))
-        }
-      }).where(eq(services.id, depotService.id))
-    })
 
     console.log("End")
   })

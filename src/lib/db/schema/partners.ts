@@ -11,8 +11,8 @@ export const partners = pgTable("partners", {
   phone: table.text(),
   address: table.text(),
   image: table.text(),
-  role: table.text().notNull().default("customer"), // contact, customer, vendor, lead
-  type: table.text().notNull(), // individual, limited, partnership
+  role: table.text().notNull().default("icnQHDZRky9yfegqfrKvvkGebVx12bRn"), // default: customer, contact, vendor
+  type: table.text().notNull(), // Individual, Limited, Partnership
   metadata: table.jsonb(),
   organizationId: table
     .text("organization_id")
