@@ -1,7 +1,7 @@
 import { authOrgMiddleware } from "@/lib/auth/middleware";
 import { db } from "@/lib/db";
 import { addOrder, addPagination, addWhere, QueryParamBaseType } from "@/lib/db/functions";
-import { tasks, taskUsers, users } from "@/lib/db/schema";
+import { taskEntities, tasks, users } from "@/lib/db/schema";
 import { AnyType, OptionType } from "@/lib/types";
 import { createServerFn } from "@tanstack/react-start";
 import { generateId } from "better-auth";
@@ -28,9 +28,9 @@ export const getTasks = createServerFn()
   .handler(async ({ context, data }) => {
     const { sort, pagination, where, search } = data
 
-    const assigneeTaskUser = alias(taskUsers, 'assignee_task_users')
+    const assigneeTaskUser = alias(taskEntities, 'assignee_task_users')
     const assigneeUser = alias(users, 'assignee_users')
-    const ownerTaskUser = alias(taskUsers, 'owner_task_users')
+    const ownerTaskUser = alias(taskEntities, 'owner_task_users')
     const ownerUser = alias(users, 'owner_users')
     
     let query = db.select({
@@ -43,7 +43,7 @@ export const getTasks = createServerFn()
     if(where?.assignee){
       query.innerJoin(assigneeTaskUser, and(
         eq(tasks.id, assigneeTaskUser.taskId),
-        eq(assigneeTaskUser.userId, where?.assignee),
+        eq(assigneeTaskUser.entityId, where?.assignee),
         eq(assigneeTaskUser.role, 'assignee'))
       )
     }else{
@@ -56,7 +56,7 @@ export const getTasks = createServerFn()
     if(where?.owner){
       query.innerJoin(ownerTaskUser, and(
         eq(tasks.id, ownerTaskUser.taskId),
-        eq(ownerTaskUser.userId, where?.owner),
+        eq(ownerTaskUser.entityId, where?.owner),
         eq(ownerTaskUser.role, 'owner'))
       )
     }else{
@@ -66,8 +66,8 @@ export const getTasks = createServerFn()
       )
     }
 
-    query.leftJoin(assigneeUser, eq(assigneeTaskUser?.userId, assigneeUser?.id))
-    query.leftJoin(ownerUser, eq(ownerTaskUser?.userId, ownerUser?.id))
+    query.leftJoin(assigneeUser, eq(assigneeTaskUser?.entityId, assigneeUser?.id))
+    query.leftJoin(ownerUser, eq(ownerTaskUser?.entityId, ownerUser?.id))
 
     query = addWhere(query, context?.session?.activeOrganizationId, tasks, where, search)
     query = addOrder(query, tasks, sort)
@@ -102,24 +102,24 @@ export const createTask = createServerFn({ method: "POST" })
           createdBy: context?.user?.id,
         }).returning()
 
-        if(values?.assignee || values?.owner){
-          await tx.insert(taskUsers).values([
-            ...values?.assignee ? [{
-              id: generateId(),
-              taskId: result?.id,
-              userId: values?.assignee,
-              role: "assignee",
-              createdBy: context?.user?.id
-            }] : [],
-            ...values?.owner ? [{
-              id: generateId(),
-              taskId: result?.id,
-              userId: values?.owner,
-              role: "owner",
-              createdBy: context?.user?.id
-            }] : []
-          ])
-        }
+        // if(values?.assignee || values?.owner){
+        //   await tx.insert(taskEntities).values([
+        //     ...values?.assignee ? [{
+        //       id: generateId(),
+        //       taskId: result?.id,
+        //       entityId: values?.assignee,
+        //       role: "assignee",
+        //       createdBy: context?.user?.id
+        //     }] : [],
+        //     ...values?.owner ? [{
+        //       id: generateId(),
+        //       taskId: result?.id,
+        //       entityId: values?.owner,
+        //       role: "owner",
+        //       createdBy: context?.user?.id
+        //     }] : []
+        //   ])
+        // }
 
         return {
           ...result,
@@ -146,49 +146,49 @@ export const updateTask = createServerFn({ method: "POST" })
           updatedBy: context?.user?.id,
         }).where(eq(tasks.id, id)).returning()
 
-        const existing = await tx.query.taskUsers.findMany({
-          where: eq(taskUsers.taskId, id)
+        const existing = await tx.query.taskEntities.findMany({
+          where: eq(taskEntities.taskId, id)
         })
 
         const assignee = existing?.find((taskUser) => taskUser?.role === 'assignee')
         const owner = existing?.find((taskUser) => taskUser?.role === 'owner')
 
-        if(!assignee && values?.assignee){
-          await tx.insert(taskUsers).values({
-            id: generateId(),
-            taskId: id,
-            userId: values?.assignee,
-            role: "assignee",
-            createdBy: context?.user?.id
-          })
-        }
-        if(assignee && values?.assignee && assignee?.userId !== values?.assignee){
-          await tx.update(taskUsers).set({
-            userId: values?.assignee,
+        // if(!assignee && values?.assignee){
+        //   await tx.insert(taskEntities).values({
+        //     id: generateId(),
+        //     taskId: id,
+        //     entityId: values?.assignee,
+        //     role: "assignee",
+        //     createdBy: context?.user?.id
+        //   })
+        // }
+        if(assignee && values?.assignee && assignee?.entityId !== values?.assignee){
+          await tx.update(taskEntities).set({
+            entityId: values?.assignee,
             updatedBy: context?.user?.id,
-          }).where(eq(taskUsers.id, assignee?.id))
+          }).where(eq(taskEntities.id, assignee?.id))
         }
         if(assignee && !values?.assignee){
-          await tx.delete(taskUsers).where(eq(taskUsers.id, assignee?.id))
+          await tx.delete(taskEntities).where(eq(taskEntities.id, assignee?.id))
         }
 
-        if(!owner && values?.owner){
-          await tx.insert(taskUsers).values({
-            id: generateId(),
-            taskId: id,
-            userId: values?.owner,
-            role: "owner",
-            createdBy: context?.user?.id
-          })
-        }
-        if(owner && values?.owner && owner?.userId !== values?.owner){
-          await tx.update(taskUsers).set({
-            userId: values?.owner,
+        // if(!owner && values?.owner){
+        //   await tx.insert(taskEntities).values({
+        //     id: generateId(),
+        //     taskId: id,
+        //     entityId: values?.owner,
+        //     role: "owner",
+        //     createdBy: context?.user?.id
+        //   })
+        // }
+        if(owner && values?.owner && owner?.entityId !== values?.owner){
+          await tx.update(taskEntities).set({
+            entityId: values?.owner,
             updatedBy: context?.user?.id,
-          }).where(eq(taskUsers.id, owner?.id))
+          }).where(eq(taskEntities.id, owner?.id))
         }
         if(owner && !values?.owner){
-          await tx.delete(taskUsers).where(eq(taskUsers.id, owner?.id))
+          await tx.delete(taskEntities).where(eq(taskEntities.id, owner?.id))
         }
 
         return {

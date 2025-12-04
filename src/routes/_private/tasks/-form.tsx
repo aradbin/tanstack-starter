@@ -16,21 +16,14 @@ export default function TaskForm() {
     queryFn: async () => {
       const result = await getData({ data: {
         table: "tasks",
-        relation: {
-          taskUsers: {
-            with: {
-              user: true
-            }
-          }
-        },
         id: taskModal?.id
       }})
       
       if(result){
         return {
           ...result,
-          assignee: result.taskUsers?.find((taskUser: AnyType) => taskUser?.role === 'assignee')?.user?.id,
-          owner: result.taskUsers?.find((taskUser: AnyType) => taskUser?.role === 'owner')?.user?.id
+          assignee: result.taskEntities?.find((taskEntity: AnyType) => taskEntity?.role === 'assignee')?.user?.id,
+          owner: result.taskEntities?.find((taskEntity: AnyType) => taskEntity?.role === 'owner')?.user?.id
         }
       }
 
