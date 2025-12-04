@@ -38,7 +38,6 @@ export function TableRowActions({
           </TooltipTrigger>
           <TooltipContent>Delete</TooltipContent>
         </Tooltip>
-        
       )}
     </div>
   )
