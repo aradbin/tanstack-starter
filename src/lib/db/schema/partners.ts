@@ -11,23 +11,9 @@ export const partners = pgTable("partners", {
   phone: table.text(),
   address: table.text(),
   image: table.text(),
+  role: table.text().notNull().default("customer"), // contact, customer, vendor, lead
   type: table.text().notNull(), // individual, limited, partnership
   metadata: table.jsonb(),
-  organizationId: table
-    .text("organization_id")
-    .notNull()
-    .references(() => organizations.id, { onDelete: "cascade" }),
-  ...timestamps,
-})
-
-export const partnerRoles = pgTable("partner_roles", {
-  id: table.text().primaryKey(),
-  role: table.text().notNull(), // contact, customer, vendor, lead
-  metadata: table.jsonb(),
-  partnerId: table
-    .text("partner_id")
-    .notNull()
-    .references(() => partners.id, { onDelete: "cascade" }),
   organizationId: table
     .text("organization_id")
     .notNull()
@@ -59,19 +45,7 @@ export const partnerRelations = relations(partners, ({ one, many }) => ({
     fields: [partners.organizationId],
     references: [organizations.id],
   }),
-  partnerRoles: many(partnerRoles),
   partnerEntities: many(partnerEntities),
-}))
-
-export const partnerRoleRelations = relations(partnerRoles, ({ one }) => ({
-  partner: one(partners, {
-    fields: [partnerRoles.partnerId],
-    references: [partners.id],
-  }),
-  organization: one(organizations, {
-    fields: [partnerRoles.organizationId],
-    references: [organizations.id],
-  }),
 }))
 
 export const partnerEntityRelations = relations(partnerEntities, ({ one }) => ({

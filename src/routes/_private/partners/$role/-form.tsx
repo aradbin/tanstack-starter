@@ -16,13 +16,10 @@ export default function PartnerForm({ modal, setModal }: {
   const { role } = Route.useParams()
 
   const { data, isLoading } = useQuery({
-    queryKey: ['partnerRoles', modal?.id],
+    queryKey: ['partners', modal?.id],
     queryFn: async () => getData({ data: {
-      table: "partnerRoles",
+      table: "partners",
       id: modal?.id,
-      relation: {
-        partner: true
-      }
     }}),
     enabled: !!modal?.id && modal?.isOpen
   })
@@ -48,19 +45,19 @@ export default function PartnerForm({ modal, setModal }: {
     ],
     [
       {
+        name: "phone",
+        label: "Phone",
+        validationOnSubmit: stringRequiredValidation("Phone"),
+        placeholder: "Enter phone number",
+      },
+    ],
+    [
+      {
         name: "email",
         label: "Email",
         type: "email",
         validationOnSubmit: emailValidation("Email"),
         placeholder: "Enter email address",
-      },
-    ],
-    [
-      {
-        name: "phone",
-        label: "Phone",
-        validationOnSubmit: stringValidation("Phone"),
-        placeholder: "Enter phone number",
       },
     ],
     [
@@ -90,38 +87,25 @@ export default function PartnerForm({ modal, setModal }: {
               return updateData({
                 data: {
                   table: "partners",
-                  id: data?.partner?.id,
+                  id: data?.id,
                   values,
                   title: capitalize(role)
                 }
               })
             } else {
-              const partnerId = generateId()
-              await createData({
+              return createData({
                 data: {
                   table: "partners",
                   values: {
                     ...values,
-                    id: partnerId
-                  },
-                  title: capitalize(role)
-                }
-              })
-
-              return createData({
-                data: {
-                  table: "partnerRoles",
-                  values: {
-                    id: generateId(),
-                    partnerId: partnerId,
-                    role: role,
+                    id: generateId()
                   },
                   title: capitalize(role)
                 }
               })
             }
           }}
-          values={modal?.isOpen && modal?.id && data ? data?.partner : {}}
+          values={modal?.isOpen && modal?.id && data ? data : {}}
           onSuccess={() => {
             props.close()
           }}
@@ -130,7 +114,7 @@ export default function PartnerForm({ modal, setModal }: {
           }}
           options={{
             isLoading,
-            queryKey: 'partnerRoles',
+            queryKey: 'partners',
           }}
         />
       )}

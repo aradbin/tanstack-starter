@@ -205,6 +205,7 @@ export const tripRoutesDepot = [
 ]
 
 export const fuelPrice = 102;
+export const portlinkPartnerId = "64g2kKyWEyk7pAMojDhDu5o8nQRWN5qf";
 export const depotTripServiceTypeId = "VOVj5e0Qn0lRuF5JXE0QplbVFKLdSbjM";
 export const districtTripServiceTypeId = "zeA6cPLyvfLXMFXOs5fsi4SPpKatGm3I";
 

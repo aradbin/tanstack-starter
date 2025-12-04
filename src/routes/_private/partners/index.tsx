@@ -12,7 +12,8 @@ function RouteComponent() {
     { to: '/partners/customer', title: 'Customers', icon: <Users /> },
     { to: '/partners/vendor', title: 'Vendors', icon: <Users /> },
     { to: '/partners/supplier', title: 'Suppliers', icon: <Users /> },
-  ]
+  ];
+  
   return (
     <div className='flex justify-center items-center gap-6'>
       {links.map(link => (

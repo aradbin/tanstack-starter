@@ -2,7 +2,7 @@ import { authOrgMiddleware } from "@/lib/auth/middleware"
 import { db } from "@/lib/db"
 import { getWhereArgs } from "@/lib/db/functions"
 import { invoiceEntities, invoicePayments, invoices, services } from "@/lib/db/schema"
-import { depotTripServiceTypeId } from "@/lib/organizations/regal-transtrade"
+import { depotTripServiceTypeId, portlinkPartnerId } from "@/lib/organizations/regal-transtrade"
 import { AnyType } from "@/lib/types"
 import { formatMonth } from "@/lib/utils"
 import { createServerFn } from "@tanstack/react-start"
@@ -132,7 +132,7 @@ export const createDepotTripInvoice = createServerFn({ method: "POST" })
             id: generateId(),
             role: "customer",
             entityType: "partners",
-            entityId: "64g2kKyWEyk7pAMojDhDu5o8nQRWN5qf",
+            entityId: portlinkPartnerId,
             organizationId: context?.session?.activeOrganizationId,
             createdBy: context?.user?.id,
             invoiceId: result?.id,
@@ -142,7 +142,7 @@ export const createDepotTripInvoice = createServerFn({ method: "POST" })
         return {
           ...result,
           customer: {
-            id: "64g2kKyWEyk7pAMojDhDu5o8nQRWN5qf",
+            id: portlinkPartnerId,
             name: "Portlink Logistic Centre Limited",
             address: "Bhatiary, Satkania, Chittagong"
           },

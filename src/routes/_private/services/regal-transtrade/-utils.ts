@@ -2,7 +2,7 @@ import { authOrgMiddleware } from "@/lib/auth/middleware"
 import { db } from "@/lib/db"
 import { addOrder, addWhere, QueryParamBaseType } from "@/lib/db/functions"
 import { assets, employees, serviceEntities, services } from "@/lib/db/schema"
-import { depotTripServiceTypeId, districtTripServiceTypeId } from "@/lib/organizations/regal-transtrade"
+import { depotTripServiceTypeId, districtTripServiceTypeId, portlinkPartnerId } from "@/lib/organizations/regal-transtrade"
 import { AnyType } from "@/lib/types"
 import { createServerFn } from "@tanstack/react-start"
 import { generateId } from "better-auth"
@@ -134,7 +134,7 @@ export const createTrip = createServerFn({ method: "POST" })
             role: "customer",
             status: "attended",
             entityType: "partners",
-            entityId: "64g2kKyWEyk7pAMojDhDu5o8nQRWN5qf",
+            entityId: portlinkPartnerId,
             serviceId: result?.id,
             organizationId: context?.session?.activeOrganizationId,
             createdBy: context?.user?.id

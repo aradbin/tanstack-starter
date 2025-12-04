@@ -65,14 +65,14 @@ export const mainNavItems: NavigationType[] = [
     title: "CRM",
     items: [
       {
-        title: "Customers",
-        href: "/partners/customers",
-        icon: Briefcase,
+        title: "Contacts",
+        href: "/partners/contact",
+        icon: Contact,
       },
       {
-        title: "Contacts",
-        href: "/partners/contacts",
-        icon: Contact,
+        title: "Customers",
+        href: "/partners/customer",
+        icon: Briefcase,
       },
     ],
   },
