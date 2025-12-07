@@ -1,10 +1,9 @@
-import { createData, getDatas, TableType } from "@/lib/db/functions";
-import { assets, contacts, employees, users } from "@/lib/db/schema";
-import { ModalStateType } from "@/lib/types";
+import { getDatas, TableType } from "@/lib/db/functions";
+import { assets, employees, partners, users } from "@/lib/db/schema";
+import { AnyType, ModalStateType } from "@/lib/types";
 import { getMembers } from "@/routes/_private/members/-utils";
 import { useQuery } from "@tanstack/react-query";
-import { generateId } from "better-auth";
-import { createContext, Dispatch, ReactNode, SetStateAction, useContext, useEffect, useState } from "react";
+import { createContext, Dispatch, ReactNode, SetStateAction, useContext, useState } from "react";
 
 type DeleteModalStateType = {
   id: string | null
@@ -22,7 +21,7 @@ type AppStateType = {
   deleteModal: DeleteModalStateType
   setDeleteModal: Dispatch<SetStateAction<DeleteModalStateType>>
   users: typeof users.$inferSelect[]
-  contacts: typeof contacts.$inferSelect[]
+  contacts: typeof partners.$inferSelect[]
   // transport
   vehicles: {
     id: string
@@ -85,7 +84,10 @@ export function AppProvider({
     queryKey: ['contacts', 'all'],
     queryFn: async () => {
       const response = await getDatas({ data: {
-        table: "contacts"
+        table: "partners",
+        where: {
+          role: "customer"
+        }
       }})
 
       return response?.result || []
@@ -100,7 +102,9 @@ export function AppProvider({
       }})
 
       if(response?.result){
-        return response?.result?.map((vehicle: typeof assets.$inferSelect) => ({
+        return response?.result?.map((vehicle: typeof assets.$inferSelect & {
+          metadata: AnyType
+        }) => ({
           id: vehicle?.id,
           name: vehicle?.metadata?.registrationNumber,
           image: vehicle?.image,

@@ -36,6 +36,7 @@ export const createDepotTripInvoice = createServerFn({ method: "POST" })
         })
         
         let amount = 0
+        let expense = 0
         let invoiceItems = {
           title: `Prime Mover Bill for the Month of ${formatMonth(new Date(values?.to))}`,
           items: [
@@ -51,6 +52,7 @@ export const createDepotTripInvoice = createServerFn({ method: "POST" })
           items: {}
         }
         trips?.forEach((trip: AnyType) => {
+          expense += trip?.metadata?.expenses?.reduce((total: number, expense: AnyType) => total + expense?.amount, 0)
           trip?.metadata?.items?.forEach((item: AnyType) => {
             amount += item?.count * ((item?.route?.income?.fuel * trip?.metadata?.fuelPrice) + item?.route?.income?.fixed)
 
@@ -103,7 +105,8 @@ export const createDepotTripInvoice = createServerFn({ method: "POST" })
         const [result] = await tx.insert(invoices).values({
           id: generateId(),
           number: `INV-DEPOT-${format(new Date(values.to), "MMyyyy")}`,
-          amount: `${amount}`,
+          amount: `${amount || 0}`,
+          expense: `${expense || 0}`,
           paid: "0",
           date: values?.date,
           dueDate: values?.dueDate,
@@ -119,15 +122,6 @@ export const createDepotTripInvoice = createServerFn({ method: "POST" })
         }).returning()
 
         await tx.insert(invoiceEntities).values([
-          ...trips?.map((trip) => ({
-            id: generateId(),
-            role: "trip",
-            entityType: "services",
-            entityId: trip?.id,
-            organizationId: context?.session?.activeOrganizationId,
-            createdBy: context?.user?.id,
-            invoiceId: result?.id,
-          })),
           ...[{
             id: generateId(),
             role: "customer",

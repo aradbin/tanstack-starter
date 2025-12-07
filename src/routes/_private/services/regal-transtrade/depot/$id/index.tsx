@@ -1,7 +1,7 @@
 import AvatarComponent from '@/components/common/avatar-component'
 import LoadingComponent from '@/components/common/loading-component'
 import { Button } from '@/components/ui/button'
-import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Table, TableBody, TableCell, TableHead, TableRow } from '@/components/ui/table'
 import { getData } from '@/lib/db/functions'
 import { useApp } from '@/providers/app-provider'
@@ -15,7 +15,6 @@ export const Route = createFileRoute('/_private/services/regal-transtrade/depot/
 
 function RouteComponent() {
   const params = Route.useParams()
-  const navigate = Route.useNavigate()
   const { setDeleteModal } = useApp()
 
   const { data, isLoading } = useQuery({
@@ -56,11 +55,6 @@ function RouteComponent() {
                     id: params?.id,
                     title: "Trip",
                     table: "services",
-                    onSuccess: () => {
-                      navigate({
-                        to: '/services/regal-transtrade/depot'
-                      })
-                    }
                   })
                 }}>
                   <Trash />

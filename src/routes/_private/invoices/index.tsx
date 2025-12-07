@@ -36,7 +36,7 @@ function RouteComponent() {
     <>
       <TableComponent columns={invoiceColumns({
         actions: {
-          async view(id, item) {
+          view: (id, item) => {
             setInvoiceModal({
               id,
               isOpen: true,

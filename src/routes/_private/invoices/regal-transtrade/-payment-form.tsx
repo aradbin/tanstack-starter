@@ -1,12 +1,9 @@
 import FormComponent from "@/components/form/form-component"
 import ModalComponent from "@/components/modal/modal-component"
-import { AnyType, FormFieldType, ModalStateType } from "@/lib/types"
+import { FormFieldType, ModalStateType } from "@/lib/types"
 import { stringRequiredValidation, stringValidation } from "@/lib/validations"
-import { pdf } from "@react-pdf/renderer"
-import InvoiceView from "@/routes/_private/invoices/regal-transtrade/-view"
-import { createDepotTripInvoice, createInvoicePayment } from "./-utils"
+import { createInvoicePayment } from "./-utils"
 import { paymentMethods } from "@/lib/variables"
-import { createData } from "@/lib/db/functions"
 import { generateId } from "better-auth"
 
 export default function InvoicePaymentForm({ modal, setModal }: {

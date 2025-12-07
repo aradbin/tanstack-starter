@@ -129,16 +129,6 @@ export const createTrip = createServerFn({ method: "POST" })
         }).returning()
 
         await tx.insert(serviceEntities).values([
-          ...values?.type === "depot" ? [{
-            id: generateId(),
-            role: "customer",
-            status: "attended",
-            entityType: "partners",
-            entityId: portlinkPartnerId,
-            serviceId: result?.id,
-            organizationId: context?.session?.activeOrganizationId,
-            createdBy: context?.user?.id
-          }] : [],
           ...values?.vehicleId ? [{
             id: generateId(),
             role: "vehicle",
@@ -216,7 +206,6 @@ export const updateTrip = createServerFn({ method: "POST" })
         const vehicle = existing?.find((entity) => entity?.role === 'vehicle' && entity?.entityType === 'assets')
         const driver = existing?.find((entity) => entity?.role === 'driver' && entity?.entityType === 'employees')
         const helper = existing?.find((entity) => entity?.role === 'helper' && entity?.entityType === 'employees')
-        const customer = existing?.find((entity) => entity?.role === 'customer' && entity?.entityType === 'customers')
 
         if(!vehicle && values?.vehicleId){
           await tx.insert(serviceEntities).values({

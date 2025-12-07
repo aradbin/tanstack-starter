@@ -88,7 +88,7 @@ function RouteComponent() {
         { key: "driver", value: params.driver, label: "Driver", type: "avatar", options: drivers },
         { key: "helper", value: params.helper, label: "Helper", type: "avatar", options: helpers },
       ]} query={query} queryFn={getTrips} options={{}} toolbar={(
-        <div className='flex gap-2'>
+        <div className='flex flex-wrap gap-2'>
           <Button size="sm" variant="outline" onClick={() => {
             setInvoiceModal({
               id: null,

@@ -56,24 +56,25 @@ export const invoiceColumns = ({
     id: "actions",
     header: ({ column }) => <TableColumnHeader column={column} title="Actions" className="text-right" />,
     cell: ({ row }) => (
-      <div className="flex justify-end gap-1">
-      {actions?.view && (
-        <Tooltip>
-          <TooltipTrigger asChild>
-            <Button variant="outline" size="icon" onClick={() => actions?.view?.(row.original.id, row.original)}><Eye /></Button>
-          </TooltipTrigger>
-          <TooltipContent>View</TooltipContent>
-        </Tooltip>
-      )}
-      {actions?.edit && (
-        <Tooltip>
-          <TooltipTrigger asChild>
-            <Button variant="outline" size="icon" onClick={() => actions?.edit?.(row.original.id, row.original)}><Receipt /></Button>
-          </TooltipTrigger>
-          <TooltipContent>Payment</TooltipContent>
-        </Tooltip>
-      )}
-    </div>
+      // <div className="flex justify-end gap-1">
+      //   {actions?.view && (
+      //     <Tooltip>
+      //       <TooltipTrigger asChild>
+      //         <Button variant="outline" size="icon" onClick={() => actions?.view?.(row.original.id, row.original)}><Eye /></Button>
+      //       </TooltipTrigger>
+      //       <TooltipContent>View</TooltipContent>
+      //     </Tooltip>
+      //   )}
+      //   {actions?.edit && (
+      //     <Tooltip>
+      //       <TooltipTrigger asChild>
+      //         <Button variant="outline" size="icon" onClick={() => actions?.edit?.(row.original.id, row.original)}><Receipt /></Button>
+      //       </TooltipTrigger>
+      //       <TooltipContent>Payment</TooltipContent>
+      //     </Tooltip>
+      //   )}
+      // </div>
+      <TableRowActions row={row} actions={actions} />
     ),
   },
 ]

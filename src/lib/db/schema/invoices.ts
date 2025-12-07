@@ -7,7 +7,8 @@ import { relations } from "drizzle-orm"
 export const invoices = pgTable("invoices", {
   id: table.text().primaryKey(),
   number: table.text().notNull(),
-  amount: table.numeric().notNull(),
+  amount: table.numeric().default("0").notNull(),
+  expense: table.numeric().default("0").notNull(),
   paid: table.numeric().default("0").notNull(),
   date: table.date().notNull(),
   dueDate: table.date("due_date").notNull(),

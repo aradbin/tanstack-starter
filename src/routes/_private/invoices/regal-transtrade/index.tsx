@@ -4,14 +4,13 @@ import { defaultSearchParamValidation, validate } from '@/lib/validations'
 import { createFileRoute } from '@tanstack/react-router'
 import { useState } from 'react'
 import { ModalStateType } from '@/lib/types'
-import { pdf } from '@react-pdf/renderer'
 import { invoiceColumns } from '../-columns'
-import InvoiceView from './-view'
 import { getInvoices } from '../-utils'
 import { Button } from '@/components/ui/button'
 import { FileCog } from 'lucide-react'
 import InvoiceForm from './-form'
 import InvoicePaymentForm from './-payment-form'
+import { useApp } from '@/providers/app-provider'
 
 export const Route = createFileRoute('/_private/invoices/regal-transtrade/')({
   validateSearch: validate({
@@ -23,6 +22,7 @@ export const Route = createFileRoute('/_private/invoices/regal-transtrade/')({
 function RouteComponent() {
   const params = Route.useSearch()
   const navigate = Route.useNavigate() 
+  const { setDeleteModal } = useApp()
   const [invoiceCreateModal, setInvoiceCreateModal] = useState<ModalStateType>(null)
   const [invoicePaymentModal, setInvoicePaymentModal] = useState<ModalStateType>(null)
   const query: QueryParamType = {
@@ -44,14 +44,21 @@ function RouteComponent() {
     <>
       <TableComponent columns={invoiceColumns({
         actions: {
-          view(id) {
+          view: (id) => {
             navigate({ to: "/invoices/regal-transtrade/$id", params: { id } })
           },
-          edit(id, item) {
+          edit: (id, item) => {
             setInvoicePaymentModal({
               id,
               isOpen: true,
               item
+            })
+          },
+          delete: (id) => {
+            setDeleteModal({
+              id,
+              title: "Invoice",
+              table: "invoices"
             })
           }
         }
