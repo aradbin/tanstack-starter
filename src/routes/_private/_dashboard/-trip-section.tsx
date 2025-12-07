@@ -67,17 +67,9 @@ export default function TripSection() {
         }
       })
 
-      console.log("invoices", invoices?.result)
-
       const amount = invoices?.result?.reduce((total: number, invoice: AnyType) => total + Number(invoice?.amount), 0)
       const expense = invoices?.result?.reduce((total: number, invoice: AnyType) => total + Number(invoice?.expense), 0)
       const paid = invoices?.result?.reduce((total: number, invoice: AnyType) => total + Number(invoice?.paid), 0)
-
-      console.log({
-        amount,
-        expense,
-        paid
-      })
 
       return {
         amount,
