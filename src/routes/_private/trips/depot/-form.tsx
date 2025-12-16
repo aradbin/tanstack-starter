@@ -1,6 +1,6 @@
 import FormComponent from "@/components/form/form-component"
 import { useQuery } from "@tanstack/react-query"
-import { getData } from "@/lib/db/functions"
+import { createData, getData, updateData } from "@/lib/db/functions"
 import { AnyType, FormFieldType } from "@/lib/types"
 import { stringRequiredValidation, stringValidation } from "@/lib/validations"
 import { useEffect, useState } from "react"
@@ -14,8 +14,8 @@ import { Label } from "@/components/ui/label"
 import InputField from "@/components/form/input-field"
 import { useNavigate } from "@tanstack/react-router"
 import { useApp } from "@/providers/app-provider"
-import { createTrip, updateTrip } from "../-utils"
 import { useAuth } from "@/providers/auth-provider"
+import { generateId } from "better-auth"
 
 export default function TripForm({ id }: { id?: string }) {
   const navigate = useNavigate()
@@ -28,25 +28,19 @@ export default function TripForm({ id }: { id?: string }) {
   const [expenses, setExpenses] = useState<AnyType[]>([])
 
   const { data, isLoading } = useQuery({
-    queryKey: ['services', id],
+    queryKey: ['trips', id],
     queryFn: async () => {
       const trip = await getData({ data: {
-        table: "services",
-        relation: {
-          serviceEntities: true
-        },
+        table: "trips",
         id
       }})
 
       return {
-        date: formatDateForInput(trip?.from),
-        vehicleId: trip?.serviceEntities?.find((entity: AnyType) => entity.entityType === "assets" && entity.role === "vehicle")?.entityId,
-        driverId: trip?.serviceEntities?.find((entity: AnyType) => entity.entityType === "employees" && entity.role === "driver")?.entityId,
-        helperId: trip?.serviceEntities?.find((entity: AnyType) => entity.entityType === "employees" && entity.role === "helper")?.entityId,
-        metadata: trip?.metadata || {},
+        ...trip,
+        date: formatDateForInput(trip?.date),
       }
     },
-    enabled: !!id
+    enabled: !!id && !!user
   })
 
   const updateFixedExpense = () => {
@@ -59,6 +53,7 @@ export default function TripForm({ id }: { id?: string }) {
     items.forEach((item) => {
       if (item.route) {
         expenses.toll += item.route.expense.toll * item.count
+        
         expenses.tips += item.route.expense.tips * item.count
         expenses.fuel += item.route.expense.fuel * item.count * (fuelPrice || 0)
       }
@@ -100,8 +95,10 @@ export default function TripForm({ id }: { id?: string }) {
   
   useEffect(() => {
     if(id && data){
-      const routes = data?.metadata?.routes || []
-      const price = data?.metadata?.fuelPrice || 0
+      const routes = user?.activeOrganization?.metadata?.routeConfigs?.find((route: AnyType) => route.id === data?.routes)?.routes || user?.activeOrganization?.metadata?.routeConfigs?.[0]?.routes || []
+
+      const price = data?.fuelPrice || user?.activeOrganization?.metadata?.fuelPrice || 0
+
       if(tripRoutesDepot !== routes){
         setTripRoutesDepot(routes)
       }
@@ -109,15 +106,15 @@ export default function TripForm({ id }: { id?: string }) {
         setFuelPrice(price)
       }
       if(items.length === 0){
-        setItems(data?.metadata?.items || [])
+        setItems(data?.items || [])
       }
       if(fixedExpenses.length === 0){
-        setFixedExpenses(data?.metadata?.expenses?.filter((expense: AnyType) => ["Toll", "Tips", "Fuel"].some((word) => expense?.description?.includes(word))) || [])
+        setFixedExpenses(data?.expenses?.filter((expense: AnyType) => ["Toll", "Tips", "Fuel"].some((word) => expense?.description?.includes(word))) || [])
       }else{
         updateFixedExpense()
       }
       if(expenses.length === 0){
-        setExpenses(data?.metadata?.expenses?.filter((expense: AnyType) => !["Toll", "Tips", "Fuel"].some((word) => expense?.description?.includes(word))) || [])
+        setExpenses(data?.expenses?.filter((expense: AnyType) => !["Toll", "Tips", "Fuel"].some((word) => expense?.description?.includes(word))) || [])
       }
     }
     if(!id && user){
@@ -324,34 +321,46 @@ export default function TripForm({ id }: { id?: string }) {
     <FormComponent
       fields={formFields}
       handleSubmit={async (values: Record<string, any>) => {
+        const allExpenses = [...fixedExpenses?.filter((expense) => expense?.description && expense?.amount), ...expenses?.filter((expense) => expense?.description && expense?.amount)]
+
         const payload = {
-          ...values,
+          id: generateId(),
           type: "depot",
+          date: new Date(values?.date),
+          vehicleId: values?.vehicleId,
+          driverId: values?.driverId,
+          helperId: values?.helperId || null,
           items: items?.filter((item) => item?.route && item?.count),
-          expenses: [...fixedExpenses?.filter((expense) => expense?.description && expense?.amount), ...expenses?.filter((expense) => expense?.description && expense?.amount)],
-          routes: tripRoutesDepot || [],
+          expenses: allExpenses,
+
+          count: items?.reduce((acc, item) => acc + (item?.count || 0), 0),
+          fuel: items?.reduce((acc, item) => acc + (item?.route?.expense?.fuel || 0) * (item?.count || 0), 0),
+          income: items?.reduce((acc, item) => acc + ((((item?.route?.income?.fuel || 0) * (fuelPrice || 0)) + (item?.route?.income?.fixed || 0)) * (item?.count || 0)), 0),
+          expense: allExpenses?.reduce((acc, expense) => acc + (expense?.amount || 0), 0),
+
+          routes: id && data ? data?.routes : user?.activeOrganization?.metadata?.routeConfigs?.[user?.activeOrganization?.metadata?.routeConfigs?.length - 1]?.id || "",
           fuelPrice: fuelPrice || 0,
         }
         if(id){
-          return await updateTrip({ data: { id: id, values: payload } })
+          return await updateData({ data: { table: "trips", values: payload, title: "Trip", id } })
         }else{
-          return await createTrip({ data: { values: payload }})
+          return await createData({ data: { table: "trips", values: payload, title: "Trip" } })
         }
       }}
       values={id && data ? data : {}}
       onSuccess={() => {
         navigate({
-          to: `/services/regal-transtrade/depot`
+          to: `/trips/depot`
         })
       }}
       onCancel={() => {
         navigate({
-          to: `/services/regal-transtrade/depot`
+          to: `/trips/depot`
         })
       }}
       options={{
         isLoading,
-        queryKey: 'services',
+        queryKey: 'trips',
       }}
       children={(
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-2">

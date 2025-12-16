@@ -1,0 +1,73 @@
+import { ColumnDef } from "@tanstack/react-table"
+import { TableColumnHeader } from "@/components/table/table-column-header"
+import { TableRowActions } from "@/components/table/table-row-actions"
+import { AnyType, TableActionType } from "@/lib/types"
+import { assets, employees, trips } from "@/lib/db/schema"
+import { Badge } from "@/components/ui/badge"
+import AvatarComponent from "@/components/common/avatar-component"
+import { formatCurrency, formatDate } from "@/lib/utils"
+
+export const tripDepotColumns = ({
+  actions
+}: {
+  actions?: TableActionType
+}): ColumnDef<typeof trips.$inferSelect & {
+  vehicle: typeof assets.$inferSelect,
+  driver: typeof employees.$inferSelect,
+  helper: typeof employees.$inferSelect,
+}>[] => [
+  {
+    id: "date",
+    header: ({ column }) => <TableColumnHeader column={column} title="Date" />,
+    cell: ({ row }) => formatDate(row?.original?.date),
+  },
+  {
+    accessorKey: "vehicle.metadata.registrationNumber",
+    header: ({ column }) => <TableColumnHeader column={column} title="Vehicle" />,
+  },
+  {
+    id: "driver",
+    header: ({ column }) => <TableColumnHeader column={column} title="Driver" />,
+    cell: ({ row }) => row?.original?.driver ? <AvatarComponent user={{
+      ...row?.original?.driver,
+      email: row?.original?.driver?.phone
+    }} /> : "N/A",
+  },
+  {
+    id: "helper",
+    header: ({ column }) => <TableColumnHeader column={column} title="Helper" />,
+    cell: ({ row }) => row?.original?.helper ? <AvatarComponent user={{
+      ...row?.original?.helper,
+      email: row?.original?.helper?.phone
+    }} /> : "N/A",
+  },
+  {
+    id: "items",
+    header: ({ column }) => <TableColumnHeader column={column} title="Trips" />,
+    cell: ({ row }: AnyType) => (
+      <div className="flex flex-col gap-1">
+        {row?.original?.items?.map((item: any, index: number) => (
+          <Badge key={index} variant="outline"><span>{item?.route?.to === 'PL' ? 'CPA to PL' : item?.route?.to}</span>:<span>{item.count}</span></Badge>
+        ))}
+        <Badge><span>Total</span>:<span>{row?.original?.count}</span></Badge>
+      </div>
+    ),
+  },
+  {
+    id: "expenses",
+    header: ({ column }) => <TableColumnHeader column={column} title="Expenses" />,
+    cell: ({ row }: AnyType) => (
+      <div className="flex flex-col gap-1">
+        {row?.original?.expenses?.map((item: any, index: number) => (
+          <Badge key={index} variant="outline"><span>{item.description}</span>:<span>{formatCurrency(item.amount)}</span></Badge>
+        ))}
+        <Badge><span>Total</span>:<span>{formatCurrency(row?.original?.expense)}</span></Badge>
+      </div>
+    ),
+  },
+  {
+    id: "actions",
+    header: ({ column }) => <TableColumnHeader column={column} title="Actions" className="text-right" />,
+    cell: ({ row }) => <TableRowActions row={row} actions={actions} />,
+  },
+]

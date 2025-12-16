@@ -1,6 +1,7 @@
 import LoadingComponent from "@/components/common/loading-component";
 import { getUser } from "@/lib/auth/functions";
 import { organizations, users } from "@/lib/db/schema";
+import { AnyType } from "@/lib/types";
 import { authRoutes } from "@/lib/variables";
 import { useQuery } from "@tanstack/react-query";
 import { useRouter } from "@tanstack/react-router";
@@ -9,7 +10,9 @@ import { createContext, ReactNode, useContext, useEffect } from "react";
 type AuthStateType = {
   user: typeof users.$inferSelect & {
     activeOrganizationId: string,
-    activeOrganization: typeof organizations.$inferSelect | null,
+    activeOrganization: typeof organizations.$inferSelect & {
+      metadata: AnyType
+    } | null,
     organizations: typeof organizations.$inferSelect[] | null | undefined
   } | null | undefined,
   refetch: () => Promise<void>

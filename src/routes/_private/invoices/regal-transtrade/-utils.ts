@@ -1,8 +1,9 @@
+import { getUser } from "@/lib/auth/functions"
 import { authOrgMiddleware } from "@/lib/auth/middleware"
 import { db } from "@/lib/db"
-import { getWhereArgs } from "@/lib/db/functions"
-import { invoiceEntities, invoicePayments, invoices, services } from "@/lib/db/schema"
-import { depotTripServiceTypeId, portlinkPartnerId } from "@/lib/organizations/regal-transtrade"
+import { getDatas, getWhereArgs } from "@/lib/db/functions"
+import { invoiceEntities, invoicePayments, invoices, trips } from "@/lib/db/schema"
+import { portlinkPartnerId } from "@/lib/organizations/regal-transtrade"
 import { AnyType } from "@/lib/types"
 import { formatMonth } from "@/lib/utils"
 import { createServerFn } from "@tanstack/react-start"
@@ -25,14 +26,19 @@ export const createDepotTripInvoice = createServerFn({ method: "POST" })
     
     try {
       return await db.transaction(async (tx) => {
-        const trips: typeof services.$inferSelect[] = await tx.query.services.findMany({
-          where: and(...getWhereArgs(context?.session?.activeOrganizationId, services, {
-            typeId: depotTripServiceTypeId,
-            from: {
-              gte: new Date(values?.from),
-              lte: new Date(values?.to)
+        const user = await getUser()
+
+        const response = await getDatas({
+          data: {
+            table: "trips",
+            where: {
+              type: "depot",
+              date: {
+                gte: new Date(values?.from),
+                lte: new Date(values?.to)
+              }
             }
-          }))
+          }
         })
         
         let amount = 0
@@ -51,11 +57,10 @@ export const createDepotTripInvoice = createServerFn({ method: "POST" })
           title: "Line Trailer: Other Depot Trip Fuel Details",
           items: {}
         }
-        trips?.forEach((trip: AnyType) => {
-          expense += trip?.metadata?.expenses?.reduce((total: number, expense: AnyType) => total + expense?.amount, 0)
-          trip?.metadata?.items?.forEach((item: AnyType) => {
-            amount += item?.count * ((item?.route?.income?.fuel * trip?.metadata?.fuelPrice) + item?.route?.income?.fixed)
-
+        response?.result?.forEach((trip: AnyType) => {
+          expense += Number(trip?.expense || 0)
+          amount += Number(trip?.income || 0)
+          trip?.items?.forEach((item: AnyType) => {
             if(item?.route?.income?.fixed){
               let key = "otherDepotTripAmount"
               if(["PL", "PCT (Import)", "PCT (Export)"].includes(item?.route?.to)){
@@ -77,13 +82,13 @@ export const createDepotTripInvoice = createServerFn({ method: "POST" })
                 ...invoiceItems.items[otherDepotTripFuelIndex],
                 particulars: invoiceItems.items[otherDepotTripFuelIndex]?.particulars,
                 quantity: invoiceItems.items[otherDepotTripFuelIndex]?.quantity + (item?.count * item?.route?.income?.fuel),
-                unitPrice: trip?.metadata?.fuelPrice,
-                total: (invoiceItems.items[otherDepotTripFuelIndex]?.quantity + (item?.count * item?.route?.income?.fuel)) * trip?.metadata?.fuelPrice
+                unitPrice: trip?.fuelPrice,
+                total: (invoiceItems.items[otherDepotTripFuelIndex]?.quantity + (item?.count * item?.route?.income?.fuel)) * trip?.fuelPrice
               }
               invoiceFuels.items[item?.route?.to] = {
                 tripFuel: item?.route?.income?.fuel,
-                tripCount: (invoiceFuels?.items?.[item?.route?.to]?.count || 0) + item?.count,
-                fuelQuantity: ((invoiceFuels?.items?.[item?.route?.to]?.count || 0) + item?.count) * item?.route?.income?.fuel,
+                tripCount: (invoiceFuels?.items?.[item?.route?.to]?.tripCount || 0) + item?.count,
+                fuelQuantity: ((invoiceFuels?.items?.[item?.route?.to]?.tripCount || 0) + item?.count) * item?.route?.income?.fuel,
               }
             }
           })
@@ -94,13 +99,19 @@ export const createDepotTripInvoice = createServerFn({ method: "POST" })
           items: {}
         }
 
-        trips[0]?.metadata?.["routes"]?.forEach((route: AnyType) => {
-          invoiceFuelItems.items[route?.to] = {
-            tripFuel: route?.income?.fuel || 0,
-            tripCount: invoiceFuels?.items?.[route?.to]?.tripCount || 0,
-            fuelQuantity: ((invoiceFuels?.items?.[route?.to]?.tripCount || 0) * (route?.income?.fuel || 0)) || 0,
-          }
-        })
+        // Find the route configuration used in the trips
+        const firstTripRouteId = response?.result?.[0]?.routes
+        const routeConfig = user?.activeOrganization?.metadata?.routeConfigs?.find((route: AnyType) => route?.id === firstTripRouteId)
+
+        if (routeConfig?.routes) {
+          routeConfig.routes.forEach((route: AnyType) => {
+            invoiceFuelItems.items[route?.to] = {
+              tripFuel: route?.income?.fuel || 0,
+              tripCount: invoiceFuels?.items?.[route?.to]?.tripCount || 0,
+              fuelQuantity: ((invoiceFuels?.items?.[route?.to]?.tripCount || 0) * (route?.income?.fuel || 0)) || 0,
+            }
+          })
+        }
 
         const [result] = await tx.insert(invoices).values({
           id: generateId(),

@@ -2,8 +2,6 @@ import FormComponent from "@/components/form/form-component"
 import ModalComponent from "@/components/modal/modal-component"
 import { AnyType, FormFieldType, ModalStateType } from "@/lib/types"
 import { stringRequiredValidation } from "@/lib/validations"
-import { pdf } from "@react-pdf/renderer"
-import InvoiceView from "@/routes/_private/invoices/regal-transtrade/-view"
 import { createDepotTripInvoice } from "./-utils"
 import { useNavigate } from "@tanstack/react-router"
 

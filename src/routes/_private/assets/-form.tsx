@@ -6,6 +6,7 @@ import { FormFieldType } from "@/lib/types"
 import { stringRequiredValidation, stringValidation } from "@/lib/validations"
 import { generateId } from "better-auth"
 import { useApp } from "@/providers/app-provider"
+import { vehicleAssetTypeId } from "@/lib/organizations/regal-transtrade"
 
 export default function AssetForm() {
   const { assetModal, setAssetModal } = useApp()
@@ -89,7 +90,7 @@ export default function AssetForm() {
           fields={formFields}
           handleSubmit={(values: Record<string, any>) => {
             const payload = {
-              typeId: "kP47g0lpyblJWVgH0XTHEWh3ftZMhuk0",
+              typeId: vehicleAssetTypeId,
               metadata: {
                 registrationNumber: values.registrationNumber,
                 registrationDate: values.registrationDate,

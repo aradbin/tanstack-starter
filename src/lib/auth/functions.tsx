@@ -58,19 +58,27 @@ export const getUser = createServerFn()
     if (context?.user) {
       const organizations = await getUserOrganizations()
 
-      if (!context?.session?.activeOrganizationId && organizations?.length) {
-        const activeOrganizationId = await setActiveOrganization(organizations[0].id)
+      let activeOrganization: AnyType = null;
+      if (!context?.session?.activeOrganizationId) {
+        if(organizations?.length){
+          activeOrganization = await setActiveOrganization(organizations[0].id)
         
-        if (context?.session) {
-          await db.update(sessions).set({ activeOrganizationId: organizations[0].id }).where(eq(sessions.id, context.session.id))
-          context.session.activeOrganizationId = activeOrganizationId
+          if (context?.session) {
+            await db.update(sessions).set({ activeOrganizationId: activeOrganization?.id }).where(eq(sessions.id, context.session.id))
+            context.session.activeOrganizationId = activeOrganization?.id
+          }
         }
+      }else{
+        activeOrganization = organizations?.find(org => org.id === context?.session?.activeOrganizationId) || null
       }
 
       return {
         ...context?.user,
         activeOrganizationId: context?.session?.activeOrganizationId,
-        activeOrganization: context?.session?.activeOrganizationId ? organizations.find((org) => org.id === context?.session?.activeOrganizationId) : null,
+        activeOrganization: context?.session?.activeOrganizationId ? {
+          ...activeOrganization,
+          metadata: JSON.parse(activeOrganization?.metadata || "{}")
+        } : null,
         organizations,
       }
     }
@@ -111,5 +119,5 @@ const setActiveOrganization = async (organizationId: string) => {
     }
   })
 
-  return response?.id
+  return response
 }
