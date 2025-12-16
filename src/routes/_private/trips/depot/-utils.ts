@@ -18,10 +18,11 @@ export const getTrips = async (
     totalIncome += Number(trip?.income) || 0
   })
 
-  response['totalTrips'] = totalTrips
-  response['totalFuel'] = totalFuel
-  response['totalExpense'] = totalExpense
-  response['totalIncome'] = totalIncome
-
-  return response
+  return {
+    ...response,
+    totalTrips,
+    totalFuel,
+    totalExpense,
+    totalIncome
+  }
 }

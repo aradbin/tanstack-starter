@@ -3,20 +3,19 @@ import { useQuery } from "@tanstack/react-query";
 import { QueryParamType } from "@/lib/db/functions";
 import { Link } from "@tanstack/react-router";
 import { endOfMonth, startOfMonth, subMonths } from "date-fns";
-import { getTrips } from "../services/regal-transtrade/-utils";
 import { Card, CardAction, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { depotTripServiceTypeId } from "@/lib/organizations/regal-transtrade";
-import { formatCurrency, formatDate } from "@/lib/utils";
+import { formatCurrency } from "@/lib/utils";
 import { getInvoices } from "../invoices/-utils";
 import { AnyType } from "@/lib/types";
+import { getTrips } from "../trips/depot/-utils";
 
 export default function TripSection() {
   const currentMonthQuery: QueryParamType = {
-    table: "services",
+    table: "trips",
     where: {
-      typeId: depotTripServiceTypeId,
-      from: {
+      type: "depot",
+      date: {
         gte: new Date(startOfMonth(new Date())),
         lte: new Date(endOfMonth(new Date())),
       }
@@ -24,10 +23,10 @@ export default function TripSection() {
   }
 
   const lastMonthQuery: QueryParamType = {
-    table: "services",
+    table: "trips",
     where: {
-      typeId: depotTripServiceTypeId,
-      from: {
+      type: "depot",
+      date: {
         gte: new Date(startOfMonth(subMonths(new Date(), 1))),
         lte: new Date(endOfMonth(subMonths(new Date(), 1))),
       },
@@ -88,14 +87,15 @@ export default function TripSection() {
   }
 
   const percentageChangeTrip = calculatePercentageChange(depotTripsCurrentMonth?.totalTrips, depotTripsLastMonth?.totalTrips)
-  const percentageChangeExpenses = calculatePercentageChange(depotTripsCurrentMonth?.totalExpenses, depotTripsLastMonth?.totalExpenses)
-  const percentageChangeFuelExpense = calculatePercentageChange(depotTripsCurrentMonth?.totalFuelExpense, depotTripsLastMonth?.totalFuelExpense)
+  const percentageChangeExpenses = calculatePercentageChange(depotTripsCurrentMonth?.totalExpense, depotTripsLastMonth?.totalExpense)
+  const percentageChangeIncome = calculatePercentageChange(depotTripsCurrentMonth?.totalIncome, depotTripsLastMonth?.totalIncome)
+  const percentageChangeFuel = calculatePercentageChange(depotTripsCurrentMonth?.totalFuel, depotTripsLastMonth?.totalFuel)
   const percentageProfitLoss = calculatePercentageChange(invoices?.amount, invoices?.expense)
 
   return (
     <div className="flex flex-col gap-4">
       <div className="grid gap-4 md:gap-6 grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
-        <Link to="/services/regal-transtrade/depot">
+        <Link to="/trips/depot">
           <Card>
             <CardHeader>
               <CardDescription>Total Trips</CardDescription>
@@ -118,12 +118,12 @@ export default function TripSection() {
           </Card>
         </Link>
 
-        <Link to="/services/regal-transtrade/depot">
+        <Link to="/trips/depot">
           <Card>
             <CardHeader>
               <CardDescription>Total Expenses</CardDescription>
               <CardTitle className="text-xl font-semibold">
-                {depotTripsCurrentMonthLoading ? <Loader2 className="animate-spin size-6 mt-2" /> : formatCurrency(depotTripsCurrentMonth?.totalExpenses)}
+                {depotTripsCurrentMonthLoading ? <Loader2 className="animate-spin size-6 mt-2" /> : formatCurrency(depotTripsCurrentMonth?.totalExpense)}
               </CardTitle>
               <CardAction>
                 <Badge variant={percentageChangeExpenses >= 0 ? "default" : "destructive"}>
@@ -135,37 +135,59 @@ export default function TripSection() {
             <CardHeader>
               <CardDescription>Last month</CardDescription>
               <CardTitle className="text-xl font-semibold">
-                {depotTripsLastMonthLoading ? <Loader2 className="animate-spin size-5 mt-2" /> : formatCurrency(depotTripsLastMonth?.totalExpenses)}
+                {depotTripsLastMonthLoading ? <Loader2 className="animate-spin size-5 mt-2" /> : formatCurrency(depotTripsLastMonth?.totalExpense)}
               </CardTitle>
             </CardHeader>
           </Card>
         </Link>
 
-        <Link to="/services/regal-transtrade/depot">
+        <Link to="/trips/depot">
           <Card>
             <CardHeader>
-              <CardDescription>Total Fuel Cost</CardDescription>
+              <CardDescription>Total Income</CardDescription>
               <CardTitle className="text-xl font-semibold">
-                {depotTripsCurrentMonthLoading ? <Loader2 className="animate-spin size-6 mt-2" /> : formatCurrency(depotTripsCurrentMonth?.totalFuelExpense)}
+                {depotTripsCurrentMonthLoading ? <Loader2 className="animate-spin size-6 mt-2" /> : formatCurrency(depotTripsCurrentMonth?.totalIncome)}
               </CardTitle>
               <CardAction>
-                <Badge variant={percentageChangeFuelExpense >= 0 ? "default" : "destructive"}>
-                  {percentageChangeFuelExpense >= 0 ? <TrendingUp /> : <TrendingDown />}
-                  <span className="font-medium">{Math.abs(percentageChangeFuelExpense).toFixed(0)}%</span>
+                <Badge variant={percentageChangeIncome >= 0 ? "default" : "destructive"}>
+                  {percentageChangeIncome >= 0 ? <TrendingUp /> : <TrendingDown />}
+                  <span className="font-medium">{Math.abs(percentageChangeIncome).toFixed(0)}%</span>
                 </Badge>
               </CardAction>
             </CardHeader>
             <CardHeader>
               <CardDescription>Last month</CardDescription>
               <CardTitle className="text-xl font-semibold">
-                {depotTripsLastMonthLoading ? <Loader2 className="animate-spin size-5 mt-2" /> : formatCurrency(depotTripsLastMonth?.totalFuelExpense)}
+                {depotTripsLastMonthLoading ? <Loader2 className="animate-spin size-5 mt-2" /> : formatCurrency(depotTripsLastMonth?.totalIncome)}
               </CardTitle>
             </CardHeader>
           </Card>
         </Link>
-      </div>
-      <div className="grid gap-4 md:gap-6 grid-cols-1 md:grid-cols-2 lg:grid-cols-2">
-        <Link to="/invoices/regal-transtrade">
+
+        <Link to="/trips/depot">
+          <Card>
+            <CardHeader>
+              <CardDescription>Total Fuel</CardDescription>
+              <CardTitle className="text-xl font-semibold">
+                {depotTripsCurrentMonthLoading ? <Loader2 className="animate-spin size-6 mt-2" /> : formatCurrency(depotTripsCurrentMonth?.totalFuel)}
+              </CardTitle>
+              <CardAction>
+                <Badge variant={percentageChangeFuel >= 0 ? "default" : "destructive"}>
+                  {percentageChangeFuel >= 0 ? <TrendingUp /> : <TrendingDown />}
+                  <span className="font-medium">{Math.abs(percentageChangeFuel).toFixed(0)}%</span>
+                </Badge>
+              </CardAction>
+            </CardHeader>
+            <CardHeader>
+              <CardDescription>Last month</CardDescription>
+              <CardTitle className="text-xl font-semibold">
+                {depotTripsLastMonthLoading ? <Loader2 className="animate-spin size-5 mt-2" /> : formatCurrency(depotTripsLastMonth?.totalFuel)}
+              </CardTitle>
+            </CardHeader>
+          </Card>
+        </Link>
+
+        <Link to="/invoices/regal-transtrade" className="col-span-2">
           <Card>
             <CardHeader>
               <CardDescription>Total Invoice Amount</CardDescription>
