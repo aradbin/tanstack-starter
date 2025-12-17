@@ -22,11 +22,11 @@ export const mainNavItems: NavigationType[] = [
   //   ],
   // },
   {
-    title: "Services",
+    title: "Trips",
     items: [
       {
         title: "Depot Trips",
-        href: "/services/regal-transtrade/depot",
+        href: "/trips/depot",
         icon: BaggageClaim,
       },
       // {

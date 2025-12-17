@@ -219,7 +219,7 @@ export default function TripSection() {
                 {invoicesLoading ? <Loader2 className="animate-spin size-6 mt-2" /> : formatCurrency(invoices?.paid)}
               </CardTitle>
               <CardAction>
-                <Badge variant={percentagePaid > 0 ? "default" : "destructive"} className={percentagePaid >= 100 ? "bg-green-500/20 text-white" : percentagePaid > 0 ? "bg-amber-500/20 text-white" : ""}>
+                <Badge variant={percentagePaid > 0 ? "default" : "destructive"} className={percentagePaid >= 100 ? "bg-green-500/20 text-white" : percentagePaid > 0 ? "bg-amber-500 text-white" : ""}>
                   <span className="font-medium">{Math.abs(percentagePaid).toFixed(0)}%</span>
                 </Badge>
               </CardAction>
