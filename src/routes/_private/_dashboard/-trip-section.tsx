@@ -91,6 +91,7 @@ export default function TripSection() {
   const percentageChangeIncome = calculatePercentageChange(depotTripsCurrentMonth?.totalIncome, depotTripsLastMonth?.totalIncome)
   const percentageChangeFuel = calculatePercentageChange(depotTripsCurrentMonth?.totalFuel, depotTripsLastMonth?.totalFuel)
   const percentageProfitLoss = calculatePercentageChange(invoices?.amount, invoices?.expense)
+  const percentagePaid = invoices?.amount ? ((invoices?.paid ?? 0) / invoices.amount) * 100 : 0
 
   return (
     <div className="flex flex-col gap-4">
@@ -187,7 +188,7 @@ export default function TripSection() {
           </Card>
         </Link>
 
-        <Link to="/invoices/regal-transtrade" className="col-span-2">
+        <Link to="/invoices/regal-transtrade">
           <Card>
             <CardHeader>
               <CardDescription>Total Invoice Amount</CardDescription>
@@ -201,19 +202,33 @@ export default function TripSection() {
                 </Badge>
               </CardAction>
             </CardHeader>
-            <CardHeader className="flex justify-between">
-              <div>
-                <CardDescription>Total Expense</CardDescription>
-                <CardTitle className="text-xl font-semibold">
-                  {invoicesLoading ? <Loader2 className="animate-spin size-5 mt-2" /> : formatCurrency(invoices?.expense)}
-                </CardTitle>
-              </div>
-              <div>
-                <CardDescription>Total Paid</CardDescription>
-                <CardTitle className="text-xl font-semibold">
-                  {invoicesLoading ? <Loader2 className="animate-spin size-5 mt-2" /> : formatCurrency(invoices?.paid)}
-                </CardTitle>
-              </div>
+            <CardHeader>
+              <CardDescription>Total Expense</CardDescription>
+              <CardTitle className="text-xl font-semibold">
+                {invoicesLoading ? <Loader2 className="animate-spin size-5 mt-2" /> : formatCurrency(invoices?.expense)}
+              </CardTitle>
+            </CardHeader>
+          </Card>
+        </Link>
+
+        <Link to="/invoices/regal-transtrade">
+          <Card>
+            <CardHeader>
+              <CardDescription>Total Paid</CardDescription>
+              <CardTitle className="text-xl font-semibold">
+                {invoicesLoading ? <Loader2 className="animate-spin size-6 mt-2" /> : formatCurrency(invoices?.paid)}
+              </CardTitle>
+              <CardAction>
+                <Badge variant={percentagePaid > 0 ? "default" : "destructive"} className={percentagePaid >= 100 ? "bg-green-500/20 text-white" : percentagePaid > 0 ? "bg-amber-500/20 text-white" : ""}>
+                  <span className="font-medium">{Math.abs(percentagePaid).toFixed(0)}%</span>
+                </Badge>
+              </CardAction>
+            </CardHeader>
+            <CardHeader>
+              <CardDescription>Total Due</CardDescription>
+              <CardTitle className="text-xl font-semibold">
+                {invoicesLoading ? <Loader2 className="animate-spin size-5 mt-2" /> : formatCurrency(invoices?.amount - invoices?.paid)}
+              </CardTitle>
             </CardHeader>
           </Card>
         </Link>
