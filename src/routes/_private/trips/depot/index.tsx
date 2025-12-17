@@ -32,6 +32,9 @@ function RouteComponent() {
   const { vehicles, drivers, helpers, setDeleteModal } = useApp()
   const [invoiceModal, setInvoiceModal] = useState<ModalStateType>(null)
 
+  const defaultFrom = formatDateForInput(startOfMonth(new Date()))
+  const defaultTo = formatDateForInput(endOfMonth(new Date()))
+
   const query: QueryParamType = {
     table: "trips",
     relation: {
@@ -49,8 +52,8 @@ function RouteComponent() {
     where: {
       type: "depot",
       date: {
-        gte: params.from && isValid(new Date(params.from)) ? new Date(params.from) : new Date(startOfMonth(new Date())),
-        lte: params.to && isValid(new Date(params.to)) ? new Date(params.to) : new Date(endOfMonth(new Date())),
+        gte: params.from && isValid(new Date(params.from)) ? new Date(params.from) : new Date(defaultFrom),
+        lte: params.to && isValid(new Date(params.to)) ? new Date(params.to) : new Date(defaultTo),
       },
       ...params.vehicle ? { vehicleId: params.vehicle } : {},
       ...params.driver ? { driverId: params.driver } : {},
@@ -80,8 +83,8 @@ function RouteComponent() {
           from: params.from,
           to: params.to
         } : {
-          from: formatDateForInput(startOfMonth(new Date())),
-          to: formatDateForInput(endOfMonth(new Date()))
+          from: defaultFrom,
+          to: defaultTo
         }, label: "Date", type: "date", icon: Calendar, multiple: true },
         { key: "vehicle", value: params.vehicle, label: "Vehicle", options: vehicles },
         { key: "driver", value: params.driver, label: "Driver", type: "avatar", options: drivers },
