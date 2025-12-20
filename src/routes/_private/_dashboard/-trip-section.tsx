@@ -5,10 +5,10 @@ import { Link } from "@tanstack/react-router";
 import { endOfMonth, startOfMonth, subMonths } from "date-fns";
 import { Card, CardAction, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { formatCurrency } from "@/lib/utils";
+import { formatCurrency, formatDateForInput } from "@/lib/utils";
 import { getInvoices } from "../invoices/-utils";
 import { AnyType } from "@/lib/types";
-import { getTrips } from "../trips/depot/-utils";
+import { getTripsSummary } from "../trips/depot/-utils";
 
 export default function TripSection() {
   const currentMonthQuery: QueryParamType = {
@@ -16,8 +16,8 @@ export default function TripSection() {
     where: {
       type: "depot",
       date: {
-        gte: new Date(startOfMonth(new Date())),
-        lte: new Date(endOfMonth(new Date())),
+        gte: new Date(formatDateForInput(startOfMonth(new Date()))),
+        lte: new Date(formatDateForInput(endOfMonth(new Date()))),
       }
     }
   }
@@ -27,22 +27,22 @@ export default function TripSection() {
     where: {
       type: "depot",
       date: {
-        gte: new Date(startOfMonth(subMonths(new Date(), 1))),
-        lte: new Date(endOfMonth(subMonths(new Date(), 1))),
+        gte: new Date(formatDateForInput(startOfMonth(subMonths(new Date(), 1)))),
+        lte: new Date(formatDateForInput(endOfMonth(subMonths(new Date(), 1)))),
       },
     }
   }
 
   const { data: depotTripsCurrentMonth, isLoading: depotTripsCurrentMonthLoading } = useQuery({
-    queryKey: [currentMonthQuery?.table, currentMonthQuery?.where],
-    queryFn: async () => getTrips({
+    queryKey: [currentMonthQuery?.table, 'summary', currentMonthQuery?.where],
+    queryFn: async () => getTripsSummary({
       data: currentMonthQuery
     })
   })
 
   const { data: depotTripsLastMonth, isLoading: depotTripsLastMonthLoading } = useQuery({
-    queryKey: [lastMonthQuery?.table, lastMonthQuery?.where],
-    queryFn: async () => getTrips({
+    queryKey: [lastMonthQuery?.table, 'summary', lastMonthQuery?.where],
+    queryFn: async () => getTripsSummary({
       data: lastMonthQuery
     })
   })
@@ -145,7 +145,7 @@ export default function TripSection() {
         <Link to="/trips/depot">
           <Card>
             <CardHeader>
-              <CardDescription>Total Income</CardDescription>
+              <CardDescription>Total Income (Projected)</CardDescription>
               <CardTitle className="text-xl font-semibold">
                 {depotTripsCurrentMonthLoading ? <Loader2 className="animate-spin size-6 mt-2" /> : formatCurrency(depotTripsCurrentMonth?.totalIncome)}
               </CardTitle>
