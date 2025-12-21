@@ -1,7 +1,6 @@
 import { getDatas, TableType } from "@/lib/db/functions";
 import { assets, employees, partners, users } from "@/lib/db/schema";
 import { AnyType, ModalStateType } from "@/lib/types";
-import { getMembers } from "@/routes/_private/members/-utils";
 import { useQuery } from "@tanstack/react-query";
 import { createContext, Dispatch, ReactNode, SetStateAction, useContext, useState } from "react";
 
@@ -75,7 +74,13 @@ export function AppProvider({
   const { data: users } = useQuery({
     queryKey: ['members', 'users', 'all'],
     queryFn: async () => {
-      const members = await getMembers({ data: {} })
+      const members = await getDatas({ data: {
+        table: "members",
+        relation: {
+          user: true
+        }
+      } })
+
       return members?.result?.map((member) => (member.user)) || []
     }
   })
