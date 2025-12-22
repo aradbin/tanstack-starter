@@ -21,7 +21,7 @@ export default function ChatList({
         url: '/chats',
         params: {
           account_type: "WHATSAPP",
-          account_id: "oABSPAUgTnG7fkd1nW12aA",
+          account_id: "zYYuA-tCTuusgh14UZyVZw",
           ...pageParam
         }
       }

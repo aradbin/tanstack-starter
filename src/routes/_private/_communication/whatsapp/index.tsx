@@ -8,7 +8,7 @@ import { useState } from 'react'
 import ChatList from './-components.tsx/-chat-list'
 import ChatBox from './-components.tsx/-chat-box'
 
-export const Route = createFileRoute('/_private/whatsapp/')({
+export const Route = createFileRoute('/_private/_communication/whatsapp/')({
   component: RouteComponent,
 })
 

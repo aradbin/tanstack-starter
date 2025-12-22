@@ -1,7 +1,10 @@
-import { NavigationType, NavItemType } from "@/lib/types";
+import { AnyType, NavigationType, NavItemType } from "@/lib/types";
 import { BaggageClaim, Briefcase, BriefcaseBusiness, Contact, LayoutGrid, ListChecks, Mail, MapPin, MapPinned, MessageCircle, Settings, ShieldUser, Truck, Users, Wallet } from "lucide-react";
+import { organizations } from "@/lib/db/schema/users";
 
-export const mainNavItems: NavigationType[] = [
+export const mainNavItems = (organization: typeof organizations.$inferSelect & {
+  metadata: AnyType
+}): NavigationType[] => [
   {
     items: [
       {
@@ -36,21 +39,21 @@ export const mainNavItems: NavigationType[] = [
       // },
     ]
   },
-  // {
-  //   title: "Communication",
-  //   items: [
-  //     {
-  //       title: "WhatsApp",
-  //       href: "/whatsapp",
-  //       icon: MessageCircle,
-  //     },
-  //     {
-  //       title: "Email",
-  //       href: "/email",
-  //       icon: Mail,
-  //     },
-  //   ],
-  // },
+  {
+    title: "Communication",
+    items: [
+      {
+        title: "WhatsApp",
+        href: "/whatsapp",
+        icon: MessageCircle,
+      },
+      {
+        title: "Email",
+        href: "/email",
+        icon: Mail,
+      },
+    ],
+  },
   {
     title: "Assets",
     items: [
@@ -69,11 +72,11 @@ export const mainNavItems: NavigationType[] = [
         href: "/partners/contact",
         icon: Contact,
       },
-      {
-        title: "Customers",
-        href: "/partners/customer",
-        icon: Briefcase,
-      },
+      ...organization?.metadata?.partnerRoles?.map((role) => ({
+        title: `${role?.name}s`,
+        href: `/partners/${role?.id}`,
+        icon: Briefcase
+      })),
     ],
   },
   {

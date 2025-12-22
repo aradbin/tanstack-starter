@@ -19,8 +19,10 @@ import {
   useSidebar,
 } from "@/components/ui/sidebar"
 import { mainNavItems } from "./nav-items"
+import { useAuth } from "@/providers/auth-provider"
 
 export function NavMain() {
+  const { user } = useAuth()
   const { openMobile, setOpenMobile } = useSidebar()
 
   const renderMenuItem = (item: NavItemType) => {
@@ -71,7 +73,7 @@ export function NavMain() {
 
   return (
     <>
-      {mainNavItems?.map((group, index) => (
+      {mainNavItems(user?.activeOrganization)?.map((group, index) => (
         <SidebarGroup key={index} className="px-2 py-0">
           {group?.title && (
             <SidebarGroupLabel>{group?.title}</SidebarGroupLabel>

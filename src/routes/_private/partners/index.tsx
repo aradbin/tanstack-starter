@@ -1,7 +1,7 @@
 import { Card, CardHeader, CardTitle } from '@/components/ui/card'
 import { useAuth } from '@/providers/auth-provider'
 import { createFileRoute, Link } from '@tanstack/react-router'
-import { Contact, Users } from 'lucide-react'
+import { Briefcase, Contact } from 'lucide-react'
 
 export const Route = createFileRoute('/_private/partners/')({
   component: RouteComponent,
@@ -12,7 +12,7 @@ function RouteComponent() {
 
   const links = [
     { to: '/partners/contact', title: 'Contacts', icon: <Contact /> },
-    ...user?.activeOrganization?.metadata?.partnerRoles?.map((role: { id: string; name: string }) => ({ to: `/partners/${role?.id}`, title: role?.name, icon: <Users /> })) || []
+    ...user?.activeOrganization?.metadata?.partnerRoles?.map((role: { id: string; name: string }) => ({ to: `/partners/${role?.id}`, title: `${role?.name}s`, icon: <Briefcase /> })) || []
   ];
   
   return (
