@@ -26,6 +26,9 @@ export default function MemberForm({ modal, setModal }: {
     queryKey: ['members', modal?.id],
     queryFn: async () => getData({ data: {
       table: "members",
+      relation: {
+        user: true
+      },
       id: modal?.id
     }}),
     enabled: !!modal?.id && modal?.isOpen
@@ -82,7 +85,11 @@ export default function MemberForm({ modal, setModal }: {
               }
             }}
           )}
-          values={modal?.isOpen && modal?.id && data ? data : {}}
+          values={modal?.isOpen && modal?.id && data ? {
+            name: data?.user?.name,
+            email: data?.user?.email,
+            role: data?.role,
+          } : {}}
           onSuccess={() => {
             props.close()
           }}

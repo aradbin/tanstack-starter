@@ -35,6 +35,11 @@ function RouteComponent() {
       page: params.page,
       pageSize: params.pageSize
     },
+    where: {
+      role: {
+        ne: "owner"
+      }
+    },
     search: {
       term: params.search,
       key: ["name"]

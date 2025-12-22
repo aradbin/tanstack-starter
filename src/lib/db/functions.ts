@@ -1,7 +1,7 @@
 import { createServerFn } from "@tanstack/react-start"
 import { db } from "@/lib/db"
 import * as schema from "@/lib/db/schema"
-import { and, desc, eq, gte, ilike, inArray, isNull, lte, or } from "drizzle-orm"
+import { and, desc, eq, gte, ilike, inArray, isNull, lte, ne, or } from "drizzle-orm"
 import { defaultPageSize } from "../variables"
 import { AnyType, PaginationType, SearchType, SortType, WhereType } from "../types"
 import { authOrgMiddleware } from "../auth/middleware"
@@ -62,6 +62,8 @@ export const getWhereArgs = (activeOrganizationId: string, tableSchema: AnyType,
             return gte(column, val)
           case "lte":
             return lte(column, val)
+          case "ne":
+            return ne(column, val)
           default:
             return eq(column, val)
         }
