@@ -88,7 +88,10 @@ export default function PartnerForm({ modal, setModal }: {
                 data: {
                   table: "partners",
                   id: data?.id,
-                  values,
+                  values: {
+                    ...values,
+                    role: role
+                  },
                   title: capitalize(role)
                 }
               })
@@ -98,7 +101,8 @@ export default function PartnerForm({ modal, setModal }: {
                   table: "partners",
                   values: {
                     ...values,
-                    id: generateId()
+                    id: generateId(),
+                    role: role
                   },
                   title: capitalize(role)
                 }

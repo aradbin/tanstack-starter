@@ -38,7 +38,6 @@ export const partnerColumns = ({
     accessorKey: "createdAt",
     header: ({ column }) => <TableColumnHeader column={column} title="Created At" />,
     cell: ({ row }) => formatDateTime(row.original.createdAt),
-    enableSorting: true,
   },
   {
     id: "actions",
