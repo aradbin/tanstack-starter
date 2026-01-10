@@ -39,21 +39,21 @@ export const mainNavItems = (organization: typeof organizations.$inferSelect & {
       // },
     ]
   },
-  {
-    title: "Communication",
-    items: [
-      {
-        title: "WhatsApp",
-        href: "/whatsapp",
-        icon: MessageCircle,
-      },
-      {
-        title: "Email",
-        href: "/email",
-        icon: Mail,
-      },
-    ],
-  },
+  // {
+  //   title: "Communication",
+  //   items: [
+  //     {
+  //       title: "WhatsApp",
+  //       href: "/whatsapp",
+  //       icon: MessageCircle,
+  //     },
+  //     {
+  //       title: "Email",
+  //       href: "/email",
+  //       icon: Mail,
+  //     },
+  //   ],
+  // },
   {
     title: "Assets",
     items: [
@@ -64,21 +64,21 @@ export const mainNavItems = (organization: typeof organizations.$inferSelect & {
       },
     ]
   },
-  {
-    title: "CRM",
-    items: [
-      {
-        title: "Contacts",
-        href: "/partners/contact",
-        icon: Contact,
-      },
-      ...organization?.metadata?.partnerRoles?.map((role) => ({
-        title: `${role?.name}s`,
-        href: `/partners/${role?.id}`,
-        icon: Briefcase
-      })),
-    ],
-  },
+  // {
+  //   title: "CRM",
+  //   items: [
+  //     {
+  //       title: "Contacts",
+  //       href: "/partners/contact",
+  //       icon: Contact,
+  //     },
+  //     ...organization?.metadata?.partnerRoles?.map((role) => ({
+  //       title: `${role?.name}s`,
+  //       href: `/partners/${role?.id}`,
+  //       icon: Briefcase
+  //     })),
+  //   ],
+  // },
   {
     title: "HRM",
     items: [
@@ -104,16 +104,16 @@ export const mainNavItems = (organization: typeof organizations.$inferSelect & {
       },
     ],
   },
-  {
-    title: "Organization",
-    items: [
-      {
-        title: "Members",
-        href: "/members",
-        icon: Users,
-      }
-    ],
-  },
+  // {
+  //   title: "Organization",
+  //   items: [
+  //     {
+  //       title: "Members",
+  //       href: "/members",
+  //       icon: Users,
+  //     }
+  //   ],
+  // },
 ]
 
 export const footerNavItems: NavItemType[] = []
